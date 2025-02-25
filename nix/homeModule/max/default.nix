@@ -9,13 +9,24 @@ let
   inherit (kor) optionals;
   inherit (user.spinyrz) izNiksDev izSemaDev saizAtList;
 
-  niksDevPackages = with pkgs; [ pandoc ];
+  niksDevPackages = with pkgs; [
+    pandoc
+    gitkraken
+  ];
 
   semaDevPackages = with pkgs; [
     krita
     calibre
     virt-manager
     gimp
+    discord-ptb
+  ];
+
+  candidatePackages = with pkgs; [
+    qpwgraph
+    tenacity
+    lapce
+    pavucontrol # TODO: pwvucontrol doesnt display virtual sources
   ];
 
 in

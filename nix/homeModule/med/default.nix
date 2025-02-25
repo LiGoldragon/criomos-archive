@@ -74,6 +74,7 @@ let
       lf
       tokenizedWrappedHub
       tokenizedWrappedGhCli
+      hugo
       #== rust
       watchexec
       zola

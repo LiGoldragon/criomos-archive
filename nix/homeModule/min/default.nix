@@ -192,6 +192,7 @@ let
     # Other
     meld # GTK diff editor
     gg-jj # Jujutsu GUI
+    lazyjj # # jujutsu TUI
     just
     difftastic
     tokei # Lines of code
@@ -390,6 +391,10 @@ mkIf saizAtList.min {
     gpg = {
       enable = true;
       settings = { };
+    };
+
+    joshuto = {
+      enable = izNiksDev;
     };
 
     jujutsu = {
