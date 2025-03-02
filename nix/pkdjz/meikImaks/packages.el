@@ -31,6 +31,10 @@
 
 (use-package json-mode)
 
+(use-package yaml-pro
+  :config
+  (add-to-list 'auto-mode-alist '("\\.yaml\\'" . yaml-pro-ts-mode)))
+
 (use-package haskell-mode)
 
 (use-package tera-mode)
