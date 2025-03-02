@@ -2,7 +2,7 @@
   description = "CriomOS";
 
   inputs = {
-    hob.url = "github:criome/hob/4thCapricorn5918AM";
+    hob.url = "github:criome/hob";
 
     attic.url = "github:zhaofengli/attic";
 

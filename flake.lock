@@ -581,16 +581,15 @@
         "xdg-desktop-portal-hyprland": "xdg-desktop-portal-hyprland"
       },
       "locked": {
-        "lastModified": 1736609012,
-        "narHash": "sha256-3FNGCjKbqlEgpvSV4iA8wzAwLMIR7FREW+KbkmcdVZ4=",
+        "lastModified": 1740913901,
+        "narHash": "sha256-HBya1Depgi3QGZt1tTHsvmZb3FgJsMhgUm4urMxYmpc=",
         "owner": "criome",
         "repo": "hob",
-        "rev": "b2a264be69f6422d25978c54a4f3b4dcf9ff9c1e",
+        "rev": "1540c93780834b66d7586dd846eebb6fa8c49404",
         "type": "github"
       },
       "original": {
         "owner": "criome",
-        "ref": "4thCapricorn5918AM",
         "repo": "hob",
         "type": "github"
       }
@@ -603,11 +602,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1735053786,
-        "narHash": "sha256-Gm+0DcbUS338vvkwyYWms5jsWlx8z8MeQBzcnIDuIkw=",
+        "lastModified": 1740845322,
+        "narHash": "sha256-AXEgFj3C0YJhu9k1OhbRhiA6FnDr81dQZ65U3DhaWpw=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "35b98d20ca8f4ca1f6a2c30b8a2c8bb305a36d84",
+        "rev": "fcac3d6d88302a5e64f6cb8014ac785e08874c8d",
         "type": "github"
       },
       "original": {
