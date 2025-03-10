@@ -171,7 +171,7 @@ let
 
   programmingTools = with pkgs; [
     # Nix
-    nixd
+    nil
     nixfmt-rfc-style
     npins
     # Clojure
@@ -439,16 +439,13 @@ mkIf saizAtList.min {
           open-editors-visible = false;
           font-size = 14;
         };
-        lapce-nix.lsp-path = "${pkgs.nixd}/bin/nixd";
       };
     };
 
     zed-editor = {
       enable = true;
       package = pkgs.zed-editor;
-      extraPackages = with pkgs; [
-        nixd
-      ];
+      extraPackages = with pkgs; [ ];
       userKeymaps = optionalAttrs iuzColemak colemakZedKeys;
       userSettings =
         let
