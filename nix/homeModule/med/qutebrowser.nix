@@ -23,6 +23,12 @@ let
     "canva.com"
   ];
 
+  bankingDomains = [
+    "*.royalbank.com"
+    "*.coinbase.com"
+    "*.eqbank.ca"
+  ];
+
   undesirableDomains = [
     "duckduckgo.com"
     "www.cloudflare.com"
@@ -69,15 +75,17 @@ let
   ];
 
   unsafeBadDomains = [
+    "*.koodomobile.com"
     "*.google.com"
     "*.youtube.com"
     "*.aliexpress.com"
     "*.locals.com"
     "*.stripe.com"
     "*.x.com"
+
   ];
 
-  unstrictWhitelist = unsafeBadDomains;
+  unstrictWhitelist = unsafeBadDomains ++ bankingDomains;
 
   strictWhitelist = betterDomains ++ undesirableDomains ++ badDomains;
 
