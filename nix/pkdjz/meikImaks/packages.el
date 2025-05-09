@@ -351,7 +351,7 @@
  format-all
  :commands format-all-mode
  :hook (prog-mode . format-all-mode)
- :custom
+ :config
  (define-format-all-formatter
   elisp-autofmt
   (:executable)
@@ -363,4 +363,7 @@
     'elisp-autofmt-mode
     (if region
         (lambda () (elisp-autofmt-region (car region) (cdr region)))
-      (lambda () (elisp-autofmt-region (point-min) (point-max))))))))
+      (lambda () (elisp-autofmt-region (point-min) (point-max)))))))
+ :custom
+ (format-all-formatters
+  (push '("Emacs Lisp" elisp-autofmt) format-all-default-formatters)))
