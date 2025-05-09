@@ -43,55 +43,6 @@ let
 
   flakeEntriesOverrides =
     {
-      blank = {
-        owner = "divnix";
-      };
-      incl = {
-        owner = "divnix";
-      };
-      haumea = {
-        owner = "nix-community";
-        ref = "v0.2.2";
-      };
-      paisano = {
-        owner = "paisano-nix";
-        repo = "core";
-      };
-      paisano-tui = {
-        owner = "paisano-nix";
-        repo = "tui";
-        ref = "0.2.0";
-      };
-      dmerge = {
-        owner = "divnix";
-        ref = "0.2.1";
-      };
-      yants = {
-        owner = "divnix";
-      };
-      std = {
-        owner = "LiGoldragon";
-        ref = "fixLibFollows";
-      };
-      call-flake = {
-        owner = "divnix";
-      };
-      nosys = {
-        owner = "divnix";
-      };
-      devshell = {
-        owner = "numtide";
-      };
-      nixago = {
-        owner = "nix-community";
-      };
-      clj-nix = {
-        owner = "jlesquembre";
-      };
-
-      flakeWorld = {
-        owner = "sajban";
-      };
       hob = {
         owner = "sajban";
         ref = "autumnCleaning";
