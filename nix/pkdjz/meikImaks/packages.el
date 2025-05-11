@@ -12,6 +12,7 @@
 
 (use-package
  eglot
+ :custom (eglot-extend-to-xref t)
  :config
  (add-to-list 'eglot-server-programs '(nix-ts-mode . ("nil"))))
 
