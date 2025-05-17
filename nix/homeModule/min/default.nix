@@ -362,7 +362,7 @@ mkIf saizAtList.min {
       settings = {
         main = {
           include = toString footThemeFile;
-          font = "Fira Code:size=9";
+          font = "Fira Code:size=10.8";
         };
       };
     };

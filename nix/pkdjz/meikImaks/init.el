@@ -5,6 +5,7 @@
 (electric-pair-mode 1)
 (recentf-mode 1)
 (run-at-time nil (* 5 60) 'recentf-save-list)
+(set-frame-font "FiraCode Nerd Font 12" nil t)
 (custom-set-variables
  '(make-backup-files nil)
  '(recentf-max-menu-items 1024)
