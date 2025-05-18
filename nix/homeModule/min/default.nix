@@ -174,7 +174,8 @@ let
     # C
     stdenv.cc
     # Rust
-    pkdjz.nightlyRustDevEnv
+    cargo
+    # pkdjz.nightlyRustDevEnv # TODO: debug - breaks zsh completions
     # Nix
     nil
     nixfmt-rfc-style
