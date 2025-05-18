@@ -13,6 +13,8 @@ let
 in
 {
   home = {
+    file.".emacs".text = builtins.readFile ./init.el;
+
     packages = [ package ] ++ (with pkgs; [ nil ]);
 
     sessionVariables = {

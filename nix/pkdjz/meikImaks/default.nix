@@ -138,11 +138,9 @@ in
 let
   imaksTheme = if profile.dark then "'modus-vivendi" else "'modus-operandi";
 
-  initEl =
-    (readFile ./init.el)
-    + ''
-      (load-theme ${imaksTheme} t)
-    '';
+  loadTheme = ''
+    (load-theme ${imaksTheme} t)
+  '';
 
   commonPackagesEl = readFile ./packages.el;
   launcherCommonEl = readFile ./selector-common.el;
@@ -175,7 +173,7 @@ let
 
   elpaHeader = readFile ./elpaHeader.el;
   elpaFooter = ";;; default.el ends here";
-  defaultEl = elpaHeader + initEl + packagesEl + elpaFooter;
+  defaultEl = elpaHeader + packagesEl + loadTheme + elpaFooter;
 
   defaultElPackage = trivialBuild {
     pname = "default-el";
