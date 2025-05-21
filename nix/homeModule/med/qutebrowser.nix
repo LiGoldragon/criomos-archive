@@ -82,7 +82,10 @@ let
     "*.locals.com"
     "*.stripe.com"
     "*.x.com"
-
+    "*.linktr.ee"
+    "*.facebook.com"
+    "*.amazon.com"
+    "*.amazon.ca"
   ];
 
   unstrictWhitelist = unsafeBadDomains ++ bankingDomains;
