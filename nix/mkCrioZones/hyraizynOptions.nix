@@ -24,7 +24,7 @@ let
     magnytiud
     sistymz
     komynUserOptions
-    mycinSpecies
+    machineSpecies
     IoOptions
     ;
 
@@ -59,8 +59,8 @@ let
       type = enum magnytiud;
     };
 
-    mycin = mkOption {
-      type = mycinSpecies;
+    machine = mkOption {
+      type = machineSpecies;
     };
 
     yggPreCriome = mkOption {

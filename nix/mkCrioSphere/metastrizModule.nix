@@ -21,7 +21,7 @@ let
     metnodeNames
     nodeSpecies
     komynUserOptions
-    mycinSpecie
+    machineSpecie
     IoOptions
     ;
 
@@ -73,8 +73,8 @@ let
         default = 1;
       };
 
-      mycin = mkOption {
-        type = mycinSpecies;
+      machine = mkOption {
+        type = machineSpecies;
       };
 
       io = mkOption {

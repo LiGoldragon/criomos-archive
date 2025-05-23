@@ -28,7 +28,7 @@ let
     3
   ];
 
-  mycinArkz = attrNames arkSistymMap;
+  machineArkz = attrNames arkSistymMap;
   sistymz = attrValues arkSistymMap;
 
   butlodyrz = [
@@ -106,7 +106,7 @@ let
 
   };
 
-  mycinSpecies = submodule {
+  machineSpecies = submodule {
     options = {
       species = mkOption {
         type = enum [
@@ -117,7 +117,7 @@ let
       };
 
       ark = mkOption {
-        type = nullOr (enum mycinArkz);
+        type = nullOr (enum machineArkz);
         default = null;
       };
 
@@ -185,7 +185,7 @@ in
     inherit
       komynUserOptions
       IoOptions
-      mycinSpecies
+      machineSpecies
       kibordz
       butlodyrz
       magnytiud

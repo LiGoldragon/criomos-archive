@@ -4,7 +4,7 @@
   user,
   pkgs,
   pkdjz,
-  uyrld,
+  world,
   ...
 }:
 let
@@ -12,7 +12,7 @@ let
   inherit (kor) optionalString optionals;
   inherit (pkdjz) kynvyrt;
   inherit (user) githubId;
-  inherit (user.methods) izNiksDev iuzColemak sizedAtLeast;
+  inherit (user.methods) izNiksDev useColemak sizedAtLeast;
   inherit (pkgs) mksh;
 
   tokenaizdWrangler = pkgs.writeScriptBin "wrangler" ''
@@ -83,7 +83,7 @@ let
       gitAndTools.gitui
       # Python
       # pkdjz.mach-nix.package # broken
-      uyrld.kibord.kpBootCli
+      world.kibord.kpBootCli
       # Manuals
       unbound.man
     ]
@@ -174,7 +174,7 @@ kor.mkIf sizedAtLeast.med {
         -f 'bestvideo[ext=webm]+bestaudio[ext=webm]/best[ext=webm]/best'
       '';
 
-      ".config/ranger/rc.conf".text = '''' + (optionalString iuzColemak readFile ./colemak.conf);
+      ".config/ranger/rc.conf".text = '''' + (optionalString useColemak readFile ./colemak.conf);
       # end('pythonConfigs')
 
     };

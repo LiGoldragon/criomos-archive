@@ -26,7 +26,7 @@
             kor = ./nix/kor;
             mkPkgs = ./nix/mkPkgs;
             mkDatom = ./nix/mkDatom;
-            mkUyrld = ./nix/mkUyrld;
+            mkWorld = ./nix/mkWorld;
             mkCrioSphere = ./nix/mkCrioSphere;
             mkCrioZones = ./nix/mkCrioZones;
             mkCriomOS = ./nix/mkCriomOS;
@@ -44,7 +44,7 @@
         inherit (inputs) rust-overlay;
         inherit (localSources) mkWebpage;
         pkdjz = {
-          HobUyrldz = localSources.pkdjz;
+          HobWorlds = localSources.pkdjz;
         };
       };
 
@@ -57,7 +57,7 @@
         mkPkgs
         homeModule
         mkCriomOS
-        mkUyrld
+        mkWorld
         ;
       inherit (lib) optionalAttrs genAttrs hasAttr;
 
@@ -67,11 +67,11 @@
         in
         { inherit cleanEvaluation; } // optionalAttrs cleanEvaluation { inherit (self) shortRev rev; };
 
-      mkPkgsAndUyrldFromSystem =
+      mkPkgsAndWorldFromSystem =
         system:
         let
           pkgs = mkPkgs { inherit nixpkgs lib system; };
-          uyrld = mkUyrld {
+          world = mkWorld {
             inherit
               lib
               pkgs
@@ -82,12 +82,12 @@
           };
         in
         {
-          inherit pkgs uyrld;
+          inherit pkgs world;
         };
 
-      perSystemPkgsAndUyrld = eachDefaultSystem mkPkgsAndUyrldFromSystem;
+      perSystemPkgsAndWorld = eachDefaultSystem mkPkgsAndWorldFromSystem;
 
-      mkPkgsAndUyrld = system: mapAttrs (name: value: value.${system}) perSystemPkgsAndUyrld;
+      mkPkgsAndWorld = system: mapAttrs (name: value: value.${system}) perSystemPkgsAndWorld;
 
       mkDatom = import inputs.mkDatom { inherit kor lib; };
 
@@ -111,10 +111,10 @@
         preNodeName: crioZone:
         let
           inherit (crioZone) users;
-          inherit (crioZone.astra.mycin) ark;
+          inherit (crioZone.astra.machine) ark;
           system = arkSistymMap.${ark};
-          pkgsAndUyrld = mkPkgsAndUyrld system;
-          inherit (pkgsAndUyrld) pkgs uyrld;
+          pkgsAndWorld = mkPkgsAndWorld system;
+          inherit (pkgsAndWorld) pkgs world;
           horizon = crioZone;
 
           userProfiles = {
@@ -126,10 +126,10 @@
             };
           };
 
-          mkUserHomz =
+          mkUserHomes =
             userName: user:
             let
-              inherit (uyrld) pkdjz;
+              inherit (world) pkdjz;
 
               mkProfileHom =
                 profileName: profile:
@@ -139,7 +139,7 @@
                     inherit
                       kor
                       pkdjz
-                      uyrld
+                      world
                       horizon
                       user
                       profile
@@ -155,7 +155,7 @@
           mkUserImaks =
             userName: user:
             let
-              inherit (uyrld.pkdjz) meikImaks;
+              inherit (world.pkdjz) meikImaks;
               mkProfileImaks = profileName: profile: meikImaks { inherit user profile; };
             in
             mapAttrs mkProfileImaks userProfiles;
@@ -166,29 +166,28 @@
             inherit
               criomOS
               kor
-              uyrld
+              world
               horizon
               homeModule
               hob
               ;
           };
-          hom = mapAttrs mkUserHomz users;
+          hom = mapAttrs mkUserHomes users;
           imaks = mapAttrs mkUserImaks users;
         };
 
       mkEachCrioZoneDerivations =
         crioZones:
         let
-          mkNodeDerivationIndex =
-            nodeName: nodePreNodeIndeks: mapAttrs mkNodeDerivations nodePreNodeIndeks;
+          mkNodeDerivationIndex = nodeName: nodePreNodeIndeks: mapAttrs mkNodeDerivations nodePreNodeIndeks;
         in
         mapAttrs mkNodeDerivationIndex crioZones;
 
       mkNixApiOutputsPerSystem =
         system:
         let
-          pkgsAndUyrld = mkPkgsAndUyrld system;
-          inherit (pkgsAndUyrld) pkgs uyrld;
+          pkgsAndWorld = mkPkgsAndWorld system;
+          inherit (pkgsAndWorld) pkgs world;
           inherit (pkgs) symlinkJoin linkFarm;
 
           devShell = pkgs.mkShell {
@@ -211,7 +210,7 @@
 
           allMeinHobOutputs = linkFarm "hob" (kor.mapAttrsToList mkSpokFarmEntry hobOutputs);
 
-          packages = uyrld // {
+          packages = world // {
             inherit pkgs;
             hob = hobOutputs;
             fullHob = allMeinHobOutputs;

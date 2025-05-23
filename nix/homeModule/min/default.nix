@@ -7,7 +7,7 @@
   horizon,
   config,
   profile,
-  uyrld,
+  world,
   hob,
   ...
 }:
@@ -24,7 +24,7 @@ let
   inherit (pkdjz) kynvyrt;
   inherit (horizon) astra;
   inherit (user.methods)
-    iuzColemak
+    useColemak
     hazPreCriome
     gitSigningKey
     matrixID
@@ -42,7 +42,7 @@ let
 
   fzfColemakBinds = import ./fzfColemak.nix;
 
-  fzfBinds = (optionals iuzColemak fzfColemakBinds);
+  fzfBinds = (optionals useColemak fzfColemakBinds);
 
   mkFzfBinds = list: "--bind=" + (builtins.concatStringsSep "," list);
 
@@ -168,7 +168,7 @@ let
       parted # Disk utils
       wireguard-tools
     ]
-    ++ (optionals (astra.mycin.ark == "x86-64") [ i7z ]);
+    ++ (optionals (astra.machine.arch == "x86-64") [ i7z ]);
 
   programmingTools = with pkgs; [
     # C
@@ -259,7 +259,7 @@ let
       ]
     ));
 
-  uyrldPackages = with uyrld; [
+  worldPackages = with world; [
     pkdjz.shen-bootstrap
     skrips.user
     # clojure-lsp.packages.default
@@ -450,7 +450,7 @@ mkIf sizedAtLeast.min {
       enable = true;
       package = pkgs.zed-editor;
       extraPackages = with pkgs; [ ];
-      userKeymaps = optionalAttrs iuzColemak colemakZedKeys;
+      userKeymaps = optionalAttrs useColemak colemakZedKeys;
       userSettings =
         let
           darkTheme = "base16-bright";
@@ -501,14 +501,14 @@ mkIf sizedAtLeast.min {
           . ${pkgs.zsh-fzf-tab}/share/fzf-tab/fzf-tab.zsh
           fi
         ''
-        + (optionalString iuzColemak (builtins.readFile ../nonNix/colemak.zsh));
+        + (optionalString useColemak (builtins.readFile ../nonNix/colemak.zsh));
     };
 
     zoxide.enable = true;
   };
 
   home = {
-    packages = nixpkgsPackages ++ uyrldPackages;
+    packages = nixpkgsPackages ++ worldPackages;
 
     pointerCursor = {
       package = pkgs.vanilla-dmz;
@@ -555,7 +555,7 @@ mkIf sizedAtLeast.min {
 
   xdg = {
     configFile = {
-      "fontconfig/conf.d/10-niksIuzyr-fonts.conf".text = mkFontConf;
+      "fontconfig/conf.d/10-nixHomeManager-fonts.conf".text = mkFontConf;
     };
 
     mimeApps = {

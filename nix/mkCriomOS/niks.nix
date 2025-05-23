@@ -4,7 +4,7 @@
   pkgs,
   hob,
   horizon,
-  uyrld,
+  world,
   konstynts,
   config,
   criomOS,
@@ -100,7 +100,7 @@ let
 
   nixOSFlakeEntries =
     let
-      nixOSFlakeRegistry = importJSON uyrld.pkdjz.flake-registry;
+      nixOSFlakeRegistry = importJSON world.pkdjz.flake-registry;
     in
     nixOSFlakeRegistry.flakes;
 

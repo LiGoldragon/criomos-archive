@@ -4,7 +4,7 @@
   horizon,
   pkgs,
   lib,
-  uyrld,
+  world,
   ...
 }:
 let
@@ -21,7 +21,7 @@ let
   inherit (pkgs) mksh writeScript gnupg;
   inherit (horizon) astra exNodes;
   inherit (horizon.astra) typeIs;
-  inherit (horizon.astra.methods) tcipIzIntel sizedAtLeast iuzColemak;
+  inherit (horizon.astra.methods) tcipIzIntel sizedAtLeast useColemak;
 
   # TODO
   hasAudioOutput = true;
@@ -79,15 +79,15 @@ in
     };
 
     systemPackages = with pkgs; [
-      uyrld.skrips.root
+      world.skrips.root
       tcpdump
       librist
       openssh
     ];
 
-    interactiveShellInit = optionalString iuzColemak "stty -ixon";
+    interactiveShellInit = optionalString useColemak "stty -ixon";
     sessionVariables = (
-      optionalAttrs iuzColemak {
+      optionalAttrs useColemak {
         XKB_DEFAULT_LAYOUT = "us";
         XKB_DEFAULT_VARIANT = "colemak";
       }

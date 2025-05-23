@@ -4,16 +4,16 @@
   horizon,
   kor,
   criomOS,
-  uyrld,
+  world,
   homeModule,
   ...
 }:
 let
   inherit (builtins) mapAttrs;
   inherit (lib) mkOverride;
-  inherit (uyrld) mkHomeConfig pkdjz;
+  inherit (world) mkHomeConfig pkdjz;
 
-  iuzMetylModule = horizon.astra.mycin.species == "metyl";
+  useMetylModule = horizon.astra.machine.species == "metyl";
   profile = {
     dark = false;
   };
@@ -35,7 +35,7 @@ in
     ];
   };
 
-  hardware.enableAllFirmware = iuzMetylModule;
+  hardware.enableAllFirmware = useMetylModule;
 
   home-manager = {
     backupFileExtension = "backup";
@@ -43,7 +43,7 @@ in
       inherit
         kor
         pkdjz
-        uyrld
+        world
         horizon
         ;
     };

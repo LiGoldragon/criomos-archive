@@ -9,7 +9,7 @@
 let
   inherit (builtins) readFile toString;
   inherit (lib) mkIf optionalString;
-  inherit (user.methods) iuzColemak sizedAtLeast;
+  inherit (user.methods) useColemak sizedAtLeast;
   inherit (profile) dark;
 
   badDomains = [
@@ -172,7 +172,7 @@ lib.mkIf sizedAtLeast.med {
             'ztu': 'spawn --userscript qute-pass  --dmenu-invocation "wofi --show dmenu" --password-only',
             'zou': 'spawn --userscript qute-pass  --dmenu-invocation "wofi --show dmenu" --otp-only',
         ''
-        + (optionalString iuzColemak ''
+        + (optionalString useColemak ''
           # Indentation hak
             ";G": "hint images tab",
             ";Y": "hint links fill :open -t -r {hint-url}",
@@ -288,7 +288,7 @@ lib.mkIf sizedAtLeast.med {
         + ''
           }
         ''
-        + (optionalString iuzColemak ''
+        + (optionalString useColemak ''
           c.hints.chars = "arstdhneio"
           c.bindings.commands["caret"] = {
             "D": "move-to-end-of-document",

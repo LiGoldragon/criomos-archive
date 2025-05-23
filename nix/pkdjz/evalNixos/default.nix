@@ -9,8 +9,8 @@ arguments@{
   pkgs ? inputs.pkgs,
   modules ? [ ],
   moduleArgs ? { },
-  iuzQemuVmModule ? false,
-  iuzIsoModule ? false,
+  useQemuVmModule ? false,
+  useIsoModule ? false,
 }:
 let
   inherit (lib) evalModules optional;
@@ -54,6 +54,6 @@ evalModules {
     arguments.modules
     ++ baseModules
     ++ [ moduleArgsModule ]
-    ++ (optional iuzQemuVmModule qemuVmModule)
-    ++ (optional iuzIsoModule isoImageModule);
+    ++ (optional useQemuVmModule qemuVmModule)
+    ++ (optional useIsoModule isoImageModule);
 }

@@ -65,8 +65,8 @@ let
       inherit (inputNode) saiz species;
       inherit (inputNode.preCriomes) yggdrasil;
 
-      filteredMycin = speciesDatum {
-        datum = inputNode.mycin;
+      filteredMachine = speciesDatum {
+        datum = inputNode.machine;
         spek = {
           metyl = [
             "ark"
@@ -84,16 +84,16 @@ let
       rytyrnArkFromMothyrBord = mb: abort "Missing mothyrBord table";
 
       tcekdArk =
-        if (filteredMycin.ark != null) then
-          filteredMycin.ark
-        else if (filteredMycin.species == "pod") then
-          nodes.${filteredMycin.ubyrNode}.mycin.ark
-        else if (filteredMycin.mothyrBord != null) then
-          (rytyrnArkFromMothyrBord filteredMycin.mothyrBord)
+        if (filteredMachine.ark != null) then
+          filteredMachine.ark
+        else if (filteredMachine.species == "pod") then
+          nodes.${filteredMachine.ubyrNode}.machine.ark
+        else if (filteredMachine.mothyrBord != null) then
+          (rytyrnArkFromMothyrBord filteredMachine.mothyrBord)
         else
-          abort "Missing mycin ark";
+          abort "Missing machine ark";
 
-      mycin = filteredMycin // {
+      machine = filteredMachine // {
         ark = tcekdArk;
       };
 
@@ -119,7 +119,7 @@ let
         inherit saiz species;
 
         name = nodeName;
-        inherit mycin wireguardPreCriome nodeIp;
+        inherit machine wireguardPreCriome nodeIp;
 
         linkLocalIPs =
           if (hasAttr "linkLocalIPs" inputNode) then (map mkLinkLocalIP inputNode.linkLocalIPs) else [ ];
@@ -142,7 +142,7 @@ let
           nodeCriomOSName
         ];
 
-        sistym = arkSistymMap.${mycin.ark};
+        sistym = arkSistymMap.${machine.ark};
 
         nbOfBildKorz = 1; # TODO
 
@@ -233,7 +233,7 @@ let
         in
         map getSshString fulyTrostydPreCriomeNames;
 
-      inherit (astra.mycin) modyl;
+      inherit (astra.machine) modyl;
       thinkpadModylz = [
         "ThinkPadX240"
         "ThinkPadX230"
@@ -260,16 +260,16 @@ let
 
       adminSshPreCriomes = unique (concatMap mkAdminUserPreCriomes adminUserNames);
 
-      tcipIzIntel = elem astra.mycin.ark [
+      tcipIzIntel = elem astra.machine.ark [
         "x86-64"
         "i686"
       ]; # TODO
 
-      modylIzThinkpad = elem astra.mycin.modyl thinkpadModylz;
+      modylIzThinkpad = elem astra.machine.modyl thinkpadModylz;
 
-      impozyzHaipyrThreding = elem astra.mycin.modyl impozdHTModylz;
+      impozyzHaipyrThreding = elem astra.machine.modyl impozdHTModylz;
 
-      iuzColemak = astra.io.kibord == "colemak";
+      useColemak = astra.io.kibord == "colemak";
 
       computerIs = computerIsNotMap // (optionalAttrs (modyl != null) { "${modyl}" = true; });
 
@@ -314,7 +314,7 @@ let
 
           gitSigningKey = if hazPreCriome then ("&" + user.preCriomes.${astra.name}.keygrip) else null;
 
-          iuzColemak = user.kibord == "colemak";
+          useColemak = user.kibord == "colemak";
 
           izSemaDev = elem user.species [
             "Sema"

@@ -38,7 +38,7 @@ arguments: with arguments; ''
     repeat_rate 35
   }
 
-  ${optionalString iuzColemak # TODO - this is model specific
+  ${optionalString useColemak # TODO - this is model specific
     ''
       input "1:1:AT_Translated_Set_2_keyboard" {
         xkb_layout us

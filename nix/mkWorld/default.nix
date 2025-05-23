@@ -10,7 +10,7 @@ let
   inherit (builtins) hasAttr mapAttrs readDir;
   inherit (localSources) kor nodeNames mkPkgs;
   inherit (kor) mkLamdy optionalAttrs genAttrs;
-  inherit (uyrld) pkdjz mkZolaWebsite;
+  inherit (world) pkdjz mkZolaWebsite;
 
   mkTypedZolaWebsite =
     name: flake:
@@ -19,13 +19,13 @@ let
       name = flake.name or name;
     };
 
-  meikSobUyrld =
-    SobUyrld@{
+  meikSobWorld =
+    SobWorld@{
       lamdy,
       modz,
       self ? src,
       src ? self,
-      sobUyrldz ? { },
+      sobWorlds ? { },
     }:
     let
       Modz = [
@@ -35,23 +35,23 @@ let
         "hob"
         "mkPkgs"
         "pkdjz"
-        "uyrld"
-        "uyrldSet"
+        "world"
+        "worldSet"
       ];
 
-      iuzMod = genAttrs Modz (n: (l.elem n modz));
+      useMod = genAttrs Modz (n: (l.elem n modz));
 
       # Warning: sets shadowing
       klozyr =
-        optionalAttrs iuzMod.pkgs pkgs
-        // optionalAttrs iuzMod.pkgsStatic pkgs.pkgsStatic
-        // optionalAttrs iuzMod.uyrld uyrld
-        // optionalAttrs iuzMod.pkdjz pkdjz
-        // optionalAttrs iuzMod.hob { inherit hob; }
-        // optionalAttrs iuzMod.pkgsSet { inherit pkgs; }
-        // optionalAttrs iuzMod.uyrldSet { inherit uyrld; }
-        // optionalAttrs iuzMod.mkPkgs { inherit mkPkgs; }
-        // sobUyrldz
+        optionalAttrs useMod.pkgs pkgs
+        // optionalAttrs useMod.pkgsStatic pkgs.pkgsStatic
+        // optionalAttrs useMod.world world
+        // optionalAttrs useMod.pkdjz pkdjz
+        // optionalAttrs useMod.hob { inherit hob; }
+        // optionalAttrs useMod.pkgsSet { inherit pkgs; }
+        // optionalAttrs useMod.worldSet { inherit world; }
+        // optionalAttrs useMod.mkPkgs { inherit mkPkgs; }
+        // sobWorlds
         // {
           inherit kor lib;
         }
@@ -71,7 +71,7 @@ let
 
   mkWorldFunction =
     flake:
-    meikSobUyrld {
+    meikSobWorld {
       modz = [
         "pkgs"
         "pkdjz"
@@ -84,18 +84,18 @@ let
     spokName:
     fleik@{ ... }:
     let
-      priMeikSobUyrld =
+      priMeikSobWorld =
         name:
-        SobUyrld@{
+        SobWorld@{
           modz ? [ ],
           lamdy,
           ...
         }:
         let
-          src = SobUyrld.src or (SobUyrld.self or fleik);
+          src = SobWorld.src or (SobWorld.self or fleik);
           self = src;
         in
-        meikSobUyrld {
+        meikSobWorld {
           inherit
             src
             self
@@ -104,19 +104,19 @@ let
             ;
         };
 
-      priMeikHobUyrld =
+      priMeikHobWorld =
         name:
-        HobUyrld@{
+        HobWorld@{
           modz ? [ "pkgs" ],
           lamdy,
           ...
         }:
         let
           implaidSelf = hob.${name} or null;
-          src = HobUyrld.src or (HobUyrld.self or implaidSelf);
+          src = HobWorld.src or (HobWorld.self or implaidSelf);
           self = src;
         in
-        meikSobUyrld {
+        meikSobWorld {
           inherit
             src
             self
@@ -125,40 +125,40 @@ let
             ;
         };
 
-      meikHobUyrldz =
-        HobUyrldz:
+      meikHobWorlds =
+        HobWorlds:
         let
-          priHobUyrldz = HobUyrldz hob;
+          priHobWorlds = HobWorlds hob;
         in
-        mapAttrs priMeikHobUyrld priHobUyrldz;
+        mapAttrs priMeikHobWorld priHobWorlds;
 
-      meikSobUyrldz =
-        SobUyrldz:
+      meikSobWorlds =
+        SobWorlds:
         let
-          priMeikSobUyrldz =
+          priMeikSobWorlds =
             name:
-            SobUyrld@{
+            SobWorld@{
               modz ? [ ],
               lamdy,
               ...
             }:
             let
-              src = SobUyrld.src or (SobUyrld.self or fleik);
+              src = SobWorld.src or (SobWorld.self or fleik);
               self = src;
             in
-            meikSobUyrld {
+            meikSobWorld {
               inherit
                 src
                 self
                 modz
                 lamdy
-                sobUyrldz
+                sobWorlds
                 ;
             };
 
-          sobUyrldz = mapAttrs priMeikSobUyrldz SobUyrldz;
+          sobWorlds = mapAttrs priMeikSobWorlds SobWorlds;
         in
-        sobUyrldz;
+        sobWorlds;
 
       mkNodeWebpageName = nodeName: [
         (nodeName + "Webpage")
@@ -209,21 +209,21 @@ let
     in
     if (hasAttr "type" fleik) then
       mkTypedFlake
-    else if (hasAttr "HobUyrldz" fleik) then
-      meikHobUyrldz fleik.HobUyrldz
-    else if (hasAttr "HobUyrld" fleik) then
-      priMeikHobUyrld spokName (fleik.HobUyrld hob)
-    else if (hasAttr "SobUyrldz" fleik) then
-      meikSobUyrldz fleik.SobUyrldz
-    else if (hasAttr "SobUyrld" fleik) then
-      priMeikSobUyrld spokName fleik.SobUyrld
+    else if (hasAttr "HobWorlds" fleik) then
+      meikHobWorlds fleik.HobWorlds
+    else if (hasAttr "HobWorld" fleik) then
+      priMeikHobWorld spokName (fleik.HobWorld hob)
+    else if (hasAttr "SobWorlds" fleik) then
+      meikSobWorlds fleik.SobWorlds
+    else if (hasAttr "SobWorld" fleik) then
+      priMeikSobWorld spokName fleik.SobWorld
     else if (isWebpageSpok spokName) then
       mkZolaWebsite { src = fleik; }
     # else if hasFleikFile then makeFleik
     else
       fleik // optionalSystemAttributes;
 
-  uyrld = mapAttrs makeSpoke hob;
+  world = mapAttrs makeSpoke hob;
 
 in
-uyrld
+world

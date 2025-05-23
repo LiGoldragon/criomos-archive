@@ -4,7 +4,7 @@
   config,
   pkgs,
   lib,
-  uyrld,
+  world,
   pkdjz,
   ...
 }:

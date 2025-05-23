@@ -17,14 +17,14 @@ let
     ;
   inherit (user.methods)
     sizedAtLeast
-    iuzColemak
+    useColemak
     izNiksDev
     izSemaDev
     ;
   inherit (user) saiz;
   inherit (profile) dark;
   inherit (pkgs) writeText;
-  inherit (horizon.astra.mycin) modyl;
+  inherit (horizon.astra.machine) modyl;
 
   shellLaunch = command: "${shell} -c '${command}'";
   homeDir = config.home.homeDirectory;
@@ -40,7 +40,7 @@ let
   terminal = nixProfileExec "foot";
 
   swayArguments = {
-    inherit iuzColemak optionalString;
+    inherit useColemak optionalString;
     waybarEksek = nixProfileExec "waybar";
     swaylockEksek = nixProfileExec "swaylock";
     browser =

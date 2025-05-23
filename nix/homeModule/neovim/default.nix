@@ -24,7 +24,7 @@ let
     optional
     optionalAttrs
     ;
-  inherit (user.methods) izNiksDev sizedAtLeast iuzColemak;
+  inherit (user.methods) izNiksDev sizedAtLeast useColemak;
   inherit (horizon) astra;
   inherit (profile) dark;
   inherit (pkgs) parinfer-rust writeText;
@@ -148,7 +148,7 @@ let
           keymaps = {
     ''
     + (
-      if iuzColemak then
+      if useColemak then
         ''
           node_decremental = "<C-N>",
           node_incremental = "<C-E>",
@@ -214,7 +214,7 @@ let
       vim.g.UltiSnipsJumpBackwardTrigger = '<c-h>'
     ''
     + (
-      if iuzColemak then
+      if useColemak then
         ''
           vim.g.UltiSnipsJumpForwardTrigger = '<c-i>'
         ''
@@ -295,9 +295,9 @@ let
     + niksPathLuaKod
     + (readFile ./vimLib.lua)
     + (readFile ./niovi.lua)
-    + (optionalString iuzColemak readFile ./colemak.lua)
+    + (optionalString useColemak readFile ./colemak.lua)
     + (readFile ./mappings.lua)
-    + (optionalString (!iuzColemak) (readFile ./qwerty.lua))
+    + (optionalString (!useColemak) (readFile ./qwerty.lua))
     + (readFile ./dwm.lua)
     + treesitterParserz
     + (readFile ./treesitter.lua)

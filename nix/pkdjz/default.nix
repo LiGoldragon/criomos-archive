@@ -25,8 +25,8 @@ let
       ];
     };
 
-    ivalNixos = {
-      lamdy = import ./ivalNixos;
+    evalNixos = {
+      lamdy = import ./evalNixos;
       modz = [
         "lib"
         "pkgsSet"
@@ -47,7 +47,7 @@ let
       lamdy = import ./kynvyrt;
       modz = [
         "pkgs"
-        "uyrld"
+        "world"
       ];
       self = null;
     };

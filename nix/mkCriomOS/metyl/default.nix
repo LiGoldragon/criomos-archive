@@ -17,13 +17,13 @@ let
     ;
   inherit (lib.generators) toINI;
   inherit (horizon.astra) typeIs;
-  inherit (horizon.astra.mycin) modyl korz;
+  inherit (horizon.astra.machine) modyl korz;
   inherit (horizon.astra.methods)
     sizedAtLeast
     tcipIzIntel
     modylIzThinkpad
     impozyzHaipyrThreding
-    iuzColemak
+    useColemak
     computerIs
     ;
 
@@ -151,7 +151,7 @@ in
 
   programs = { };
 
-  console.useXkbConfig = iuzColemak;
+  console.useXkbConfig = useColemak;
 
   environment = {
     systemPackages =
@@ -213,7 +213,7 @@ in
     };
 
     xserver = {
-      xkb.variant = optionalString iuzColemak "colemak";
+      xkb.variant = optionalString useColemak "colemak";
       xkb.options = "caps:ctrl_modifier, altwin:swap_alt_win";
 
       autoRepeatDelay = 200;
