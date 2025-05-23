@@ -13,7 +13,7 @@ let
   inherit (horizon.astra) machine io typeIs;
 
   usePodModule = (machine.species == "pod");
-  useMetylModule = (machine.species == "metyl");
+  useMetalModule = (machine.species == "metal");
 
   useRouterModule = typeIs.haibrid || typeIs.router;
   useEdjModule = typeIs.edj || typeIs.haibrid || typeIs.edjTesting;
@@ -21,7 +21,7 @@ let
 
   usersModule = import ./users.nix;
   niksModule = import ./niks.nix;
-  normylaizModule = import ./normylaiz.nix;
+  normalizeModule = import ./normalize.nix;
   networkModule = import ./network;
   edjModule = import ./edj;
 
@@ -31,24 +31,24 @@ let
     else if useIsoModule then
       import ./liveIso.nix
     else
-      import ./priInstyld.nix;
+      import ./preInstalled.nix;
 
-  metylModule = import ./metyl;
+  metalModule = import ./metal;
 
-  beisModules = [
+  baseModules = [
     usersModule
     disksModule
     niksModule
-    normylaizModule
+    normalizeModule
     networkModule
   ];
 
   nixosModules =
-    beisModules
+    baseModules
     ++ (optional useEdjModule edjModule)
     ++ (optional useRouterModule ./router)
     ++ (optional useIsoModule home-manager.nixosModules.default)
-    ++ (optional useMetylModule metylModule);
+    ++ (optional useMetalModule metalModule);
 
   nixosArgs = {
     inherit

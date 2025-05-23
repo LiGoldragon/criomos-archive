@@ -1,6 +1,6 @@
 {
   imports = [
-    ./beisModule.nix
+    ./baseModule.nix
     ./emacs
     ./min
     ./min/sway.nix

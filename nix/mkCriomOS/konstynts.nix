@@ -10,8 +10,8 @@ in
 {
   fileSystem = {
     niks = rec {
-      beisDyrektori = "/niks";
-      podzDyrektori = beisDyrektori + "/podz";
+      baseDyrektori = "/niks";
+      podzDyrektori = baseDyrektori + "/podz";
     };
 
     niks = rec {

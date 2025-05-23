@@ -68,7 +68,7 @@ let
       filteredMachine = speciesDatum {
         datum = inputNode.machine;
         spek = {
-          metyl = [
+          metal = [
             "arch"
             "motherBoard"
             "model"
@@ -135,7 +135,7 @@ let
         yggAddress = yggdrasil.address;
         yggSubnet = yggdrasil.subnet;
 
-        inherit (inputNode.preCriomes) niksPreCriome;
+        inherit (inputNode.preCriomes) nixPreCriome;
 
         criomOSName = concatStringsSep "." [
           nodeName
@@ -155,7 +155,7 @@ let
             species
             trost
             saiz
-            niksPreCriome
+            nixPreCriome
             yggAddress
             criomOSName
             typeIs
@@ -169,7 +169,7 @@ let
             !typeIs.edj && isFullyTrusted && (sizedAtLeast.med || typeIs.sentyr) && hasBasePrecriads;
           isDispatcher = !typeIs.sentyr && isFullyTrusted && sizedAtLeast.min;
           isNixCache = typeIs.sentyr && sizedAtLeast.min && hasBasePrecriads;
-          izNiksCriodaizd = niksPreCriome != null && niksPreCriome != "";
+          izNiksCriodaizd = nixPreCriome != null && nixPreCriome != "";
           hasYggPrecriad = yggAddress != null && yggAddress != "";
           hasSshPrecriad = hasAttr "ssh" inputNode.preCriomes;
           hasWireguardPrecriad = wireguardPreCriome != null;
@@ -181,7 +181,7 @@ let
           nixPreCriome = optionalString izNiksCriodaizd (
             concatStringsSep ":" [
               criomOSName
-              niksPreCriome
+              nixPreCriome
             ]
           );
 
@@ -266,7 +266,7 @@ let
 
       impozyzHaipyrThreding = elem astra.machine.model impozdHTModels;
 
-      useColemak = astra.io.kibord == "colemak";
+      useColemak = astra.io.keyboard == "colemak";
 
       computerIs = computerIsNotMap // (optionalAttrs (model != null) { "${model}" = true; });
 
@@ -283,7 +283,7 @@ let
       user = {
         name = userName;
 
-        inherit (inputUser) stail species kibord;
+        inherit (inputUser) stail species keyboard;
 
         saiz = louestOf [
           inputUser.saiz
@@ -311,7 +311,7 @@ let
 
           gitSigningKey = if hazPreCriome then ("&" + user.preCriomes.${astra.name}.keygrip) else null;
 
-          useColemak = user.kibord == "colemak";
+          useColemak = user.keyboard == "colemak";
 
           izSemaDev = elem user.species [
             "Sema"

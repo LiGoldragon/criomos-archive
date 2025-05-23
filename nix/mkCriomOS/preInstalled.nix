@@ -1,0 +1,25 @@
+{ kor, horizon, ... }:
+let
+  inherit (builtins) mapAttrs attrNames filter;
+  inherit (kor) optionals mkIf optional;
+
+  inherit (horizon.astra.io) disks swapDevices bootloader;
+
+in
+{
+  boot = {
+    supportedFilesystems = [ "xfs" ];
+
+    loader = {
+      grub.enable = bootloader == "mbr";
+      systemd-boot.enable = bootloader == "uefi";
+      efi.canTouchEfiVariables = bootloader == "uefi";
+      generic-extlinux-compatible.enable = bootloader == "uboot";
+    };
+
+  };
+
+  fileSystems = disks;
+  inherit swapDevices;
+
+}

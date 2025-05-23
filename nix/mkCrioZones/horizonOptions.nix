@@ -83,7 +83,7 @@ let
       default = null;
     };
 
-    niksPreCriome = mkOption {
+    nixPreCriome = mkOption {
       type = nullOr str;
       default = null;
     };

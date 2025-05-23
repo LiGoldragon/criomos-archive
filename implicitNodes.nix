@@ -3,7 +3,7 @@
     species = "haibrid";
     size = 1;
     machine = {
-      species = "metyl";
+      species = "metal";
       arch = "x86-64";
     };
   };

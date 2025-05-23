@@ -13,7 +13,7 @@ let
   inherit (lib) mkOverride;
   inherit (world) mkHomeConfig pkdjz;
 
-  useMetylModule = horizon.astra.machine.species == "metyl";
+  useMetalModule = horizon.astra.machine.species == "metal";
   profile = {
     dark = false;
   };
@@ -35,7 +35,7 @@ in
     ];
   };
 
-  hardware.enableAllFirmware = useMetylModule;
+  hardware.enableAllFirmware = useMetalModule;
 
   home-manager = {
     backupFileExtension = "backup";

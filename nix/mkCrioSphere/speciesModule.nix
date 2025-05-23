@@ -31,12 +31,12 @@ let
   machineArchs = attrNames archToSystemMap;
   sistymz = attrValues archToSystemMap;
 
-  butlodyrz = [
+  bootloaders = [
     "uefi"
     "mbr"
     "uboot"
   ];
-  kibordz = [
+  keyboards = [
     "qwerty"
     "colemak"
   ];
@@ -91,7 +91,7 @@ let
       type = attrsOf (submodule preCriomeSubmodule);
     };
 
-    kibord = mkOption {
+    keyboard = mkOption {
       type = enum [
         "colemak"
         "qwerty"
@@ -110,10 +110,10 @@ let
     options = {
       species = mkOption {
         type = enum [
-          "metyl"
+          "metal"
           "pod"
         ];
-        default = "metyl";
+        default = "metal";
       };
 
       arch = mkOption {
@@ -149,13 +149,13 @@ let
   };
 
   IoOptions = {
-    kibord = mkOption {
-      type = enum kibordz;
+    keyboard = mkOption {
+      type = enum keyboards;
       default = "colemak";
     };
 
-    butlodyr = mkOption {
-      type = enum butlodyrz;
+    bootloader = mkOption {
+      type = enum bootloaders;
       default = "uefi";
     };
 
@@ -186,8 +186,8 @@ in
       komynUserOptions
       IoOptions
       machineSpecies
-      kibordz
-      butlodyrz
+      keyboards
+      bootloaders
       magnytiud
       metnodeNames
       nodeSpecies
