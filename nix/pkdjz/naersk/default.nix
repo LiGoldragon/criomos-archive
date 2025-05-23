@@ -23,7 +23,7 @@ let
     // {
       inherit (xorg) lndir;
     };
-  buildLamdy = import (self + /default.nix);
+  buildLambda = import (self + /default.nix);
 
 in
-buildLamdy buildArguments
+buildLambda buildArguments

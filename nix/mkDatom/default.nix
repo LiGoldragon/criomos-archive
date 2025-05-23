@@ -11,7 +11,7 @@
 input:
 
 let
-  inherit (kor) mkLamdyz;
+  inherit (kor) mkLambdas;
   inherit (lib) evalModules mkOption;
   inherit (lib.types) submoduleWith;
 
@@ -57,9 +57,9 @@ let
     inherit self kor lib;
   };
 
-  methods = mkLamdyz {
-    klozyr = closure;
-    lamdyz = spec.methods;
+  methods = mkLambdas {
+    inherit closure;
+    lambdas = spec.methods;
   };
 
   type = name + "Datom";

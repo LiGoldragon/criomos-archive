@@ -6,27 +6,27 @@
   bildNvimPlogin,
 }:
 let
-  inherit (kor) mkLamdy;
+  inherit (kor) mkLambda;
 
   ovyridynPkgs = pkgs // {
     buildVimPluginFrom2Nix = bildNvimPlogin;
   };
 
-  overridesLamdy = import (self + /pkgs/misc/vim-plugins/overrides.nix);
+  overridesLambda = import (self + /pkgs/misc/vim-plugins/overrides.nix);
 
-  overrides = mkLamdy {
-    lamdy = overridesLamdy;
-    klozyr = ovyridynPkgs;
+  overrides = mkLambda {
+    lambda = overridesLambda;
+    closure = ovyridynPkgs;
   };
 
-  lamdy = import (self + /pkgs/misc/vim-plugins/generated.nix);
+  lambda = import (self + /pkgs/misc/vim-plugins/generated.nix);
 
-  klozyr = ovyridynPkgs // {
+  closure = ovyridynPkgs // {
     inherit overrides;
   };
 
-  plugins = mkLamdy {
-    inherit lamdy klozyr;
+  plugins = mkLambda {
+    inherit lambda closure;
   };
 
   brokenPlugins = [ "minimap-vim" ];

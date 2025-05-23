@@ -3,13 +3,13 @@ hob:
 let
   pkdjz = {
     beaker = {
-      lamdy = import ./beaker;
+      lambda = import ./beaker;
       self = null;
     };
 
     bildNvimPlogin = {
-      lamdy = import ./bildNvimPlogin;
-      modz = [
+      lambda = import ./bildNvimPlogin;
+      mods = [
         "pkgs"
         "pkdjz"
       ];
@@ -17,8 +17,8 @@ let
     };
 
     home-manager = {
-      lamdy = import ./home-manager;
-      modz = [
+      lambda = import ./home-manager;
+      mods = [
         "lib"
         "pkgs"
         "hob"
@@ -26,8 +26,8 @@ let
     };
 
     evalNixos = {
-      lamdy = import ./evalNixos;
-      modz = [
+      lambda = import ./evalNixos;
+      mods = [
         "lib"
         "pkgsSet"
       ];
@@ -35,8 +35,8 @@ let
     };
 
     kreitOvyraidz = {
-      lamdy = import ./kreitOvyraidz;
-      modz = [
+      lambda = import ./kreitOvyraidz;
+      mods = [
         "pkgs"
         "lib"
       ];
@@ -44,8 +44,8 @@ let
     };
 
     kynvyrt = {
-      lamdy = import ./kynvyrt;
-      modz = [
+      lambda = import ./kynvyrt;
+      mods = [
         "pkgs"
         "world"
       ];
@@ -53,22 +53,22 @@ let
     };
 
     lib = {
-      lamdy = import ./lib;
-      modz = [ ];
+      lambda = import ./lib;
+      mods = [ ];
       self = hob.nixpkgs;
     };
 
     librem5-flash-image = {
-      lamdy = import ./librem5/flashImage.nix;
+      lambda = import ./librem5/flashImage.nix;
     };
 
     mach-nix = {
-      lamdy = import ./mach-nix;
+      lambda = import ./mach-nix;
     };
 
     mkEmacs = {
-      lamdy = import ./mkEmacs;
-      modz = [
+      lambda = import ./mkEmacs;
+      mods = [
         "pkgsSet"
         "hob"
         "pkdjz"
@@ -77,12 +77,12 @@ let
     };
 
     mfgtools = {
-      lamdy = import ./mfgtools;
+      lambda = import ./mfgtools;
     };
 
     nvimLuaPloginz = {
-      lamdy = import ./nvimPloginz/lua.nix;
-      modz = [
+      lambda = import ./nvimPloginz/lua.nix;
+      mods = [
         "hob"
         "pkdjz"
       ];
@@ -90,8 +90,8 @@ let
     };
 
     nvimPloginz = {
-      lamdy = import ./nvimPloginz;
-      modz = [
+      lambda = import ./nvimPloginz;
+      mods = [
         "hob"
         "pkdjz"
       ];
@@ -99,13 +99,13 @@ let
     };
 
     nerd-fonts = {
-      lamdy = import ./nerd-fonts;
+      lambda = import ./nerd-fonts;
       self = null;
     };
 
     nix-dev = {
-      lamdy = import ./nix;
-      modz = [
+      lambda = import ./nix;
+      mods = [
         "pkgs"
         "pkdjz"
       ];
@@ -113,8 +113,8 @@ let
     };
 
     pkgsNvimPloginz = {
-      lamdy = import ./pkgsNvimPloginz;
-      modz = [
+      lambda = import ./pkgsNvimPloginz;
+      mods = [
         "pkgsSet"
         "lib"
         "pkdjz"
@@ -123,56 +123,56 @@ let
     };
 
     shen-bootstrap = {
-      lamdy = import ./shen/bootstrap.nix;
+      lambda = import ./shen/bootstrap.nix;
       self = hob.shen;
     };
 
     shen-ecl-bootstrap = {
-      lamdy = import ./shen/ecl.nix;
+      lambda = import ./shen/ecl.nix;
       self = null;
     };
 
     remux = {
-      lamdy = import ./remux;
+      lambda = import ./remux;
       self = hob.videocut;
     };
 
-    shenPrelude.lamdy = import ./shen/prelude.nix;
+    shenPrelude.lambda = import ./shen/prelude.nix;
 
     slynkPackages = {
-      lamdy = import ./slynkPackages;
+      lambda = import ./slynkPackages;
       self = null;
     };
 
     niks = {
-      lamdy = import ./niks;
-      modz = [
+      lambda = import ./niks;
+      mods = [
         "pkgs"
         "pkdjz"
       ];
     };
 
     obs-ndi = {
-      modz = [
+      mods = [
         "pkgsSet"
         "pkgs"
         "pkdjz"
       ];
       src = null;
-      lamdy = import ./obs-ndi;
+      lambda = import ./obs-ndi;
     };
 
     videocut = {
-      lamdy = import ./videocut;
-      modz = [
+      lambda = import ./videocut;
+      mods = [
         "pkgs"
         "pkdjz"
       ];
     };
 
     vimPloginz = {
-      lamdy = import ./vimPloginz;
-      modz = [
+      lambda = import ./vimPloginz;
+      mods = [
         "pkgs"
         "pkdjz"
         "hob"

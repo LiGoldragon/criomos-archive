@@ -268,8 +268,8 @@ let
     local niks_path = '${nioviNiksFile}'
   '';
 
-  luaModz = [ ];
-  luaCModz = [ pkgs.luajit.pkgs.rapidjson ];
+  luaMods = [ ];
+  luaCMods = [ pkgs.luajit.pkgs.rapidjson ];
 
   mkLuaCPath = drv: "${drv}/lib/lua/${drv.lua.luaversion}/?.so";
 
@@ -278,15 +278,15 @@ let
     "${drv}/share/lua/${drv.lua.luaversion}/?/init.lua"
   ];
 
-  luaModulesPaths = concatStringsSep ";" (optionals (luaModz != [ ]) (concatMap mkLuaPaths luaModz));
+  luaModulesPaths = concatStringsSep ";" (optionals (luaMods != [ ]) (concatMap mkLuaPaths luaMods));
 
-  luaCModulesPaths = concatStringsSep ";" (optionals (luaCModz != [ ]) (map mkLuaCPath luaCModz));
+  luaCModulesPaths = concatStringsSep ";" (optionals (luaCMods != [ ]) (map mkLuaCPath luaCMods));
 
   loadLuaPathsKod =
-    optionalString (luaModz != [ ]) ''
+    optionalString (luaMods != [ ]) ''
       package.path = package.path .. ";" .. [[${luaModulesPaths}]]
     ''
-    + optionalString (luaCModz != [ ]) ''
+    + optionalString (luaCMods != [ ]) ''
       package.cpath = package.cpath .. ";" .. [[${luaCModulesPaths}]]
     '';
 

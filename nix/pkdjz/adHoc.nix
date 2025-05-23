@@ -5,7 +5,7 @@ let
 in
 {
   base16-styles = {
-    lamdy =
+    lambda =
       { src, stdenv }:
       stdenv.mkDerivation {
         name = "base16-styles";
@@ -22,16 +22,16 @@ in
   };
 
   flake-registry = {
-    lamdy = { src, copyPathToStore }: copyPathToStore (src + /flake-registry.json);
+    lambda = { src, copyPathToStore }: copyPathToStore (src + /flake-registry.json);
   };
 
   jumpdrive = {
-    modz = [
+    mods = [
       "pkgs"
       "pkdjz"
     ];
     src = null;
-    lamdy =
+    lambda =
       {
         stdenv,
         fetchurl,
@@ -98,7 +98,7 @@ in
   };
 
   ndi = {
-    lamdy =
+    lambda =
       {
         src,
         lib,
@@ -158,7 +158,7 @@ in
   };
 
   netresolve = {
-    lamdy =
+    lambda =
       {
         src,
         stdenv,
@@ -193,8 +193,8 @@ in
 
   nightlyRustDevEnv = {
     self = hob.rust-overlay;
-    modz = [ "pkgs" ];
-    lamdy =
+    mods = [ "pkgs" ];
+    lambda =
       { src, pkgs }:
       let
         rust-bin = src.lib.mkRustBin { } pkgs;
@@ -209,8 +209,8 @@ in
   };
 
   postcss-scss = {
-    modz = [ "pkdjz" ];
-    lamdy =
+    mods = [ "pkdjz" ];
+    lambda =
       { src, pnpm2nix }:
       let
         inherit (pnpm2nix.v12) mkPnpmPackage;
@@ -224,7 +224,7 @@ in
 
   hyprland-relative-workspace = {
     src = null;
-    lamdy =
+    lambda =
       {
         lib,
         rustPlatform,
@@ -254,9 +254,9 @@ in
   };
 
   pkgs-master = {
-    modz = [ "mkPkgs" ];
+    mods = [ "mkPkgs" ];
     self = hob.nixpkgs-master;
-    lamdy =
+    lambda =
       {
         lib,
         src,
@@ -271,7 +271,7 @@ in
 
   skylendar = {
     src = null;
-    lamdy =
+    lambda =
       { stdenv, fetchurl }:
       let
         pname = "skylendar";
@@ -287,7 +287,7 @@ in
   };
 
   tdlib = {
-    lamdy =
+    lambda =
       { src, tdlib }:
       tdlib.overrideAttrs (attrs: {
         version = "1.8.16";
@@ -296,12 +296,12 @@ in
   };
 
   wireguardNetresolved = {
-    modz = [
+    mods = [
       "pkgs"
       "pkdjz"
     ];
     src = null;
-    lamdy =
+    lambda =
       {
         wireguard-tools,
         makeWrapper,
@@ -320,6 +320,6 @@ in
       });
   };
 
-  xdg-desktop-portal-hyprland.lamdy = { src, system }: src.packages.${system}.default;
+  xdg-desktop-portal-hyprland.lambda = { src, system }: src.packages.${system}.default;
 
 }

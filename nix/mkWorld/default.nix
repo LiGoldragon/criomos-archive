@@ -9,7 +9,7 @@ let
   l = lib // builtins;
   inherit (builtins) hasAttr mapAttrs readDir;
   inherit (localSources) kor nodeNames mkPkgs;
-  inherit (kor) mkLamdy optionalAttrs genAttrs;
+  inherit (kor) mkLambda optionalAttrs genAttrs;
   inherit (world) pkdjz mkZolaWebsite;
 
   mkTypedZolaWebsite =
@@ -21,14 +21,14 @@ let
 
   mkSubWorld =
     SubWorld@{
-      lamdy,
-      modz,
+      lambda,
+      mods,
       self ? src,
       src ? self,
       subWorlds ? { },
     }:
     let
-      Modz = [
+      Mods = [
         "pkgs"
         "pkgsStatic"
         "pkgsSet"
@@ -39,10 +39,10 @@ let
         "worldSet"
       ];
 
-      useMod = genAttrs Modz (n: (l.elem n modz));
+      useMod = genAttrs Mods (n: (l.elem n mods));
 
       # Warning: sets shadowing
-      klozyr =
+      closure =
         optionalAttrs useMod.pkgs pkgs
         // optionalAttrs useMod.pkgsStatic pkgs.pkgsStatic
         // optionalAttrs useMod.world world
@@ -67,17 +67,17 @@ let
         };
 
     in
-    mkLamdy { inherit klozyr lamdy; };
+    mkLambda { inherit closure lambda; };
 
   mkWorldFunction =
     flake:
     mkSubWorld {
-      modz = [
+      mods = [
         "pkgs"
         "pkdjz"
       ];
       src = flake;
-      lamdy = flake.function;
+      lambda = flake.function;
     };
 
   makeSpoke =
@@ -87,8 +87,8 @@ let
       priMkSubWorld =
         name:
         SubWorld@{
-          modz ? [ ],
-          lamdy,
+          mods ? [ ],
+          lambda,
           ...
         }:
         let
@@ -99,16 +99,16 @@ let
           inherit
             src
             self
-            modz
-            lamdy
+            mods
+            lambda
             ;
         };
 
       priMkHobWorld =
         name:
         HobWorld@{
-          modz ? [ "pkgs" ],
-          lamdy,
+          mods ? [ "pkgs" ],
+          lambda,
           ...
         }:
         let
@@ -120,8 +120,8 @@ let
           inherit
             src
             self
-            modz
-            lamdy
+            mods
+            lambda
             ;
         };
 
@@ -138,8 +138,8 @@ let
           priMkSubWorlds =
             name:
             SubWorld@{
-              modz ? [ ],
-              lamdy,
+              mods ? [ ],
+              lambda,
               ...
             }:
             let
@@ -150,8 +150,8 @@ let
               inherit
                 src
                 self
-                modz
-                lamdy
+                mods
+                lambda
                 subWorlds
                 ;
             };

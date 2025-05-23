@@ -264,23 +264,23 @@ rec {
     else
       ifNon;
 
-  mkLamdy =
-    { klozyr, lamdy }:
+  mkLambda =
+    { closure, lambda }:
     let
-      rykuestydDatomz = functionArgs lamdy;
-      rytyrndDatomz = intersectAttrs rykuestydDatomz klozyr;
+      rykuestydDatomz = functionArgs lambda;
+      rytyrndDatomz = intersectAttrs rykuestydDatomz closure;
     in
-    lamdy rytyrndDatomz;
+    lambda rytyrndDatomz;
 
-  mkLamdyz =
-    { lamdyz, klozyr }:
+  mkLambdas =
+    { lambdas, closure }:
     mapAttrs (
       n: v:
-      mkLamdy {
-        inherit klozyr;
-        lamdy = v;
+      mkLambda {
+        inherit closure;
+        lambda = v;
       }
-    ) lamdyz;
+    ) lambdas;
 
   # TODO(desc: "remove", tags: [ "mkHorizon" ])
   speciesDatum =
