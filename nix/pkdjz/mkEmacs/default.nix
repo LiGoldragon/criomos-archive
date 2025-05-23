@@ -184,8 +184,9 @@ let
 
   treeSitterPackages = [ (emacsPackages.treesit-grammars.with-all-grammars) ];
 
-  emacsPackages = usePackages ++ [ defaultElPackage ] ++ treeSitterPackages;
-  emacs = withPackages emacsPackages;
+  allEmacsPackages = usePackages ++ [ defaultElPackage ] ++ treeSitterPackages;
+
+  emacs = withPackages allEmacsPackages;
 
 in
 emacs

@@ -20,7 +20,7 @@ let
   useIsoModule = !usePodModule && (io.disks == { });
 
   usersModule = import ./users.nix;
-  niksModule = import ./niks.nix;
+  nixModule = import ./nix.nix;
   normalizeModule = import ./normalize.nix;
   networkModule = import ./network;
   edjModule = import ./edj;
@@ -38,7 +38,7 @@ let
   baseModules = [
     usersModule
     disksModule
-    niksModule
+    nixModule
     normalizeModule
     networkModule
   ];
