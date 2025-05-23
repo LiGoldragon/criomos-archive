@@ -17,11 +17,11 @@ let
     ;
   inherit (lib.generators) toINI;
   inherit (horizon.astra) typeIs;
-  inherit (horizon.astra.machine) modyl korz;
+  inherit (horizon.astra.machine) model cores;
   inherit (horizon.astra.methods)
     sizedAtLeast
     tcipIzIntel
-    modylIzThinkpad
+    modelIzThinkpad
     impozyzHaipyrThreding
     useColemak
     computerIs
@@ -32,19 +32,19 @@ let
   # TODO
   hasTouchpad = true;
 
-  hasQuickSyncSupport = modyl == "ThinkPadE15Gen2Intel";
-  hasThunderbolt = modyl == "ThinkPadE15Gen2Intel";
-  hasNvme = modyl == "ThinkPadE15Gen2Intel";
-  requiresSofFirmware = modyl == "ThinkPadE15Gen2Intel";
+  hasQuickSyncSupport = model == "ThinkPadE15Gen2Intel";
+  hasThunderbolt = model == "ThinkPadE15Gen2Intel";
+  hasNvme = model == "ThinkPadE15Gen2Intel";
+  requiresSofFirmware = model == "ThinkPadE15Gen2Intel";
 
-  izX230 = modyl == "ThinkPadX230";
-  izX240 = modyl == "ThinkPadX240";
+  izX230 = model == "ThinkPadX230";
+  izX240 = model == "ThinkPadX240";
 
   enabledExtendedPowerSave = true;
 
   cpuFreqGovernor = if enabledExtendedPowerSave then "powersave" else "schedutil";
 
-  hasModelSpecificPowerTweaks = modyl == "ThinkPadE15Gen2Intel";
+  hasModelSpecificPowerTweaks = model == "ThinkPadE15Gen2Intel";
 
   modelSpecificPowerTweaks = {
     ThinkPadE15Gen2Intel = {
@@ -60,7 +60,7 @@ let
     ThinkPadX240 = "PCH";
   };
 
-  mainSoundCard = soundCardIndex."${modyl}" or "0";
+  mainSoundCard = soundCardIndex."${model}" or "0";
 
   modelKernelModulesIndex = {
     ThinkPadX250 = [
@@ -69,7 +69,7 @@ let
     ];
   };
 
-  modelSpecificKernelModules = modelKernelModulesIndex."${modyl}" or [ ];
+  modelSpecificKernelModules = modelKernelModulesIndex."${model}" or [ ];
 
   # (Todo Hack)
   useVaapiIntel = true;
@@ -116,7 +116,7 @@ in
   boot = {
     extraModulePackages =
       [ ]
-      ++ (optional modylIzThinkpad config.boot.kernelPackages.acpi_call)
+      ++ (optional modelIzThinkpad config.boot.kernelPackages.acpi_call)
       ++ (optional sizedAtLeast.max config.boot.kernelPackages.v4l2loopback);
 
     initrd = {
@@ -147,7 +147,7 @@ in
   powerManagement = {
     inherit cpuFreqGovernor;
     powertop.enable = true;
-  } // (optionalAttrs hasModelSpecificPowerTweaks modelSpecificPowerTweaks."${modyl}");
+  } // (optionalAttrs hasModelSpecificPowerTweaks modelSpecificPowerTweaks."${model}");
 
   programs = { };
 
@@ -227,7 +227,7 @@ in
       lidSwitchExternalPower = if typeIs.edj then "suspend" else "ignore";
     };
 
-    thinkfan = mkIf modylIzThinkpad {
+    thinkfan = mkIf modelIzThinkpad {
       enable = true;
       levels = (
         if izX230 then

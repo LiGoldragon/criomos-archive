@@ -25,7 +25,7 @@ let
     mapAttrsToList
     optionalAttrs
     optionalString
-    arkSistymMap
+    archToSystemMap
     unique
     ;
   inherit (config) clusterName astraName species;
@@ -69,32 +69,32 @@ let
         datum = inputNode.machine;
         spek = {
           metyl = [
-            "ark"
-            "mothyrBord"
-            "modyl"
+            "arch"
+            "motherBoard"
+            "model"
           ];
           pod = [
-            "ark"
+            "arch"
             "ubyrNode"
             "ubyrUser"
           ];
         };
       };
 
-      rytyrnArkFromMothyrBord = mb: abort "Missing mothyrBord table";
+      archFromMotherboard = mb: abort "Missing motherBoard table";
 
-      tcekdArk =
-        if (filteredMachine.ark != null) then
-          filteredMachine.ark
+      checkedArch =
+        if (filteredMachine.arch != null) then
+          filteredMachine.arch
         else if (filteredMachine.species == "pod") then
-          nodes.${filteredMachine.ubyrNode}.machine.ark
-        else if (filteredMachine.mothyrBord != null) then
-          (rytyrnArkFromMothyrBord filteredMachine.mothyrBord)
+          nodes.${filteredMachine.ubyrNode}.machine.arch
+        else if (filteredMachine.motherBoard != null) then
+          (archFromMotherboard filteredMachine.motherBoard)
         else
-          abort "Missing machine ark";
+          abort "Missing machine arch";
 
       machine = filteredMachine // {
-        ark = tcekdArk;
+        arch = checkedArch;
       };
 
       mkLinkLocalIP =
@@ -142,9 +142,9 @@ let
           nodeCriomOSName
         ];
 
-        sistym = arkSistymMap.${machine.ark};
+        sistym = archToSystemMap.${machine.arch};
 
-        nbOfBildKorz = 1; # TODO
+        nbOfBuildCores = 1; # TODO
 
         typeIs = listToAttrs (map mkTypeIsFromTypeName nodeSpecies);
       };
@@ -214,7 +214,7 @@ let
           supportedFeatures = optional (!node.typeIs.edj) "big-parallel";
           system = node.sistym;
           systems = lib.optional (node.sistym == "x86_64-linux") "i686-linux";
-          maxJobs = node.nbOfBildKorz;
+          maxJobs = node.nbOfBuildCores;
         };
 
       mkAdminUserPreCriomes =
@@ -226,23 +226,20 @@ let
           fulyTrostydPreCriomeNames = filter izNodeFulyTrostyd preCriomeNodeNames;
           getSshString =
             n:
-            if (adminUser.preCriomes.${n}.ssh == null) then
-              ""
-            else
-              (mkSshString adminUser.preCriomes.${n}.ssh);
+            if (adminUser.preCriomes.${n}.ssh == null) then "" else (mkSshString adminUser.preCriomes.${n}.ssh);
         in
         map getSshString fulyTrostydPreCriomeNames;
 
-      inherit (astra.machine) modyl;
-      thinkpadModylz = [
+      inherit (astra.machine) model;
+      thinkpadModels = [
         "ThinkPadX240"
         "ThinkPadX230"
       ];
-      impozdHTModylz = [ "ThinkPadX240" ];
+      impozdHTModels = [ "ThinkPadX240" ];
 
-      computerModylz = thinkpadModylz ++ [ "rpi3B" ];
+      computerModels = thinkpadModels ++ [ "rpi3B" ];
 
-      computerIsNotMap = listToAttrs (map (n: nameValuePair n false) computerModylz);
+      computerIsNotMap = listToAttrs (map (n: nameValuePair n false) computerModels);
 
     in
     {
@@ -260,18 +257,18 @@ let
 
       adminSshPreCriomes = unique (concatMap mkAdminUserPreCriomes adminUserNames);
 
-      tcipIzIntel = elem astra.machine.ark [
+      tcipIzIntel = elem astra.machine.arch [
         "x86-64"
         "i686"
       ]; # TODO
 
-      modylIzThinkpad = elem astra.machine.modyl thinkpadModylz;
+      modelIzThinkpad = elem astra.machine.model thinkpadModels;
 
-      impozyzHaipyrThreding = elem astra.machine.modyl impozdHTModylz;
+      impozyzHaipyrThreding = elem astra.machine.model impozdHTModels;
 
       useColemak = astra.io.kibord == "colemak";
 
-      computerIs = computerIsNotMap // (optionalAttrs (modyl != null) { "${modyl}" = true; });
+      computerIs = computerIsNotMap // (optionalAttrs (model != null) { "${model}" = true; });
 
       wireguardUntrustedProxies = astra.wireguardUntrustedProxies or [ ];
     };

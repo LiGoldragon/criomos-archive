@@ -154,7 +154,7 @@ in
         "nix-serve"
       ];
 
-      build-cores = astra.nbOfBildKorz;
+      build-cores = astra.nbOfBuildCores;
 
       connect-timeout = 5;
       fallback = true;

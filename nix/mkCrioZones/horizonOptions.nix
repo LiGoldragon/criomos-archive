@@ -50,7 +50,7 @@ let
       type = enum sistymz;
     };
 
-    nbOfBildKorz = mkOption {
+    nbOfBuildCores = mkOption {
       type = int;
       default = 1;
     };

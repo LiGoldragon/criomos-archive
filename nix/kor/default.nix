@@ -231,7 +231,7 @@ rec {
 
   cortHacFile = file: builtins.substring 0 7 (builtins.hashFile "sha256" file);
 
-  arkSistymMap = {
+  archToSystemMap = {
     x86-64 = "x86_64-linux";
     amd64 = "x86_64-linux";
     i686 = "i686-linux";

@@ -24,7 +24,7 @@ let
   inherit (user) saiz;
   inherit (profile) dark;
   inherit (pkgs) writeText;
-  inherit (horizon.astra.machine) modyl;
+  inherit (horizon.astra.machine) model;
 
   shellLaunch = command: "${shell} -c '${command}'";
   homeDir = config.home.homeDirectory;

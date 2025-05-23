@@ -7,7 +7,7 @@
 }:
 let
   inherit (builtins) attrNames attrValues;
-  inherit (kor) arkSistymMap;
+  inherit (kor) archToSystemMap;
   inherit (lib) mkOption;
   inherit (lib.types)
     enum
@@ -28,8 +28,8 @@ let
     3
   ];
 
-  machineArkz = attrNames arkSistymMap;
-  sistymz = attrValues arkSistymMap;
+  machineArchs = attrNames archToSystemMap;
+  sistymz = attrValues archToSystemMap;
 
   butlodyrz = [
     "uefi"
@@ -116,23 +116,23 @@ let
         default = "metyl";
       };
 
-      ark = mkOption {
-        type = nullOr (enum machineArkz);
+      arch = mkOption {
+        type = nullOr (enum machineArchs);
         default = null;
       };
 
-      korz = mkOption {
+      cores = mkOption {
         type = int;
         default = 1;
       };
 
-      modyl = mkOption {
+      model = mkOption {
         type = nullOr str;
         default = null;
       };
 
-      mothyrBord = mkOption {
-        type = nullOr (enum mothyrBordSpeciesNames);
+      motherBoard = mkOption {
+        type = nullOr (enum motherBoardSpeciesNames);
         default = null;
       };
 
@@ -170,7 +170,7 @@ let
     };
   };
 
-  mothyrBordSpeciesNames = [ "ondyfaind" ];
+  motherBoardSpeciesNames = [ "ondyfaind" ];
 
 in
 {

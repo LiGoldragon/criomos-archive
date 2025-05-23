@@ -92,7 +92,7 @@
       mkDatom = import inputs.mkDatom { inherit kor lib; };
 
       inherit (builtins) mapAttrs;
-      inherit (kor) arkSistymMap;
+      inherit (kor) archToSystemMap;
       inherit (flake-utils.lib) eachDefaultSystem;
 
       generateCrioSphereProposalFromName =
@@ -111,8 +111,8 @@
         preNodeName: crioZone:
         let
           inherit (crioZone) users;
-          inherit (crioZone.astra.machine) ark;
-          system = arkSistymMap.${ark};
+          inherit (crioZone.astra.machine) arch;
+          system = archToSystemMap.${arch};
           pkgsAndWorld = mkPkgsAndWorld system;
           inherit (pkgsAndWorld) pkgs world;
           horizon = crioZone;
