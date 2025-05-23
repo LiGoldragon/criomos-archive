@@ -48,7 +48,7 @@ let
 
   srcDirs = readDir src;
 
-  checkSrcComponent = dirNeim: fileType: optionalString (fileType == "directory") dirNeim;
+  checkSrcComponent = dirName: fileType: optionalString (fileType == "directory") dirName;
 
   srcComponents = mapAttrsToList checkSrcComponent srcDirs;
 

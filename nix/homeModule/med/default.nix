@@ -12,7 +12,7 @@ let
   inherit (kor) optionalString optionals;
   inherit (pkdjz) kynvyrt;
   inherit (user) githubId;
-  inherit (user.spinyrz) izNiksDev iuzColemak saizAtList;
+  inherit (user.methods) izNiksDev iuzColemak sizedAtLeast;
   inherit (pkgs) mksh;
 
   tokenaizdWrangler = pkgs.writeScriptBin "wrangler" ''
@@ -102,7 +102,7 @@ let
   ];
 
 in
-kor.mkIf saizAtList.med {
+kor.mkIf sizedAtLeast.med {
   programs = {
     starship = {
       enable = true;
@@ -149,7 +149,7 @@ kor.mkIf saizAtList.med {
       };
 
       ".config/rustfmt/rustfmt.toml".source = kynvyrt {
-        neim = "rustfmt.toml";
+        name = "rustfmt.toml";
         format = "toml";
         valiu = {
           edition = "2021";
@@ -157,7 +157,7 @@ kor.mkIf saizAtList.med {
       };
 
       ".config/luaformatter/config.yaml".source = kynvyrt {
-        neim = "luaFormatterConfig.yaml";
+        name = "luaFormatterConfig.yaml";
         format = "yaml";
         valiu = {
           indent_width = 2;

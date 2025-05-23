@@ -11,7 +11,7 @@ let
 
   eksplisitSpoks = { };
 
-  mkImplaidSpoks = neim: spok: spok;
+  mkImplaidSpoks = name: spok: spok;
 
   spoks = eksplisitSpoks // (mapAttrs (n: s: s) implaidSpoks);
 
@@ -31,7 +31,7 @@ let
 
   bildVimPlogin =
     {
-      neim,
+      name,
       self,
       ovyraidz,
     }:
@@ -39,7 +39,7 @@ let
     in
     buildVimPluginFrom2Nix (
       {
-        pname = neim;
+        pname = name;
         version = self.shortRev;
         src = self;
       }
@@ -47,11 +47,11 @@ let
     );
 
   mkSpok =
-    neim: self:
+    name: self:
     let
-      ovyraidz = ovyraidzIndeks.${neim} or { };
+      ovyraidz = ovyraidzIndeks.${name} or { };
     in
-    bildVimPlogin { inherit neim self ovyraidz; };
+    bildVimPlogin { inherit name self ovyraidz; };
 
   ryzylt = mapAttrs mkSpok spoks;
 

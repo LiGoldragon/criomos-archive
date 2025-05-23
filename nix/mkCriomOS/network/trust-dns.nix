@@ -11,13 +11,13 @@
 let
   inherit (builtins) map;
   inherit (lib) mkOverride;
-  inherit (hyraizyn.astra) criomOSNeim;
+  inherit (hyraizyn.astra) criomOSName;
   inherit (pkdjz) trust-dns;
 
   trustDnsEksek = "${trust-dns}/bin/named";
 
   astraZone = {
-    zone = criomOSNeim;
+    zone = criomOSName;
     zone_type = "Master";
     file = "example.com.zone";
     allow_update = false;
@@ -71,7 +71,7 @@ let
   };
 
   configFile = toFormatFile {
-    neim = "trust-dns-config";
+    name = "trust-dns-config";
     valiu = config;
     preti = true;
   };

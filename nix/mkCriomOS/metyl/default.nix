@@ -18,8 +18,8 @@ let
   inherit (lib.generators) toINI;
   inherit (hyraizyn.astra) typeIs;
   inherit (hyraizyn.astra.mycin) modyl korz;
-  inherit (hyraizyn.astra.spinyrz)
-    saizAtList
+  inherit (hyraizyn.astra.methods)
+    sizedAtLeast
     tcipIzIntel
     modylIzThinkpad
     impozyzHaipyrThreding
@@ -27,7 +27,7 @@ let
     computerIs
     ;
 
-  enableWaydroid = saizAtList.max && !typeIs.router;
+  enableWaydroid = sizedAtLeast.max && !typeIs.router;
 
   # TODO
   hasTouchpad = true;
@@ -73,7 +73,7 @@ let
 
   # (Todo Hack)
   useVaapiIntel = true;
-  hasOpenClSupport = saizAtList.max;
+  hasOpenClSupport = sizedAtLeast.max;
 
   waydroidPackages = with pkgs; [
     wl-clipboard
@@ -111,13 +111,13 @@ in
 
   };
 
-  location.provider = if saizAtList.min then "geoclue2" else "manual";
+  location.provider = if sizedAtLeast.min then "geoclue2" else "manual";
 
   boot = {
     extraModulePackages =
       [ ]
       ++ (optional modylIzThinkpad config.boot.kernelPackages.acpi_call)
-      ++ (optional saizAtList.max config.boot.kernelPackages.v4l2loopback);
+      ++ (optional sizedAtLeast.max config.boot.kernelPackages.v4l2loopback);
 
     initrd = {
       availableKernelModules =
@@ -127,7 +127,7 @@ in
     kernelModules = [ "coretemp" ];
 
     extraModprobeConfig = (
-      optionalString saizAtList.max ''
+      optionalString sizedAtLeast.max ''
         options v4l2loopback devices=2 card_label="camera","obs" exclusive_caps=1
       ''
     );
@@ -161,7 +161,7 @@ in
         libva-utils
         i7z
       ]
-      ++ optionals saizAtList.max [ v4l-utils ];
+      ++ optionals sizedAtLeast.max [ v4l-utils ];
 
   };
 
@@ -172,7 +172,7 @@ in
     fwupd.enable = true;
 
     geoclue2 = {
-      enable = saizAtList.min;
+      enable = sizedAtLeast.min;
       enableDemoAgent = lib.mkOverride 0 true;
       geoProviderUrl = "https://beacondb.net/v1/geolocate";
       appConfig.redshift = {
@@ -182,12 +182,12 @@ in
     };
 
     localtimed = {
-      enable = saizAtList.min;
+      enable = sizedAtLeast.min;
     };
 
     printing = {
       enable = true;
-      cups-pdf.enable = saizAtList.min;
+      cups-pdf.enable = sizedAtLeast.min;
     };
 
     udev.extraRules = ''
@@ -402,8 +402,8 @@ in
   };
 
   virtualisation = {
-    libvirtd.enable = (saizAtList.max && !typeIs.router);
+    libvirtd.enable = (sizedAtLeast.max && !typeIs.router);
     waydroid.enable = enableWaydroid;
-    spiceUSBRedirection.enable = saizAtList.max;
+    spiceUSBRedirection.enable = sizedAtLeast.max;
   };
 }

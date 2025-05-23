@@ -50,7 +50,7 @@ let
     "router"
   ];
 
-  metastriNeimz = attrNames priMetastriz;
+  metastriNames = attrNames priMetastriz;
 
   preCriomeSubmodule = {
     options = {
@@ -132,7 +132,7 @@ let
       };
 
       mothyrBord = mkOption {
-        type = nullOr (enum mothyrBordSpiciNeimz);
+        type = nullOr (enum mothyrBordSpiciNames);
         default = null;
       };
 
@@ -170,7 +170,7 @@ let
     };
   };
 
-  mothyrBordSpiciNeimz = [ "ondyfaind" ];
+  mothyrBordSpiciNames = [ "ondyfaind" ];
 
 in
 {
@@ -189,7 +189,7 @@ in
       kibordz
       butlodyrz
       magnytiud
-      metastriNeimz
+      metastriNames
       astriSpiciz
       sistymz
       ;

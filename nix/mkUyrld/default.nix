@@ -81,11 +81,11 @@ let
     };
 
   makeSpoke =
-    spokNeim:
+    spokName:
     fleik@{ ... }:
     let
       priMeikSobUyrld =
-        neim:
+        name:
         SobUyrld@{
           modz ? [ ],
           lamdy,
@@ -105,14 +105,14 @@ let
         };
 
       priMeikHobUyrld =
-        neim:
+        name:
         HobUyrld@{
           modz ? [ "pkgs" ],
           lamdy,
           ...
         }:
         let
-          implaidSelf = hob.${neim} or null;
+          implaidSelf = hob.${name} or null;
           src = HobUyrld.src or (HobUyrld.self or implaidSelf);
           self = src;
         in
@@ -136,7 +136,7 @@ let
         SobUyrldz:
         let
           priMeikSobUyrldz =
-            neim:
+            name:
             SobUyrld@{
               modz ? [ ],
               lamdy,
@@ -160,14 +160,14 @@ let
         in
         sobUyrldz;
 
-      mkNeksysWebpageName = neksysNeim: [
-        (neksysNeim + "Webpage")
-        (neksysNeim + "Website")
+      mkNeksysWebpageName = neksysName: [
+        (neksysName + "Webpage")
+        (neksysName + "Website")
       ];
 
       neksysWebpageSpokNames = lib.concatMap mkNeksysWebpageName neksysNames;
 
-      isWebpageSpok = spokNeim: l.elem spokNeim neksysWebpageSpokNames;
+      isWebpageSpok = spokName: l.elem spokName neksysWebpageSpokNames;
 
       optionalSystemAttributes = {
         packages = fleik.packages.${system} or { };
@@ -197,7 +197,7 @@ let
       typedFlakeMakerIndex = {
         nixpkgsHob = mkNixpkgsHob fleik.value;
         worldFunction = mkWorldFunction fleik;
-        zolaWebsite = mkTypedZolaWebsite spokNeim fleik;
+        zolaWebsite = mkTypedZolaWebsite spokName fleik;
       };
 
       mkTypedFlake =
@@ -212,12 +212,12 @@ let
     else if (hasAttr "HobUyrldz" fleik) then
       meikHobUyrldz fleik.HobUyrldz
     else if (hasAttr "HobUyrld" fleik) then
-      priMeikHobUyrld spokNeim (fleik.HobUyrld hob)
+      priMeikHobUyrld spokName (fleik.HobUyrld hob)
     else if (hasAttr "SobUyrldz" fleik) then
       meikSobUyrldz fleik.SobUyrldz
     else if (hasAttr "SobUyrld" fleik) then
-      priMeikSobUyrld spokNeim fleik.SobUyrld
-    else if (isWebpageSpok spokNeim) then
+      priMeikSobUyrld spokName fleik.SobUyrld
+    else if (isWebpageSpok spokName) then
       mkZolaWebsite { src = fleik; }
     # else if hasFleikFile then makeFleik
     else

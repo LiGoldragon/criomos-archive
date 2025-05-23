@@ -31,7 +31,7 @@ let
 
   bildNvimLuaPlogin =
     {
-      neim,
+      name,
       self,
       ovyraidz,
     }:
@@ -39,7 +39,7 @@ let
     in
     bildNvimPlogin (
       {
-        pname = neim;
+        pname = name;
         version = self.shortRev;
         src = self;
         namePrefix = "nvimLuaPlogin";
@@ -53,11 +53,11 @@ let
     );
 
   mkSpok =
-    neim: self:
+    name: self:
     let
-      ovyraidz = ovyraidzIndeks.${neim} or { };
+      ovyraidz = ovyraidzIndeks.${name} or { };
     in
-    bildNvimLuaPlogin { inherit neim self ovyraidz; };
+    bildNvimLuaPlogin { inherit name self ovyraidz; };
 
   ryzylt = mapAttrs mkSpok spoks;
 

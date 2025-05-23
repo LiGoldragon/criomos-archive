@@ -7,7 +7,7 @@
 }:
 let
   inherit (kor) optionals;
-  inherit (user.spinyrz) izNiksDev izSemaDev saizAtList;
+  inherit (user.methods) izNiksDev izSemaDev sizedAtLeast;
 
   niksDevPackages = with pkgs; [
     pandoc
@@ -30,7 +30,7 @@ let
   ];
 
 in
-kor.mkIf saizAtList.max {
+kor.mkIf sizedAtLeast.max {
   home = {
     packages =
       with pkgs;

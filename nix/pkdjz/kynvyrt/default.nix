@@ -6,7 +6,7 @@
 }:
 
 {
-  neim ? "data",
+  name ? "data",
   valiu,
   preti ? true,
   format ? "msgpack",
@@ -36,6 +36,6 @@ let
   prettyFlag = optionalString (preti && (format == "toml")) "-i";
 
 in
-runCommandLocal "${neim}.${format}" { inherit jsonValiu prettyFlag; } ''
+runCommandLocal "${name}.${format}" { inherit jsonValiu prettyFlag; } ''
   printf '%s' """$jsonValiu""" | ${kynvyrtKmd} > $out
 ''

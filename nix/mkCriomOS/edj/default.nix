@@ -19,9 +19,9 @@ let
   inherit (lib) mkOverride;
 
   inherit (hyraizyn.astra) typeIs;
-  inherit (hyraizyn.astra.spinyrz) saizAtList;
+  inherit (hyraizyn.astra.methods) sizedAtLeast;
 
-  minPackages = optionals saizAtList.min (
+  minPackages = optionals sizedAtLeast.min (
     with pkgs;
     [
       adwaita-icon-theme
@@ -38,14 +38,14 @@ in
 {
   hardware = {
     bluetooth.enable = true;
-    graphics.enable32Bit = saizAtList.max;
+    graphics.enable32Bit = sizedAtLeast.max;
     pulseaudio.enable = false;
   };
 
   environment = {
     systemPackages =
       with pkgs;
-      minPackages ++ (optionals saizAtList.med medPackages ++ (optionals saizAtList.max maxPackages));
+      minPackages ++ (optionals sizedAtLeast.med medPackages ++ (optionals sizedAtLeast.max maxPackages));
 
     gnome.excludePackages = with pkgs; [
       gnome-software
@@ -53,21 +53,21 @@ in
   };
 
   programs = {
-    browserpass.enable = saizAtList.max;
+    browserpass.enable = sizedAtLeast.max;
 
     dconf.enable = true;
-    droidcam.enable = saizAtList.max;
+    droidcam.enable = sizedAtLeast.max;
     evolution.enable = true;
-    file-roller.enable = saizAtList.med;
+    file-roller.enable = sizedAtLeast.med;
 
-    firejail.enable = saizAtList.med;
+    firejail.enable = sizedAtLeast.med;
 
     hyprland = {
       enable = typeIs.edjTesting || typeIs.haibrid;
     };
 
     regreet = {
-      enable = !(saizAtList.min);
+      enable = !(sizedAtLeast.min);
       settings = {
         GTK = {
           application_prefer_dark_theme = true;
@@ -80,13 +80,13 @@ in
   };
 
   services = {
-    avahi.enable = saizAtList.min;
+    avahi.enable = sizedAtLeast.min;
 
-    blueman.enable = saizAtList.med;
+    blueman.enable = sizedAtLeast.med;
 
     power-profiles-daemon.enable = false;
 
-    dbus.packages = mkIf saizAtList.med [ pkgs.gcr ];
+    dbus.packages = mkIf sizedAtLeast.med [ pkgs.gcr ];
 
     gnome = {
       at-spi2-core.enable = true;
@@ -95,15 +95,15 @@ in
       gnome-settings-daemon.enable = true;
     };
 
-    tumbler.enable = saizAtList.med;
+    tumbler.enable = sizedAtLeast.med;
 
     xserver = {
-      enable = saizAtList.min;
+      enable = sizedAtLeast.min;
       excludePackages = with pkgs; [ xorg.xorgserver.out ];
-      desktopManager.gnome.enable = saizAtList.med && typeIs.edj;
+      desktopManager.gnome.enable = sizedAtLeast.med && typeIs.edj;
       displayManager = {
         gdm = {
-          enable = saizAtList.min;
+          enable = sizedAtLeast.min;
           autoSuspend = typeIs.edj;
         };
       };

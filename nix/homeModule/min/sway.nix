@@ -15,8 +15,8 @@ let
     optionalString
     matcSaiz
     ;
-  inherit (user.spinyrz)
-    saizAtList
+  inherit (user.methods)
+    sizedAtLeast
     iuzColemak
     izNiksDev
     izSemaDev
@@ -53,7 +53,7 @@ let
   swayConfigString = import ./swayConf.nix swayArgz;
 
 in
-mkIf saizAtList.min {
+mkIf sizedAtLeast.min {
   wayland.windowManager.sway = {
     enable = true;
     wrapperFeatures = {

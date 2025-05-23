@@ -28,22 +28,22 @@ let
     arkSistymMap
     unique
     ;
-  inherit (config) metastraNeim astraNeim spiciz;
-  inherit (metastrizSpiciz) metastriNeimz astriSpiciz;
+  inherit (config) clusterName astraName spiciz;
+  inherit (metastrizSpiciz) metastriNames astriSpiciz;
 
-  inputMetastra = Metastriz.${metastraNeim};
-  inputAstriz = inputMetastra.astriz;
-  inputAstra = inputAstriz.${astraNeim};
+  inputCluster = Metastriz.${clusterName};
+  inputAstriz = inputCluster.astriz;
+  inputAstra = inputAstriz.${astraName};
 
-  astriNeimz = attrNames inputMetastra.astriz;
-  userNeimz = attrNames inputMetastra.users;
+  astriNames = attrNames inputCluster.astriz;
+  userNames = attrNames inputCluster.users;
 
-  neksysCriomOSNeim = concatStringsSep "." [
-    metastraNeim
+  neksysCriomOSName = concatStringsSep "." [
+    clusterName
     "criome"
   ];
 
-  metaTrost = inputMetastra.trost.metastra;
+  metaTrost = inputCluster.trost.cluster;
 
   mkTrost = yrei: louestOf (yrei ++ [ metaTrost ]);
 
@@ -58,10 +58,10 @@ let
       ];
 
   mkAstri =
-    astriNeim:
+    astriName:
     let
       # (TODO typecheck)
-      inputAstri = inputAstriz.${astriNeim};
+      inputAstri = inputAstriz.${astriName};
       inherit (inputAstri) saiz spici;
       inherit (inputAstri.preCriomes) yggdrasil;
 
@@ -118,7 +118,7 @@ let
       astri = {
         inherit saiz spici;
 
-        neim = astriNeim;
+        name = astriName;
         inherit mycin wireguardPreCriome neksysIp;
 
         linkLocalIPs =
@@ -126,7 +126,7 @@ let
 
         trost = mkTrost [
           inputAstri.trost
-          inputMetastra.trost.astriz.${astriNeim}
+          inputCluster.trost.astriz.${astriName}
         ];
 
         eseseitc = mkEseseitcString inputAstri.preCriomes.eseseitc;
@@ -137,9 +137,9 @@ let
 
         inherit (inputAstri.preCriomes) niksPreCriome;
 
-        criomOSNeim = concatStringsSep "." [
-          astriNeim
-          neksysCriomOSNeim
+        criomOSName = concatStringsSep "." [
+          astriName
+          neksysCriomOSName
         ];
 
         sistym = arkSistymMap.${mycin.ark};
@@ -149,7 +149,7 @@ let
         typeIs = listToAttrs (map mkTypeIsFromTypeName astriSpiciz);
       };
 
-      spinyrz =
+      methods =
         let
           inherit (astri)
             spici
@@ -157,51 +157,51 @@ let
             saiz
             niksPreCriome
             yggAddress
-            criomOSNeim
+            criomOSName
             typeIs
             ;
 
         in
         rec {
-          izFullyTrusted = trost == 3;
-          saizAtList = kor.mkSaizAtList saiz;
-          izBildyr = !typeIs.edj && izFullyTrusted && (saizAtList.med || typeIs.sentyr) && izCriodaizd;
-          izDispatcyr = !typeIs.sentyr && izFullyTrusted && saizAtList.min;
-          izNiksKac = typeIs.sentyr && saizAtList.min && izCriodaizd;
+          isFullyTrusted = trost == 3;
+          sizedAtLeast = kor.mkSaizAtList saiz;
+          isBuilder = !typeIs.edj && isFullyTrusted && (sizedAtLeast.med || typeIs.sentyr) && hasBasePrecriads;
+          isDispatcher = !typeIs.sentyr && isFullyTrusted && sizedAtLeast.min;
+          isNixCache = typeIs.sentyr && sizedAtLeast.min && hasBasePrecriads;
           izNiksCriodaizd = niksPreCriome != null && niksPreCriome != "";
-          izYggCriodaizd = yggAddress != null && yggAddress != "";
-          izNeksisCriodaizd = izYggCriodaizd;
-          izEseseitcCriodaizd = hasAttr "eseseitc" inputAstri.preCriomes;
-          hazWireguardPreCriome = wireguardPreCriome != null;
+          hasYggPrecriad = yggAddress != null && yggAddress != "";
+          izNeksisCriodaizd = hasYggPrecriad;
+          hasSshPrecriad = hasAttr "eseseitc" inputAstri.preCriomes;
+          hasWireguardPrecriad = wireguardPreCriome != null;
 
-          izCriodaizd = izNiksCriodaizd && izYggCriodaizd && izEseseitcCriodaizd;
+          hasBasePrecriads = izNiksCriodaizd && hasYggPrecriad && hasSshPrecriad;
 
-          eseseitcPreCriome =
-            if !izEseseitcCriodaizd then "" else mkEseseitcString inputAstri.preCriomes.eseseitc;
+          sshPrecriome =
+            if !hasSshPrecriad then "" else mkEseseitcString inputAstri.preCriomes.eseseitc;
 
           nixPreCriome = optionalString izNiksCriodaizd (
             concatStringsSep ":" [
-              criomOSNeim
+              criomOSName
               niksPreCriome
             ]
           );
 
-          nixCacheDomain = if izNiksKac then ("nix." + criomOSNeim) else null;
-          nixUrl = if izNiksKac then ("http://" + nixCacheDomain) else null;
+          nixCacheDomain = if isNixCache then ("nix." + criomOSName) else null;
+          nixUrl = if isNixCache then ("http://" + nixCacheDomain) else null;
 
         };
 
     in
-    astri // { inherit spinyrz; };
+    astri // { inherit methods; };
 
-  exAstriNeimz = attrNames exAstriz;
-  bildyrz = filter (n: astriz.${n}.spinyrz.izBildyr) exAstriNeimz;
-  kacyz = filter (n: astriz.${n}.spinyrz.izNiksKac) exAstriNeimz;
-  dispatcyrz = filter (n: astriz.${n}.spinyrz.izDispatcyr) exAstriNeimz;
+  exAstriNames = attrNames exAstriz;
+  bildyrz = filter (n: astriz.${n}.methods.isBuilder) exAstriNames;
+  kacyz = filter (n: astriz.${n}.methods.isNixCache) exAstriNames;
+  dispatcyrz = filter (n: astriz.${n}.methods.isDispatcher) exAstriNames;
 
-  adminUserNeimz = filter (n: users.${n}.trost == 3) userNeimz;
+  adminUserNames = filter (n: users.${n}.trost == 3) userNames;
 
-  astraSpinyrz =
+  astraMethods =
     let
       mkBildyr =
         n:
@@ -209,7 +209,7 @@ let
           astri = exAstriz.${n};
         in
         {
-          hostName = astri.criomOSNeim;
+          hostName = astri.criomOSName;
           sshUser = "nixBuilder";
           sshKey = "/etc/ssh/ssh_host_ed25519_key";
           supportedFeatures = optional (!astri.typeIs.edj) "big-parallel";
@@ -219,12 +219,12 @@ let
         };
 
       mkAdminUserPreCriomes =
-        adminUserNeim:
+        adminUserName:
         let
-          adminUser = users.${adminUserNeim};
-          preCriomeAstriNeimz = attrNames adminUser.preCriomes;
-          izAstriFulyTrostyd = n: astriz.${n}.spinyrz.izFullyTrusted;
-          fulyTrostydPreCriomeNeimz = filter izAstriFulyTrostyd preCriomeAstriNeimz;
+          adminUser = users.${adminUserName};
+          preCriomeAstriNames = attrNames adminUser.preCriomes;
+          izAstriFulyTrostyd = n: astriz.${n}.methods.isFullyTrusted;
+          fulyTrostydPreCriomeNames = filter izAstriFulyTrostyd preCriomeAstriNames;
           getEseseitcString =
             n:
             if (adminUser.preCriomes.${n}.eseseitc == null) then
@@ -232,7 +232,7 @@ let
             else
               (mkEseseitcString adminUser.preCriomes.${n}.eseseitc);
         in
-        map getEseseitcString fulyTrostydPreCriomeNeimz;
+        map getEseseitcString fulyTrostydPreCriomeNames;
 
       inherit (astra.mycin) modyl;
       thinkpadModylz = [
@@ -251,15 +251,15 @@ let
 
       kacURLz =
         let
-          mkKacURL = n: exAstriz.${n}.spinyrz.nixUrl;
+          mkKacURL = n: exAstriz.${n}.methods.nixUrl;
         in
         map mkKacURL kacyz;
 
-      exAstrizEseseitcPreCriomes = map (n: exAstriz.${n}.eseseitc) exAstriNeimz;
+      exAstrizEseseitcPreCriomes = map (n: exAstriz.${n}.eseseitc) exAstriNames;
 
       dispatcyrzEseseitcKiz = map (n: exAstriz.${n}.eseseitc) dispatcyrz;
 
-      adminEseseitcPreCriomes = unique (concatMap mkAdminUserPreCriomes adminUserNeimz);
+      adminEseseitcPreCriomes = unique (concatMap mkAdminUserPreCriomes adminUserNames);
 
       tcipIzIntel = elem astra.mycin.ark [
         "x86-64"
@@ -278,14 +278,14 @@ let
     };
 
   mkUser =
-    userNeim:
+    userName:
     let
-      inputUser = inputMetastra.users.${userNeim};
+      inputUser = inputCluster.users.${userName};
 
-      tcekPreCriome = astriNeim: preCriome: hasAttr astriNeim astriz;
+      tcekPreCriome = astriName: preCriome: hasAttr astriName astriz;
 
       user = {
-        neim = userNeim;
+        name = userName;
 
         inherit (inputUser) stail spici kibord;
 
@@ -294,26 +294,26 @@ let
           astra.saiz
         ];
 
-        trost = inputMetastra.trost.users.${userNeim};
+        trost = inputCluster.trost.users.${userName};
 
         preCriomes = filterAttrs tcekPreCriome inputUser.preCriomes;
 
-        githubId = if (inputUser.githubId == null) then userNeim else inputUser.githubId;
+        githubId = if (inputUser.githubId == null) then userName else inputUser.githubId;
 
       };
 
-      hazPreCriome = hasAttr astra.neim user.preCriomes;
+      hazPreCriome = hasAttr astra.name user.preCriomes;
 
-      spinyrz =
+      methods =
         {
           inherit hazPreCriome;
 
-          saizAtList = kor.mkSaizAtList user.saiz;
+          sizedAtLeast = kor.mkSaizAtList user.saiz;
 
-          emailAddress = "${user.neim}@${metastra.neim}.criome.me";
-          matrixID = "@${user.neim}:${metastra.neim}.criome.me";
+          emailAddress = "${user.name}@${cluster.name}.criome.me";
+          matrixID = "@${user.name}:${cluster.name}.criome.me";
 
-          gitSigningKey = if hazPreCriome then ("&" + user.preCriomes.${astra.neim}.keygrip) else null;
+          gitSigningKey = if hazPreCriome then ("&" + user.preCriomes.${astra.name}.keygrip) else null;
 
           iuzColemak = user.kibord == "colemak";
 
@@ -330,45 +330,45 @@ let
 
         }
         // (kor.optionalAttrs hazPreCriome {
-          eseseitc = mkEseseitcString user.preCriomes.${astra.neim}.eseseitc;
+          eseseitc = mkEseseitcString user.preCriomes.${astra.name}.eseseitc;
         });
 
     in
-    user // { inherit spinyrz; };
+    user // { inherit methods; };
 
   astriz = listToAttrs (
-    map (y: nameValuePair y.neim y) (filter (x: x.trost != 0) (map (n: mkAstri n) astriNeimz))
+    map (y: nameValuePair y.name y) (filter (x: x.trost != 0) (map (n: mkAstri n) astriNames))
   );
 
-  metastra = {
-    neim = metastraNeim;
+  cluster = {
+    name = clusterName;
 
-    spinyrz = {
-      trostydBildPreCriomes = map (n: astriz.${n}.spinyrz.nixPreCriome) astriNeimz;
+    methods = {
+      trostydBildPreCriomes = map (n: astriz.${n}.methods.nixPreCriome) astriNames;
     };
   };
 
-  exAstriz = kor.filterAttrs (n: v: n != astraNeim) astriz;
+  exAstriz = kor.filterAttrs (n: v: n != astraName) astriz;
 
   astra =
     let
-      astri = astriz.${astraNeim};
+      astri = astriz.${astraName};
     in
     astri
     // {
       inherit (inputAstra) io;
-      spinyrz = astri.spinyrz // astraSpinyrz;
+      methods = astri.methods // astraMethods;
     };
 
   users = listToAttrs (
-    map (y: nameValuePair y.neim y) (filter (x: x.trost != 0) (map (n: mkUser n) userNeimz))
+    map (y: nameValuePair y.name y) (filter (x: x.trost != 0) (map (n: mkUser n) userNames))
   );
 
 in
 {
   hyraizyn = {
     inherit
-      metastra
+      cluster
       astra
       exAstriz
       users

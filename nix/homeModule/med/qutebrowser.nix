@@ -9,7 +9,7 @@
 let
   inherit (builtins) readFile toString;
   inherit (lib) mkIf optionalString;
-  inherit (user.spinyrz) iuzColemak saizAtList;
+  inherit (user.methods) iuzColemak sizedAtLeast;
   inherit (profile) dark;
 
   badDomains = [
@@ -99,7 +99,7 @@ let
   domainListBlok = builtins.concatStringsSep "\n" mkDomainsList;
 
 in
-lib.mkIf saizAtList.med {
+lib.mkIf sizedAtLeast.med {
   home = {
     packages = [ pkgs.qutebrowser ];
 

@@ -13,14 +13,11 @@ let
   mkHyraizynModule = import ./mkHyraizynModule.nix;
 
   mkCrioZone =
-    neksysNeim: priNeksysNeim:
+    clusterName: astraName:
     let
-      astraNeim = priNeksysNeim;
-      metastraNeim = neksysNeim;
-
       argzModule = {
         config = {
-          inherit astraNeim metastraNeim;
+          inherit astraName clusterName;
           _module.args = {
             inherit kor lib;
             Metastriz = metastriz.datom;
@@ -42,10 +39,7 @@ let
     in
     crioZone;
 
-  mkNeksysCrioZones =
-    neksysNeim: neksys:
-    # let priNeksysNeimz = attrNames neksys.astriz; in
-    mapAttrs (pnn: pn: mkCrioZone neksysNeim pnn) neksys.astriz;
+  mkNeksysCrioZones = neksysName: neksys: mapAttrs (pnn: pn: mkCrioZone neksysName pnn) neksys.astriz;
 
   ryzylt = mapAttrs mkNeksysCrioZones proposedCrioSphere.datom;
 

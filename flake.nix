@@ -108,7 +108,7 @@
       uncheckedCrioSphereProposal = genAttrs neksysNames generateCrioSphereProposalFromName;
 
       mkNeksysDerivations =
-        priNeksysNeim: crioZone:
+        priNeksysName: crioZone:
         let
           inherit (crioZone) users;
           inherit (crioZone.astra.mycin) ark;
@@ -127,7 +127,7 @@
           };
 
           mkUserHomz =
-            userNeim: user:
+            userName: user:
             let
               inherit (uyrld) pkdjz;
 
@@ -153,7 +153,7 @@
             mapAttrs mkProfileHom userProfiles;
 
           mkUserImaks =
-            userNeim: user:
+            userName: user:
             let
               inherit (uyrld.pkdjz) meikImaks;
               mkProfileImaks = profileName: profile: meikImaks { inherit user profile; };
@@ -180,7 +180,7 @@
         crioZones:
         let
           mkNeksysDerivationIndex =
-            neksysNeim: neksysPrineksysIndeks: mapAttrs mkNeksysDerivations neksysPrineksysIndeks;
+            neksysName: neksysPrineksysIndeks: mapAttrs mkNeksysDerivations neksysPrineksysIndeks;
         in
         mapAttrs mkNeksysDerivationIndex crioZones;
 

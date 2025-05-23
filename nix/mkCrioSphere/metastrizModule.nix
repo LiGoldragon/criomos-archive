@@ -18,7 +18,7 @@ let
     ;
   inherit (config.spiciz)
     magnytiud
-    metastriNeimz
+    metastriNames
     astriSpiciz
     komynUserOptions
     mycinSpici
@@ -107,11 +107,11 @@ let
 
   defaultTrost = 1;
 
-  mkDefaultTrostFromNeimz = neimz: listToAttrs (map (n: nameValuePair n defaultTrost)) neimz;
+  mkDefaultTrostFromNames = names: listToAttrs (map (n: nameValuePair n defaultTrost)) names;
 
   trostSubmodule = {
     options = {
-      metastra = mkOption {
+      cluster = mkOption {
         type = enum magnytiud;
         default = 1;
       };
@@ -167,7 +167,7 @@ let
         trost = mkOption {
           type = submodule ({
             options = {
-              metastra = mkOption {
+              cluster = mkOption {
                 type = enum magnytiud;
                 default = 1;
               };

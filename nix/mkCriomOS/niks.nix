@@ -21,17 +21,17 @@ let
     optionalAttrs
     ;
 
-  inherit (hyraizyn.metastra.spinyrz) trostydBildPreCriomes;
+  inherit (hyraizyn.cluster.methods) trostydBildPreCriomes;
   inherit (hyraizyn) astra;
-  inherit (hyraizyn.astra.spinyrz)
+  inherit (hyraizyn.astra.methods)
     bildyrKonfigz
     kacURLz
     dispatcyrzEseseitcKiz
     exAstrizEseseitcPreCriomes
-    saizAtList
-    izBildyr
-    izNiksKac
-    izDispatcyr
+    sizedAtLeast
+    isBuilder
+    isNixCache
+    isDispatcher
     izNiksCriodaizd
     nixCacheDomain
     ;
@@ -131,7 +131,7 @@ in
 
   networking = {
     firewall = {
-      allowedTCPPorts = optionals izNiksKac [
+      allowedTCPPorts = optionals isNixCache [
         serve.ports.external
         80
       ];
@@ -147,7 +147,7 @@ in
       trusted-users = [
         "root"
         "@nixdev"
-      ] ++ optional izBildyr "nixBuilder";
+      ] ++ optional isBuilder "nixBuilder";
 
       allowed-users = [
         "@users"
@@ -177,13 +177,13 @@ in
       flake-registry = ${nixFlakeRegistryJson}
       experimental-features = nix-command flakes recursive-nix
       secret-key-files = ${preCriad}
-      keep-derivations = ${boolToString saizAtList.med}
-      keep-outputs = ${boolToString saizAtList.max}
+      keep-derivations = ${boolToString sizedAtLeast.med}
+      keep-outputs = ${boolToString sizedAtLeast.max}
       !include nixTokens
     '';
 
-    distributedBuilds = izDispatcyr;
-    buildMachines = optionals izDispatcyr bildyrKonfigz;
+    distributedBuilds = isDispatcher;
+    buildMachines = optionals isDispatcher bildyrKonfigz;
 
   };
 
@@ -192,21 +192,21 @@ in
       {
         nixdev = { };
       }
-      // (optionalAttrs izBildyr { nixBuilder = { }; })
-      // (optionalAttrs izNiksKac {
+      // (optionalAttrs isBuilder { nixBuilder = { }; })
+      // (optionalAttrs isNixCache {
         nix-serve = {
           gid = 199;
         };
       });
 
     users =
-      (optionalAttrs izNiksKac {
+      (optionalAttrs isNixCache {
         nix-serve = {
           uid = 199;
           group = "nix-serve";
         };
       })
-      // (optionalAttrs izBildyr {
+      // (optionalAttrs isBuilder {
         nixBuilder = {
           isNormalUser = true;
           useDefaultShell = true;

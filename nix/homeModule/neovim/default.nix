@@ -24,7 +24,7 @@ let
     optional
     optionalAttrs
     ;
-  inherit (user.spinyrz) izNiksDev saizAtList iuzColemak;
+  inherit (user.methods) izNiksDev sizedAtLeast iuzColemak;
   inherit (hyraizyn) astra;
   inherit (profile) dark;
   inherit (pkgs) parinfer-rust writeText;
@@ -68,13 +68,13 @@ let
 
   vimlPloginz =
     minVimLPloginz
-    ++ (optionals saizAtList.med medVimlPlogins)
-    ++ (optionals saizAtList.max maxVimlPlogins);
+    ++ (optionals sizedAtLeast.med medVimlPlogins)
+    ++ (optionals sizedAtLeast.max maxVimlPlogins);
 
   luaPloginz =
     minLuaPloginz
-    ++ (optionals saizAtList.med medLuaPloginz)
-    ++ (optionals saizAtList.max maxLuaPloginz);
+    ++ (optionals sizedAtLeast.med medLuaPloginz)
+    ++ (optionals sizedAtLeast.max maxLuaPloginz);
 
   minLuaPloginz = with aolPloginz; [
     plenary-nvim
@@ -206,7 +206,7 @@ let
   };
 
   langServers = optionalAttrs izNiksDev (
-    (optionalAttrs saizAtList.med medLangServers) // (optionalAttrs saizAtList.max maxLangServers)
+    (optionalAttrs sizedAtLeast.med medLangServers) // (optionalAttrs sizedAtLeast.max maxLangServers)
   );
 
   medKod =
@@ -260,7 +260,7 @@ let
   };
 
   nioviNiks = {
-    inherit lsp_capabilities langServers saizAtList;
+    inherit lsp_capabilities langServers sizedAtLeast;
   };
 
   nioviNiksFile = writeText "niovi-niks.json" (toJSON nioviNiks);
@@ -304,8 +304,8 @@ let
     + minKod
     + themeKod
     + (readFile ./expressline.lua)
-    + (optionalString (izNiksDev && saizAtList.med) (
-      medLuaKod + optionalString saizAtList.max maxLuaKod
+    + (optionalString (izNiksDev && sizedAtLeast.med) (
+      medLuaKod + optionalString sizedAtLeast.max maxLuaKod
     ));
 
   luaVimrc = writeText "vimrc.lua" initLuaKod;
@@ -333,12 +333,12 @@ in
   home = {
     packages =
       minPackages
-      ++ (optionals (izNiksDev && saizAtList.med) (
-        medPackages ++ (optionals saizAtList.max maxPackages)
+      ++ (optionals (izNiksDev && sizedAtLeast.med) (
+        medPackages ++ (optionals sizedAtLeast.max maxPackages)
       ));
 
     sessionVariables = {
-      EDITOR = if saizAtList.med then "nvr -cc split --remote-wait +'set bufhidden=wipe'" else "nvim";
+      EDITOR = if sizedAtLeast.med then "nvr -cc split --remote-wait +'set bufhidden=wipe'" else "nvim";
     };
   };
 

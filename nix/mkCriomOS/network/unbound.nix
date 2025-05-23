@@ -13,7 +13,7 @@ let
     attrNames
     ;
   inherit (lib) mapAttrsToList concatMapStringsSep lowPrio;
-  inherit (hyraizyn.astra) typeIs criomOSNeim;
+  inherit (hyraizyn.astra) typeIs criomOSName;
 
   listenIPs = [
     "::1"

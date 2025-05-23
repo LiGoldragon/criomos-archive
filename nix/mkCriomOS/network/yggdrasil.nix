@@ -8,7 +8,7 @@
 let
   inherit (builtins) mapAttrs attrNames filter;
   inherit (kor) mkIf optionalString;
-  inherit (hyraizyn.astra.spinyrz) izYggCriodaizd;
+  inherit (hyraizyn.astra.methods) hasYggPrecriad;
   inherit (konstynts) fileSystem;
   inherit (konstynts.fileSystem.yggdrasil)
     preCriadJson
@@ -48,7 +48,7 @@ let
 
   configFile = mkConfigFile yggdrasilConfig;
 
-  seedYggdrasil = !izYggCriodaizd;
+  seedYggdrasil = !hasYggPrecriad;
 
   seedYggdrasilScript = pkgs.writeScript "createYggdrasilKeys.sh" ''
     if [[ ! -e ${preCriadJson} ]]; then

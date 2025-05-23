@@ -23,16 +23,16 @@ let
     ;
   inherit (pkdjz) kynvyrt;
   inherit (hyraizyn) astra;
-  inherit (user.spinyrz)
+  inherit (user.methods)
     iuzColemak
     hazPreCriome
     gitSigningKey
     matrixID
-    saizAtList
+    sizedAtLeast
     izNiksDev
     izSemaDev
     ;
-  inherit (user) githubId neim spinyrz;
+  inherit (user) githubId name methods;
   inherit (profile) dark;
   inherit (pkgs) writeText;
 
@@ -68,7 +68,7 @@ let
 
   fontDeriveicynz =
     [ pkgs.noto-fonts-cjk-sans ]
-    ++ (optionals saizAtList.med (
+    ++ (optionals sizedAtLeast.med (
       with pkgs;
       [
         pkdjz.nerd-fonts.firaCode
@@ -266,7 +266,7 @@ let
   ];
 
 in
-mkIf saizAtList.min {
+mkIf sizedAtLeast.min {
   services = {
     dunst = {
       enable = true;
@@ -322,7 +322,7 @@ mkIf saizAtList.min {
       defaultCacheTtlSsh = 3600;
       maxCacheTtlSsh = 86400;
       enableSshSupport = true;
-      sshKeys = (optional hazPreCriome user.preCriomes.${astra.neim}.keygrip);
+      sshKeys = (optional hazPreCriome user.preCriomes.${astra.name}.keygrip);
     };
 
     mpd = {
@@ -377,8 +377,8 @@ mkIf saizAtList.min {
 
     git = {
       enable = true;
-      userEmail = spinyrz.emailAddress;
-      userName = neim;
+      userEmail = methods.emailAddress;
+      userName = name;
       signing = mkIf hazPreCriome {
         key = gitSigningKey;
         signByDefault = true;
@@ -414,8 +414,8 @@ mkIf saizAtList.min {
           ];
         };
         user = {
-          name = neim;
-          email = spinyrz.emailAddress;
+          name = name;
+          email = methods.emailAddress;
         };
         signing = {
           sign-all = true;
@@ -543,7 +543,7 @@ mkIf saizAtList.min {
       ".config/broot/conf.toml".text = brootConfig;
 
       ".cargo/config.toml".source = kynvyrt {
-        neim = "cargo-config";
+        name = "cargo-config";
         format = "toml";
         valiu = {
           build.target-dir = "${homeDir}/.cargo/sharedTarget";

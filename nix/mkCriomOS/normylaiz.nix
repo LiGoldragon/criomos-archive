@@ -21,7 +21,7 @@ let
   inherit (pkgs) mksh writeScript gnupg;
   inherit (hyraizyn) astra exAstriz;
   inherit (hyraizyn.astra) typeIs;
-  inherit (hyraizyn.astra.spinyrz) tcipIzIntel saizAtList iuzColemak;
+  inherit (hyraizyn.astra.methods) tcipIzIntel sizedAtLeast iuzColemak;
 
   # TODO
   hasAudioOutput = true;
@@ -35,7 +35,7 @@ let
   mkAstriKnownHost =
     n: astri:
     concatStringsSep " " [
-      astri.criomOSNeim
+      astri.criomOSName
       astri.eseseitc
     ];
 
@@ -53,7 +53,7 @@ in
         "xfs"
         "btrfs"
       ]
-      ++ (optional saizAtList.min "exfat")
+      ++ (optional sizedAtLeast.min "exfat")
     );
   };
 
@@ -98,12 +98,12 @@ in
   nixpkgs.overlays = mkOverride 0 [ ];
 
   networking.networkmanager = {
-    enable = saizAtList.min && !typeIs.router;
+    enable = sizedAtLeast.min && !typeIs.router;
   };
 
   programs = {
     zsh.enable = true;
-    adb.enable = saizAtList.med;
+    adb.enable = sizedAtLeast.med;
     light.enable = hasVideoOutput;
   };
 

@@ -144,11 +144,11 @@ rec {
     datom:
     assert mesydj (isAttrs datom) "Spici-Datom is not Attrs";
     let
-      neimz = attrNames datom;
+      names = attrNames datom;
     in
-    assert mesydj ((length neimz) == 1) "Spici-Datom has more than one Attr";
+    assert mesydj ((length names) == 1) "Spici-Datom has more than one Attr";
     let
-      name = head neimz;
+      name = head names;
     in
     {
       inherit name;
@@ -168,10 +168,10 @@ rec {
     spiciz:
     let
       aylSpiciz = map getSpici spiciz;
-      neimz = unique (map (s: s.name) aylSpiciz);
-      meikNeimdYrei = neim: map (s: s.value) (filter (s: s.name == neim) aylSpiciz);
+      names = unique (map (s: s.name) aylSpiciz);
+      meikNamedYrei = name: map (s: s.value) (filter (s: s.name == name) aylSpiciz);
     in
-    genAttrs neimz meikNeimdYrei;
+    genAttrs names meikNamedYrei;
 
   matchEnum = enum: match: genAttrs enum (name: name == match);
 
@@ -181,7 +181,7 @@ rec {
 
   importJSON = path: fromJSON (readFile path);
 
-  eksportJSON = neim: datom: toFile neim (toJSON datom);
+  eksportJSON = name: datom: toFile name (toJSON datom);
 
   getFleik =
     fleik:
@@ -253,13 +253,13 @@ rec {
   matcSaiz =
     saiz: ifNon: ifMin: ifMed: ifMax:
     let
-      saizAtList = mkSaizAtList saiz;
+      sizedAtLeast = mkSaizAtList saiz;
     in
-    if saizAtList.max then
+    if sizedAtLeast.max then
       ifMax
-    else if saizAtList.med then
+    else if sizedAtLeast.med then
       ifMed
-    else if saizAtList.min then
+    else if sizedAtLeast.min then
       ifMin
     else
       ifNon;
@@ -287,10 +287,10 @@ rec {
     { datum, spek }:
     let
       inherit (datum) spici;
-      allSpeksNeimz = concatMap (n: getAttr n spek) (attrNames spek);
-      wantedAttrsNeimz = spek.${spici};
-      izyntWanted = n: !(elem n wantedAttrsNeimz);
-      unwantedAttrs = filter izyntWanted allSpeksNeimz;
+      allSpeksNames = concatMap (n: getAttr n spek) (attrNames spek);
+      wantedAttrsNames = spek.${spici};
+      izyntWanted = n: !(elem n wantedAttrsNames);
+      unwantedAttrs = filter izyntWanted allSpeksNames;
     in
     removeAttrs datum unwantedAttrs;
 

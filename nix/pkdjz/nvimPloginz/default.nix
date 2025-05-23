@@ -6,20 +6,20 @@ let
 
   eksplisitSpoks = { };
 
-  mkImplaidSpoks = neim: spok: spok;
+  mkImplaidSpoks = name: spok: spok;
 
   spoks = eksplisitSpoks // (mapAttrs (n: s: s) implaidSpoks);
 
   ovyraidzIndeks = { };
 
   mkSpok =
-    neim: self:
+    name: self:
     let
-      ovyraidz = ovyraidzIndeks.${neim} or { };
+      ovyraidz = ovyraidzIndeks.${name} or { };
     in
     bildNvimPlogin (
       {
-        pname = neim;
+        pname = name;
         version = self.shortRev;
         src = self;
       }

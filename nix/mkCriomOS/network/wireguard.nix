@@ -20,8 +20,8 @@ let
     filterAttrs
     ;
   inherit (hyraizyn) astra exAstriz;
-  inherit (hyraizyn.astra.spinyrz)
-    hazWireguardPreCriome
+  inherit (hyraizyn.astra.methods)
+    hasWireguardPrecriad
     wireguardUntrustedProxies
     ;
 
@@ -36,13 +36,13 @@ let
 
   untrustedProxiesIps = map mkUntrustedProxyIp wireguardUntrustedProxies;
 
-  mkNeksysPeer = neim: astri: {
+  mkNeksysPeer = name: astri: {
     allowedIPs = [ astri.neksysIp ];
     publicKey = astri.wireguardPreCriome;
-    endpoint = "wg.${astri.criomOSNeim}:51820";
+    endpoint = "wg.${astri.criomOSName}:51820";
   };
 
-  criomeaizdPriNeksiz = filterAttrs (n: v: v.spinyrz.hazWireguardPreCriome) exAstriz;
+  criomeaizdPriNeksiz = filterAttrs (n: v: v.methods.hasWireguardPrecriad) exAstriz;
 
   neksysPeers = mapAttrsToList mkNeksysPeer criomeaizdPriNeksiz;
 

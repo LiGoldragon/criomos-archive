@@ -23,9 +23,9 @@ let
     ;
 
   inherit (hyraizyn) astra exAstriz users;
-  inherit (astra.spinyrz) adminEseseitcPreCriomes;
+  inherit (astra.methods) adminEseseitcPreCriomes;
 
-  userNeimz = attrNames users;
+  userNames = attrNames users;
 
   mkEseseitcString =
     preCriome:
@@ -35,14 +35,14 @@ let
     ];
 
   mkUser =
-    attrNeim: user:
+    attrName: user:
     let
-      inherit (user) trost spinyrz;
-      inherit (user.spinyrz) eseseitcyz hazPreCriome;
+      inherit (user) trost methods;
+      inherit (user.methods) eseseitcyz hazPreCriome;
 
     in
     optionalAttrs (trost > 0) {
-      name = user.neim;
+      name = user.name;
 
       useDefaultShell = true;
       isNormalUser = true;

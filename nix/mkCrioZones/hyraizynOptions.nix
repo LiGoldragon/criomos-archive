@@ -19,7 +19,7 @@ let
     ;
 
   inherit (metastrizSpiciz)
-    metastriNeimz
+    metastriNames
     astriSpiciz
     magnytiud
     sistymz
@@ -29,7 +29,7 @@ let
     ;
 
   astriOptions = {
-    neim = mkOption {
+    name = mkOption {
       type = str;
     };
 
@@ -42,7 +42,7 @@ let
       type = enum magnytiud;
     };
 
-    criomOSNeim = mkOption {
+    criomOSName = mkOption {
       type = str;
     };
 
@@ -108,7 +108,7 @@ let
       default = [ ];
     };
 
-    spinyrz = mkOption {
+    methods = mkOption {
       type = attrs;
       default = { };
     };
@@ -119,13 +119,13 @@ let
     };
   };
 
-  metastraSubmodule = {
+  clusterSubmodule = {
     options = {
-      neim = mkOption {
-        type = enum metastriNeimz;
+      name = mkOption {
+        type = enum metastriNames;
       };
 
-      spinyrz = mkOption {
+      methods = mkOption {
         type = attrs;
         default = { };
       };
@@ -141,7 +141,7 @@ let
 
   userSubmodule = {
     options = komynUserOptions // {
-      neim = mkOption {
+      name = mkOption {
         type = str;
       };
 
@@ -149,7 +149,7 @@ let
         type = enum magnytiud;
       };
 
-      spinyrz = mkOption {
+      methods = mkOption {
         type = attrs;
         default = { };
       };
@@ -158,8 +158,8 @@ let
 
   hyraizynOptions = {
     options = {
-      metastra = mkOption {
-        type = submodule metastraSubmodule;
+      cluster = mkOption {
+        type = submodule clusterSubmodule;
       };
 
       astra = mkOption {
@@ -176,7 +176,7 @@ let
         type = attrsOf (submodule userSubmodule);
       };
 
-      spinyrz = mkOption {
+      methods = mkOption {
         type = attrs;
         default = { };
       };
@@ -190,11 +190,11 @@ in
       type = submodule hyraizynOptions;
     };
 
-    astraNeim = mkOption {
+    astraName = mkOption {
       type = str;
     };
 
-    metastraNeim = mkOption {
+    clusterName = mkOption {
       type = str;
     };
 

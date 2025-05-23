@@ -11,8 +11,8 @@ in
 {
   config = {
     home = {
-      username = user.neim;
-      homeDirectory = "/home/" + user.neim;
+      username = user.name;
+      homeDirectory = "/home/" + user.name;
       # TODO
       stateVersion = "23.11";
     };
