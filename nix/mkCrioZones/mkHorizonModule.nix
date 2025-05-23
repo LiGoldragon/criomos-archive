@@ -17,7 +17,7 @@ let
     elem
     ;
   inherit (kor)
-    louestOf
+    lowestOf
     nameValuePair
     filterAttrs
     speciesDatum
@@ -45,7 +45,7 @@ let
 
   metaTrust = inputCluster.trust.cluster;
 
-  mkTrust = yrei: louestOf (yrei ++ [ metaTrust ]);
+  mkTrust = yrei: lowestOf (yrei ++ [ metaTrust ]);
 
   mkSshString =
     preCriome:
@@ -169,16 +169,16 @@ let
             !typeIs.edj && isFullyTrusted && (sizedAtLeast.med || typeIs.sentyr) && hasBasePrecriads;
           isDispatcher = !typeIs.sentyr && isFullyTrusted && sizedAtLeast.min;
           isNixCache = typeIs.sentyr && sizedAtLeast.min && hasBasePrecriads;
-          izNiksCriodaizd = nixPreCriome != null && nixPreCriome != "";
+          hasNixPreCriad = nixPreCriome != null && nixPreCriome != "";
           hasYggPrecriad = yggAddress != null && yggAddress != "";
           hasSshPrecriad = hasAttr "ssh" inputNode.preCriomes;
           hasWireguardPrecriad = wireguardPreCriome != null;
 
-          hasBasePrecriads = izNiksCriodaizd && hasYggPrecriad && hasSshPrecriad;
+          hasBasePrecriads = hasNixPreCriad && hasYggPrecriad && hasSshPrecriad;
 
           sshPrecriome = if !hasSshPrecriad then "" else mkSshString inputNode.preCriomes.ssh;
 
-          nixPreCriome = optionalString izNiksCriodaizd (
+          nixPreCriome = optionalString hasNixPreCriad (
             concatStringsSep ":" [
               criomOSName
               nixPreCriome
@@ -283,9 +283,9 @@ let
       user = {
         name = userName;
 
-        inherit (inputUser) stail species keyboard;
+        inherit (inputUser) style species keyboard;
 
-        size = louestOf [
+        size = lowestOf [
           inputUser.size
           astra.size
         ];
@@ -298,34 +298,34 @@ let
 
       };
 
-      hazPreCriome = hasAttr astra.name user.preCriomes;
+      hasPreCriome = hasAttr astra.name user.preCriomes;
 
       methods =
         {
-          inherit hazPreCriome;
+          inherit hasPreCriome;
 
           sizedAtLeast = kor.mkSizeAtList user.size;
 
           emailAddress = "${user.name}@${cluster.name}.criome.me";
           matrixID = "@${user.name}:${cluster.name}.criome.me";
 
-          gitSigningKey = if hazPreCriome then ("&" + user.preCriomes.${astra.name}.keygrip) else null;
+          gitSigningKey = if hasPreCriome then ("&" + user.preCriomes.${astra.name}.keygrip) else null;
 
           useColemak = user.keyboard == "colemak";
 
-          izSemaDev = elem user.species [
+          isMultimediaDev = elem user.species [
             "Sema"
             "Onlimityd"
           ];
-          izNiksDev = elem user.species [
+          isCodeDev = elem user.species [
             "Niks"
             "Onlimityd"
           ];
 
-          sshyz = mapAttrsToList (n: pk: mkSshString pk.ssh) user.preCriomes;
+          sshCriomes = mapAttrsToList (n: pk: mkSshString pk.ssh) user.preCriomes;
 
         }
-        // (kor.optionalAttrs hazPreCriome {
+        // (kor.optionalAttrs hasPreCriome {
           ssh = mkSshString user.preCriomes.${astra.name}.ssh;
         });
 

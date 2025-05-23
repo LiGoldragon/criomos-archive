@@ -32,7 +32,7 @@ let
     isBuilder
     isNixCache
     isDispatcher
-    izNiksCriodaizd
+    hasNixPreCriad
     nixCacheDomain
     ;
 

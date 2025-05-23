@@ -7,7 +7,7 @@
 }:
 let
   inherit (kor) optionals;
-  inherit (user.methods) izNiksDev izSemaDev sizedAtLeast;
+  inherit (user.methods) isCodeDev isMultimediaDev sizedAtLeast;
 
   niksDevPackages = with pkgs; [
     pandoc
@@ -39,8 +39,8 @@ kor.mkIf sizedAtLeast.max {
         wineWowPackages.waylandFull
         whatsapp-for-linux
       ]
-      ++ (optionals izNiksDev niksDevPackages)
-      ++ (optionals izSemaDev semaDevPackages);
+      ++ (optionals isCodeDev niksDevPackages)
+      ++ (optionals isMultimediaDev semaDevPackages);
   };
 
   programs = {

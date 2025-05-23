@@ -12,7 +12,7 @@ let
   inherit (kor) optionalString optionals;
   inherit (pkdjz) kynvyrt;
   inherit (user) githubId;
-  inherit (user.methods) izNiksDev useColemak sizedAtLeast;
+  inherit (user.methods) isCodeDev useColemak sizedAtLeast;
   inherit (pkgs) mksh;
 
   tokenaizdWrangler = pkgs.writeScriptBin "wrangler" ''
@@ -139,7 +139,7 @@ kor.mkIf sizedAtLeast.med {
         spotify-player
       ]
       ++ graphicalPackages
-      ++ optionals izNiksDev (niksDevPackages ++ lispDevPackages);
+      ++ optionals isCodeDev (niksDevPackages ++ lispDevPackages);
 
     file = {
       # ".config/jesseduffield/lazygit/config.yml".text = { };

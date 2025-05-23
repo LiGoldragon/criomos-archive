@@ -175,7 +175,7 @@ rec {
 
   matchEnum = enum: match: genAttrs enum (name: name == match);
 
-  louestOf = yrei: head (sort lessThan yrei);
+  lowestOf = yrei: head (sort lessThan yrei);
 
   haiystOf = yrei: tail (sort lessThan yrei);
 

@@ -25,12 +25,12 @@ let
   inherit (horizon) astra;
   inherit (user.methods)
     useColemak
-    hazPreCriome
+    hasPreCriome
     gitSigningKey
     matrixID
     sizedAtLeast
-    izNiksDev
-    izSemaDev
+    isCodeDev
+    isMultimediaDev
     ;
   inherit (user) githubId name methods;
   inherit (profile) dark;
@@ -251,8 +251,8 @@ let
     ]
     ++ bleedingEdgeGraphicalPackages # (Todo configure)
     ++ modernGraphicalPackages # (Todo configure)
-    ++ (optionals izNiksDev unixDeveloperPackages)
-    ++ (optionals izSemaDev (
+    ++ (optionals isCodeDev unixDeveloperPackages)
+    ++ (optionals isMultimediaDev (
       with pkgs;
       [
         inkscape
@@ -322,7 +322,7 @@ mkIf sizedAtLeast.min {
       defaultCacheTtlSsh = 3600;
       maxCacheTtlSsh = 86400;
       enableSshSupport = true;
-      sshKeys = (optional hazPreCriome user.preCriomes.${astra.name}.keygrip);
+      sshKeys = (optional hasPreCriome user.preCriomes.${astra.name}.keygrip);
     };
 
     mpd = {
@@ -331,7 +331,7 @@ mkIf sizedAtLeast.min {
     };
 
     pueue = {
-      enable = izNiksDev;
+      enable = isCodeDev;
       settings = {
         shared = { };
         client = {
@@ -354,8 +354,8 @@ mkIf sizedAtLeast.min {
     };
 
     direnv = {
-      enable = izNiksDev;
-      nix-direnv.enable = izNiksDev;
+      enable = isCodeDev;
+      nix-direnv.enable = isCodeDev;
     };
 
     foot = {
@@ -379,7 +379,7 @@ mkIf sizedAtLeast.min {
       enable = true;
       userEmail = methods.emailAddress;
       userName = name;
-      signing = mkIf hazPreCriome {
+      signing = mkIf hasPreCriome {
         key = gitSigningKey;
         signByDefault = true;
       };
@@ -398,11 +398,11 @@ mkIf sizedAtLeast.min {
     };
 
     joshuto = {
-      enable = izNiksDev;
+      enable = isCodeDev;
     };
 
     jujutsu = {
-      enable = izNiksDev;
+      enable = isCodeDev;
       settings = {
         ui = {
           diff-instructions = false;
@@ -426,7 +426,7 @@ mkIf sizedAtLeast.min {
     };
 
     lapce = {
-      enable = izNiksDev;
+      enable = isCodeDev;
       plugins = [ ];
       settings = {
         core = {

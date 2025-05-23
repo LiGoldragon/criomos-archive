@@ -79,7 +79,7 @@ let
       default = "Sema";
     };
 
-    stail = mkOption {
+    style = mkOption {
       type = enum [
         "vim"
         "emacs"

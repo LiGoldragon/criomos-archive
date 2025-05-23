@@ -38,7 +38,7 @@ let
     attrName: user:
     let
       inherit (user) trust methods;
-      inherit (user.methods) sshyz hazPreCriome;
+      inherit (user.methods) sshCriomes hasPreCriome;
 
     in
     optionalAttrs (trust > 0) {
@@ -47,7 +47,7 @@ let
       useDefaultShell = true;
       isNormalUser = true;
 
-      openssh.authorizedKeys.keys = sshyz;
+      openssh.authorizedKeys.keys = sshCriomes;
 
       extraGroups =
         [ "audio" ]

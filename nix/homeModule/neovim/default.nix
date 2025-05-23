@@ -24,7 +24,7 @@ let
     optional
     optionalAttrs
     ;
-  inherit (user.methods) izNiksDev sizedAtLeast useColemak;
+  inherit (user.methods) isCodeDev sizedAtLeast useColemak;
   inherit (horizon) astra;
   inherit (profile) dark;
   inherit (pkgs) parinfer-rust writeText;
@@ -205,7 +205,7 @@ let
     };
   };
 
-  langServers = optionalAttrs izNiksDev (
+  langServers = optionalAttrs isCodeDev (
     (optionalAttrs sizedAtLeast.med medLangServers) // (optionalAttrs sizedAtLeast.max maxLangServers)
   );
 
@@ -304,7 +304,7 @@ let
     + minKod
     + themeKod
     + (readFile ./expressline.lua)
-    + (optionalString (izNiksDev && sizedAtLeast.med) (
+    + (optionalString (isCodeDev && sizedAtLeast.med) (
       medLuaKod + optionalString sizedAtLeast.max maxLuaKod
     ));
 
@@ -333,7 +333,7 @@ in
   home = {
     packages =
       minPackages
-      ++ (optionals (izNiksDev && sizedAtLeast.med) (
+      ++ (optionals (isCodeDev && sizedAtLeast.med) (
         medPackages ++ (optionals sizedAtLeast.max maxPackages)
       ));
 

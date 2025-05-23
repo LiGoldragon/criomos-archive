@@ -18,8 +18,8 @@ let
   inherit (user.methods)
     sizedAtLeast
     useColemak
-    izNiksDev
-    izSemaDev
+    isCodeDev
+    isMultimediaDev
     ;
   inherit (user) size;
   inherit (profile) dark;
