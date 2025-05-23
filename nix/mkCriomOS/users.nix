@@ -37,11 +37,11 @@ let
   mkUser =
     attrName: user:
     let
-      inherit (user) trost methods;
+      inherit (user) trust methods;
       inherit (user.methods) sshyz hazPreCriome;
 
     in
-    optionalAttrs (trost > 0) {
+    optionalAttrs (trust > 0) {
       name = user.name;
 
       useDefaultShell = true;
@@ -52,10 +52,10 @@ let
       extraGroups =
         [ "audio" ]
         ++ (optional (config.programs.sway.enable == true) "sway")
-        ++ (optionals (trost >= 2) (
+        ++ (optionals (trust >= 2) (
           [ "video" ] ++ (optional (config.networking.networkmanager.enable == true)) "networkmanager"
         ))
-        ++ (optionals (trost >= 3) [
+        ++ (optionals (trust >= 3) [
           "adbusers"
           "nixdev"
           "systemd-journal"

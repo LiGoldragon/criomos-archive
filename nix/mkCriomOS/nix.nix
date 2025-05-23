@@ -21,7 +21,7 @@ let
     optionalAttrs
     ;
 
-  inherit (horizon.cluster.methods) trostydBildPreCriomes;
+  inherit (horizon.cluster.methods) trustydBildPreCriomes;
   inherit (horizon) astra;
   inherit (horizon.astra.methods)
     bildyrKonfigz
@@ -159,7 +159,7 @@ in
       connect-timeout = 5;
       fallback = true;
 
-      trusted-public-keys = trostydBildPreCriomes;
+      trusted-public-keys = trustydBildPreCriomes;
       substituters = kacURLz;
       trusted-binary-caches = kacURLz;
 

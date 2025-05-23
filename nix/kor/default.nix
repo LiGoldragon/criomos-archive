@@ -244,16 +244,16 @@ rec {
     avr = "avr-none";
   };
 
-  mkSaizAtList = saiz: {
-    min = saiz >= 1;
-    med = saiz >= 2;
-    max = saiz == 3;
+  mkSizeAtList = size: {
+    min = size >= 1;
+    med = size >= 2;
+    max = size == 3;
   };
 
-  matcSaiz =
-    saiz: ifNon: ifMin: ifMed: ifMax:
+  matcSize =
+    size: ifNon: ifMin: ifMed: ifMax:
     let
-      sizedAtLeast = mkSaizAtList saiz;
+      sizedAtLeast = mkSizeAtList size;
     in
     if sizedAtLeast.max then
       ifMax

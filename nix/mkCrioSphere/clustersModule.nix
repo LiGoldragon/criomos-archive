@@ -63,12 +63,12 @@ let
         default = "sentyr";
       };
 
-      saiz = mkOption {
+      size = mkOption {
         type = enum magnytiud;
         default = 0;
       };
 
-      trost = mkOption {
+      trust = mkOption {
         type = enum magnytiud;
         default = 1;
       };
@@ -105,11 +105,11 @@ let
     };
   };
 
-  defaultTrost = 1;
+  defaultTrust = 1;
 
-  mkDefaultTrostFromNames = names: listToAttrs (map (n: nameValuePair n defaultTrost)) names;
+  mkDefaultTrustFromNames = names: listToAttrs (map (n: nameValuePair n defaultTrust)) names;
 
-  trostSubmodule = {
+  trustSubmodule = {
     options = {
       cluster = mkOption {
         type = enum magnytiud;
@@ -147,7 +147,7 @@ let
     { name, config, ... }@metnodeArgs:
     let
       preCluster = preClusters."${name}";
-      mkDefaultNodeTrost = name: node: preCluster.trost.nodes."${name}" or 1;
+      mkDefaultNodeTrust = name: node: preCluster.trust.nodes."${name}" or 1;
     in
     {
       options = {
@@ -164,7 +164,7 @@ let
           default = { };
         };
 
-        trost = mkOption {
+        trust = mkOption {
           type = submodule ({
             options = {
               cluster = mkOption {
@@ -186,7 +186,7 @@ let
             };
 
             config = {
-              nodes = mapAttrs mkDefaultNodeTrost preCluster.nodes;
+              nodes = mapAttrs mkDefaultNodeTrust preCluster.nodes;
             };
           });
         };

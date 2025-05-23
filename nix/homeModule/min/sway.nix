@@ -13,7 +13,7 @@ let
     mkIf
     optionals
     optionalString
-    matcSaiz
+    matcSize
     ;
   inherit (user.methods)
     sizedAtLeast
@@ -21,7 +21,7 @@ let
     izNiksDev
     izSemaDev
     ;
-  inherit (user) saiz;
+  inherit (user) size;
   inherit (profile) dark;
   inherit (pkgs) writeText;
   inherit (horizon.astra.machine) model;
@@ -44,7 +44,7 @@ let
     waybarEksek = nixProfileExec "waybar";
     swaylockEksek = nixProfileExec "swaylock";
     browser =
-      matcSaiz saiz "" termBrowser "${nixProfileExec "qutebrowser"}"
+      matcSize size "" termBrowser "${nixProfileExec "qutebrowser"}"
         "${nixProfileExec "qutebrowser"}";
     launcher = "${nixProfileExec "wofi"} --show drun";
     shellTerm = shellLaunch "export SHELL=${zshEksek}; exec ${terminal} ${zshEksek}";

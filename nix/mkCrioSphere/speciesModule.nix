@@ -65,7 +65,7 @@ let
   };
 
   komynUserOptions = {
-    saiz = mkOption {
+    size = mkOption {
       type = enum magnytiud;
       default = 0;
     };

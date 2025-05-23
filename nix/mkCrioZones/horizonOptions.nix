@@ -38,7 +38,7 @@ let
       default = "sentyr";
     };
 
-    trost = mkOption {
+    trust = mkOption {
       type = enum magnytiud;
     };
 
@@ -55,7 +55,7 @@ let
       default = 1;
     };
 
-    saiz = mkOption {
+    size = mkOption {
       type = enum magnytiud;
     };
 
@@ -145,7 +145,7 @@ let
         type = str;
       };
 
-      trost = mkOption {
+      trust = mkOption {
         type = enum magnytiud;
       };
 

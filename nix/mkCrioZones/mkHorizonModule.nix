@@ -43,9 +43,9 @@ let
     "criome"
   ];
 
-  metaTrost = inputCluster.trost.cluster;
+  metaTrust = inputCluster.trust.cluster;
 
-  mkTrost = yrei: louestOf (yrei ++ [ metaTrost ]);
+  mkTrust = yrei: louestOf (yrei ++ [ metaTrust ]);
 
   mkSshString =
     preCriome:
@@ -62,7 +62,7 @@ let
     let
       # (TODO typecheck)
       inputNode = inputNodes.${nodeName};
-      inherit (inputNode) saiz species;
+      inherit (inputNode) size species;
       inherit (inputNode.preCriomes) yggdrasil;
 
       filteredMachine = speciesDatum {
@@ -116,7 +116,7 @@ let
         nameValuePair name isOfThisType;
 
       node = {
-        inherit saiz species;
+        inherit size species;
 
         name = nodeName;
         inherit machine wireguardPreCriome nodeIp;
@@ -124,9 +124,9 @@ let
         linkLocalIPs =
           if (hasAttr "linkLocalIPs" inputNode) then (map mkLinkLocalIP inputNode.linkLocalIPs) else [ ];
 
-        trost = mkTrost [
-          inputNode.trost
-          inputCluster.trost.nodes.${nodeName}
+        trust = mkTrust [
+          inputNode.trust
+          inputCluster.trust.nodes.${nodeName}
         ];
 
         ssh = mkSshString inputNode.preCriomes.ssh;
@@ -153,8 +153,8 @@ let
         let
           inherit (node)
             species
-            trost
-            saiz
+            trust
+            size
             nixPreCriome
             yggAddress
             criomOSName
@@ -163,8 +163,8 @@ let
 
         in
         rec {
-          isFullyTrusted = trost == 3;
-          sizedAtLeast = kor.mkSaizAtList saiz;
+          isFullyTrusted = trust == 3;
+          sizedAtLeast = kor.mkSizeAtList size;
           isBuilder =
             !typeIs.edj && isFullyTrusted && (sizedAtLeast.med || typeIs.sentyr) && hasBasePrecriads;
           isDispatcher = !typeIs.sentyr && isFullyTrusted && sizedAtLeast.min;
@@ -198,7 +198,7 @@ let
   kacyz = filter (n: nodes.${n}.methods.isNixCache) exNodeNames;
   dispatcyrz = filter (n: nodes.${n}.methods.isDispatcher) exNodeNames;
 
-  adminUserNames = filter (n: users.${n}.trost == 3) userNames;
+  adminUserNames = filter (n: users.${n}.trust == 3) userNames;
 
   astraMethods =
     let
@@ -222,13 +222,13 @@ let
         let
           adminUser = users.${adminUserName};
           preCriomeNodeNames = attrNames adminUser.preCriomes;
-          izNodeFulyTrostyd = n: nodes.${n}.methods.isFullyTrusted;
-          fulyTrostydPreCriomeNames = filter izNodeFulyTrostyd preCriomeNodeNames;
+          izNodeFulyTrustyd = n: nodes.${n}.methods.isFullyTrusted;
+          fulyTrustydPreCriomeNames = filter izNodeFulyTrustyd preCriomeNodeNames;
           getSshString =
             n:
             if (adminUser.preCriomes.${n}.ssh == null) then "" else (mkSshString adminUser.preCriomes.${n}.ssh);
         in
-        map getSshString fulyTrostydPreCriomeNames;
+        map getSshString fulyTrustydPreCriomeNames;
 
       inherit (astra.machine) model;
       thinkpadModels = [
@@ -285,12 +285,12 @@ let
 
         inherit (inputUser) stail species keyboard;
 
-        saiz = louestOf [
-          inputUser.saiz
-          astra.saiz
+        size = louestOf [
+          inputUser.size
+          astra.size
         ];
 
-        trost = inputCluster.trost.users.${userName};
+        trust = inputCluster.trust.users.${userName};
 
         preCriomes = filterAttrs tcekPreCriome inputUser.preCriomes;
 
@@ -304,7 +304,7 @@ let
         {
           inherit hazPreCriome;
 
-          sizedAtLeast = kor.mkSaizAtList user.saiz;
+          sizedAtLeast = kor.mkSizeAtList user.size;
 
           emailAddress = "${user.name}@${cluster.name}.criome.me";
           matrixID = "@${user.name}:${cluster.name}.criome.me";
@@ -333,14 +333,14 @@ let
     user // { inherit methods; };
 
   nodes = listToAttrs (
-    map (y: nameValuePair y.name y) (filter (x: x.trost != 0) (map (n: mkNode n) nodeNames))
+    map (y: nameValuePair y.name y) (filter (x: x.trust != 0) (map (n: mkNode n) nodeNames))
   );
 
   cluster = {
     name = clusterName;
 
     methods = {
-      trostydBildPreCriomes = map (n: nodes.${n}.methods.nixPreCriome) nodeNames;
+      trustydBildPreCriomes = map (n: nodes.${n}.methods.nixPreCriome) nodeNames;
     };
   };
 
@@ -357,7 +357,7 @@ let
     };
 
   users = listToAttrs (
-    map (y: nameValuePair y.name y) (filter (x: x.trost != 0) (map (n: mkUser n) userNames))
+    map (y: nameValuePair y.name y) (filter (x: x.trust != 0) (map (n: mkUser n) userNames))
   );
 
 in

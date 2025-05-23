@@ -13,7 +13,7 @@ local lspconfig
 local lsp_status
 local default_lsp_capabilities
 
-if niks.saizAtList.med then
+if niks.sizeAtList.med then
   lspconfig = require('lspconfig')
   lsp_status = require('lsp-status')
   lsp_status.register_progress()
@@ -50,6 +50,6 @@ niovi.lsp.setup = function()
   end
 end
 
-niovi.setup = function() if niks.saizAtList.med then niovi.lsp.setup() end end
+niovi.setup = function() if niks.sizeAtList.med then niovi.lsp.setup() end end
 
 niovi.setup()
