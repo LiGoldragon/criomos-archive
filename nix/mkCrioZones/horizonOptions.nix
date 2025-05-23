@@ -28,7 +28,7 @@ let
     IoOptions
     ;
 
-  nodeOptions = {
+  exNodeOptions = {
     name = mkOption {
       type = str;
     };
@@ -132,7 +132,7 @@ let
     };
   };
 
-  nodeOptions = nodeOptions // {
+  nodeOptions = exNodeOptions // {
     io = mkOption {
       type = submodule { options = IoOptions; };
       default = { };
@@ -168,7 +168,7 @@ let
 
       exNodes = mkOption {
         type = attrsOf (submodule {
-          options = nodeOptions;
+          options = exNodeOptions;
         });
       };
 
