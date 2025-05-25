@@ -35,7 +35,7 @@ let
 
     species = mkOption {
       type = enum nodeSpecies;
-      default = "sentyr";
+      default = "center";
     };
 
     trust = mkOption {

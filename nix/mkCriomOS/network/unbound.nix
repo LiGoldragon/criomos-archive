@@ -48,7 +48,7 @@ let
 in
 {
   services.unbound = {
-    # enable = (!typeIs.edj); # bootstrap
+    # enable = (!typeIs.edge); # bootstrap
     enable = true;
     settings = {
       server = {

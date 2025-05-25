@@ -166,9 +166,9 @@ let
           isFullyTrusted = trust == 3;
           sizedAtLeast = kor.mkSizeAtList size;
           isBuilder =
-            !typeIs.edj && isFullyTrusted && (sizedAtLeast.med || typeIs.sentyr) && hasBasePrecriads;
-          isDispatcher = !typeIs.sentyr && isFullyTrusted && sizedAtLeast.min;
-          isNixCache = typeIs.sentyr && sizedAtLeast.min && hasBasePrecriads;
+            !typeIs.edge && isFullyTrusted && (sizedAtLeast.med || typeIs.center) && hasBasePrecriads;
+          isDispatcher = !typeIs.center && isFullyTrusted && sizedAtLeast.min;
+          isNixCache = typeIs.center && sizedAtLeast.min && hasBasePrecriads;
           hasNixPreCriad = node.nixPreCriome != null && node.nixPreCriome != "";
           hasYggPrecriad = yggAddress != null && yggAddress != "";
           hasSshPrecriad = hasAttr "ssh" inputNode.preCriomes;
@@ -211,7 +211,7 @@ let
           hostName = node.criomeDomainName;
           sshUser = "nixBuilder";
           sshKey = "/etc/ssh/ssh_host_ed25519_key";
-          supportedFeatures = optional (!node.typeIs.edj) "big-parallel";
+          supportedFeatures = optional (!node.typeIs.edge) "big-parallel";
           system = node.system;
           systems = lib.optional (node.system == "x86_64-linux") "i686-linux";
           maxJobs = node.nbOfBuildCores;

@@ -1,6 +1,6 @@
 {
   liveIso-x86-64-small = {
-    species = "haibrid";
+    species = "hybrid";
     size = 1;
     machine = {
       species = "metal";

@@ -103,7 +103,7 @@ in
       ++ optional computerIs.rpi3B raspberrypiWirelessFirmware
       ++ optional requiresSofFirmware sof-firmware;
 
-    ledger.enable = typeIs.edj;
+    ledger.enable = typeIs.edge;
 
     graphics.extraPackages =
       optionals tcipIzIntel intelGraphicsPackages
@@ -219,12 +219,12 @@ in
       autoRepeatDelay = 200;
       autoRepeatInterval = 28;
 
-      digimend.enable = false; # !typeIs.sentyr; # Broken
+      digimend.enable = false; # !typeIs.center; # Broken
     };
 
     logind = {
-      lidSwitch = if typeIs.sentyr then "ignore" else "suspend";
-      lidSwitchExternalPower = if typeIs.edj then "suspend" else "ignore";
+      lidSwitch = if typeIs.center then "ignore" else "suspend";
+      lidSwitchExternalPower = if typeIs.edge then "suspend" else "ignore";
     };
 
     thinkfan = mkIf modelIzThinkpad {

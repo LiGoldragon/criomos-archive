@@ -42,10 +42,10 @@ let
   ];
 
   nodeSpecies = [
-    "sentyr"
-    "haibrid"
-    "edj"
-    "edjTesting"
+    "center"
+    "hybrid"
+    "edge"
+    "edgeTesting"
     "mediaBroadcast"
     "router"
   ];

@@ -15,15 +15,15 @@ let
   usePodModule = (machine.species == "pod");
   useMetalModule = (machine.species == "metal");
 
-  useRouterModule = typeIs.haibrid || typeIs.router;
-  useEdjModule = typeIs.edj || typeIs.haibrid || typeIs.edjTesting;
+  useRouterModule = typeIs.hybrid || typeIs.router;
+  useEdgeModule = typeIs.edge || typeIs.hybrid || typeIs.edgeTesting;
   useIsoModule = !usePodModule && (io.disks == { });
 
   usersModule = import ./users.nix;
   nixModule = import ./nix.nix;
   normalizeModule = import ./normalize.nix;
   networkModule = import ./network;
-  edjModule = import ./edj;
+  edgeModule = import ./edge;
 
   disksModule =
     if usePodModule then
@@ -45,7 +45,7 @@ let
 
   nixosModules =
     baseModules
-    ++ (optional useEdjModule edjModule)
+    ++ (optional useEdgeModule edgeModule)
     ++ (optional useRouterModule ./router)
     ++ (optional useIsoModule home-manager.nixosModules.default)
     ++ (optional useMetalModule metalModule);

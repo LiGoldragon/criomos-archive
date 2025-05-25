@@ -63,7 +63,7 @@ in
     firejail.enable = sizedAtLeast.med;
 
     hyprland = {
-      enable = typeIs.edjTesting || typeIs.haibrid;
+      enable = typeIs.edgeTesting || typeIs.hybrid;
     };
 
     regreet = {
@@ -100,15 +100,15 @@ in
     xserver = {
       enable = sizedAtLeast.min;
       excludePackages = with pkgs; [ xorg.xorgserver.out ];
-      desktopManager.gnome.enable = sizedAtLeast.med && typeIs.edj;
+      desktopManager.gnome.enable = sizedAtLeast.med && typeIs.edge;
       displayManager = {
         gdm = {
           enable = sizedAtLeast.min;
-          autoSuspend = typeIs.edj;
+          autoSuspend = typeIs.edge;
         };
       };
 
-      windowManager.hypr.enable = typeIs.edjTesting || typeIs.haibrid;
+      windowManager.hypr.enable = typeIs.edgeTesting || typeIs.hybrid;
     };
   };
 }

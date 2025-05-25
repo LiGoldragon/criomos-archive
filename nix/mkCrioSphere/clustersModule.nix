@@ -60,7 +60,7 @@ let
     options = {
       species = mkOption {
         type = enum nodeSpecies;
-        default = "sentyr";
+        default = "center";
       };
 
       size = mkOption {
