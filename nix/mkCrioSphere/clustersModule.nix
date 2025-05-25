@@ -17,10 +17,10 @@ let
     listOf
     ;
   inherit (config.species)
-    magnytiud
-    metnodeNames
+    magnitude
+    clusterNames
     nodeSpecies
-    komynUserOptions
+    commonUserOptions
     machineSpecies
     IoOptions
     ;
@@ -64,12 +64,12 @@ let
       };
 
       size = mkOption {
-        type = enum magnytiud;
+        type = enum magnitude;
         default = 0;
       };
 
       trust = mkOption {
-        type = enum magnytiud;
+        type = enum magnitude;
         default = 1;
       };
 
@@ -87,7 +87,7 @@ let
         default = { };
       };
 
-      linkLocalIPs = mkOption {
+      linkLocalIps = mkOption {
         type = listOf attrs;
         default = [ ];
       };
@@ -112,25 +112,25 @@ let
   trustSubmodule = {
     options = {
       cluster = mkOption {
-        type = enum magnytiud;
+        type = enum magnitude;
         default = 1;
       };
 
       clusters = mkOption {
-        type = attrsOf (enum magnytiud);
+        type = attrsOf (enum magnitude);
       };
 
       nodes = mkOption {
-        type = attrsOf (enum magnytiud);
+        type = attrsOf (enum magnitude);
       };
 
       users = mkOption {
-        type = attrsOf (enum magnytiud);
+        type = attrsOf (enum magnitude);
       };
     };
   };
 
-  domeinSubmodule = {
+  domainSubmodule = {
     options = {
       species = mkOption {
         type = enum [ "cloudflare" ];
@@ -140,11 +140,11 @@ let
   };
 
   userSubmodule = {
-    options = komynUserOptions;
+    options = commonUserOptions;
   };
 
-  metnodeSubmodule = (
-    { name, config, ... }@metnodeArgs:
+  clusterSubmodule = (
+    { name, config, ... }@clusterArgs:
     let
       preCluster = preClusters."${name}";
       mkDefaultNodeTrust = name: node: preCluster.trust.nodes."${name}" or 1;
@@ -159,8 +159,8 @@ let
           type = attrsOf (submodule userSubmodule);
         };
 
-        domeinz = mkOption {
-          type = attrsOf (submodule domeinSubmodule);
+        domains = mkOption {
+          type = attrsOf (submodule domainSubmodule);
           default = { };
         };
 
@@ -168,20 +168,20 @@ let
           type = submodule ({
             options = {
               cluster = mkOption {
-                type = enum magnytiud;
+                type = enum magnitude;
                 default = 1;
               };
 
               clusters = mkOption {
-                type = attrsOf (enum magnytiud);
+                type = attrsOf (enum magnitude);
               };
 
               nodes = mkOption {
-                type = attrsOf (enum magnytiud);
+                type = attrsOf (enum magnitude);
               };
 
               users = mkOption {
-                type = attrsOf (enum magnytiud);
+                type = attrsOf (enum magnitude);
               };
             };
 
@@ -198,7 +198,7 @@ in
 {
   options = {
     Clusters = mkOption {
-      type = attrsOf (submodule metnodeSubmodule);
+      type = attrsOf (submodule clusterSubmodule);
     };
   };
 

@@ -35,7 +35,7 @@ let
   mkNodeKnownHost =
     n: node:
     concatStringsSep " " [
-      node.criomOSName
+      node.criomeDomainName
       node.ssh
     ];
 

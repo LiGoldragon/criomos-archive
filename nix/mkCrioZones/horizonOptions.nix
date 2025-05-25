@@ -19,11 +19,11 @@ let
     ;
 
   inherit (clustersSpecies)
-    metnodeNames
+    clusterNames
     nodeSpecies
-    magnytiud
+    magnitude
     systems
-    komynUserOptions
+    commonUserOptions
     machineSpecies
     IoOptions
     ;
@@ -39,10 +39,10 @@ let
     };
 
     trust = mkOption {
-      type = enum magnytiud;
+      type = enum magnitude;
     };
 
-    criomOSName = mkOption {
+    criomeDomainName = mkOption {
       type = str;
     };
 
@@ -56,7 +56,7 @@ let
     };
 
     size = mkOption {
-      type = enum magnytiud;
+      type = enum magnitude;
     };
 
     machine = mkOption {
@@ -88,7 +88,7 @@ let
       default = null;
     };
 
-    linkLocalIPs = mkOption {
+    linkLocalIps = mkOption {
       type = listOf str;
       default = [ ];
     };
@@ -122,7 +122,7 @@ let
   clusterSubmodule = {
     options = {
       name = mkOption {
-        type = enum metnodeNames;
+        type = enum clusterNames;
       };
 
       methods = mkOption {
@@ -140,13 +140,13 @@ let
   };
 
   userSubmodule = {
-    options = komynUserOptions // {
+    options = commonUserOptions // {
       name = mkOption {
         type = str;
       };
 
       trust = mkOption {
-        type = enum magnytiud;
+        type = enum magnitude;
       };
 
       methods = mkOption {

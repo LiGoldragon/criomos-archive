@@ -13,26 +13,26 @@ let
   mkCriomeHostEntries =
     name: node:
     let
-      inherit (node) criomOSName nodeIp yggAddress;
+      inherit (node) criomeDomainName nodeIp yggAddress;
       inherit (node.methods) isNixCache nixCacheDomain;
 
       mkPreNodeHost = linkLocalIP: {
         name = linkLocalIP;
-        value = [ ("wg." + criomOSName) ];
+        value = [ ("wg." + criomeDomainName) ];
       };
 
       nodeHost = {
         name = nodeIp;
-        value = [ criomOSName ];
+        value = [ criomeDomainName ];
       };
 
-      preNodeHosts = map mkPreNodeHost node.linkLocalIPs;
+      preNodeHosts = map mkPreNodeHost node.linkLocalIps;
 
       nodeHosts = optionals (nodeIp != null) ([ nodeHost ] ++ preNodeHosts);
 
       yggdrasilHost = optional (yggAddress != null) {
         name = yggAddress;
-        value = [ criomOSName ] ++ (optional isNixCache nixCacheDomain);
+        value = [ criomeDomainName ] ++ (optional isNixCache nixCacheDomain);
       };
 
     in

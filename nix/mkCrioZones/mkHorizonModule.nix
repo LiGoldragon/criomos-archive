@@ -29,7 +29,7 @@ let
     unique
     ;
   inherit (config) clusterName nodeName species;
-  inherit (clustersSpecies) metnodeNames nodeSpecies;
+  inherit (clustersSpecies) clusterNames nodeSpecies;
 
   inputCluster = Clusters.${clusterName};
   inputNodes = inputCluster.nodes;
@@ -38,7 +38,7 @@ let
   nodeNames = attrNames inputCluster.nodes;
   userNames = attrNames inputCluster.users;
 
-  nodeCriomOSName = concatStringsSep "." [
+  nodeCriomeDomainName = concatStringsSep "." [
     clusterName
     "criome"
   ];
@@ -121,8 +121,8 @@ let
         name = nodeName;
         inherit machine wireguardPreCriome nodeIp;
 
-        linkLocalIPs =
-          if (hasAttr "linkLocalIPs" inputNode) then (map mkLinkLocalIP inputNode.linkLocalIPs) else [ ];
+        linkLocalIps =
+          if (hasAttr "linkLocalIps" inputNode) then (map mkLinkLocalIP inputNode.linkLocalIps) else [ ];
 
         trust = mkTrust [
           inputNode.trust
@@ -137,9 +137,9 @@ let
 
         inherit (inputNode.preCriomes) nixPreCriome;
 
-        criomOSName = concatStringsSep "." [
+        criomeDomainName = concatStringsSep "." [
           nodeName
-          nodeCriomOSName
+          nodeCriomeDomainName
         ];
 
         system = archToSystemMap.${machine.arch};
@@ -157,7 +157,7 @@ let
             size
             nixPreCriome
             yggAddress
-            criomOSName
+            criomeDomainName
             typeIs
             ;
 
@@ -180,12 +180,12 @@ let
 
           nixPreCriome = optionalString hasNixPreCriad (
             concatStringsSep ":" [
-              criomOSName
+              criomeDomainName
               node.nixPreCriome
             ]
           );
 
-          nixCacheDomain = if isNixCache then ("nix." + criomOSName) else null;
+          nixCacheDomain = if isNixCache then ("nix." + criomeDomainName) else null;
           nixUrl = if isNixCache then ("http://" + nixCacheDomain) else null;
 
         };
@@ -208,7 +208,7 @@ let
           node = exNodes.${n};
         in
         {
-          hostName = node.criomOSName;
+          hostName = node.criomeDomainName;
           sshUser = "nixBuilder";
           sshKey = "/etc/ssh/ssh_host_ed25519_key";
           supportedFeatures = optional (!node.typeIs.edj) "big-parallel";

@@ -39,7 +39,7 @@ let
   mkNodePeer = name: node: {
     allowedIPs = [ node.nodeIp ];
     publicKey = node.wireguardPreCriome;
-    endpoint = "wg.${node.criomOSName}:51820";
+    endpoint = "wg.${node.criomeDomainName}:51820";
   };
 
   validPreNodes = filterAttrs (n: v: v.methods.hasWireguardPrecriad) exNodes;

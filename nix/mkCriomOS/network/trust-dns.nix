@@ -11,13 +11,13 @@
 let
   inherit (builtins) map;
   inherit (lib) mkOverride;
-  inherit (horizon.node) criomOSName;
+  inherit (horizon.node) criomeDomainName;
   inherit (pkdjz) trust-dns;
 
   trustDnsEksek = "${trust-dns}/bin/named";
 
   nodeZone = {
-    zone = criomOSName;
+    zone = criomeDomainName;
     zone_type = "Master";
     file = "example.com.zone";
     allow_update = false;

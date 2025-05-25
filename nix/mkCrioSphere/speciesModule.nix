@@ -21,7 +21,7 @@ let
     attrs
     ;
 
-  magnytiud = [
+  magnitude = [
     0
     1
     2
@@ -50,7 +50,7 @@ let
     "router"
   ];
 
-  metnodeNames = attrNames preClusters;
+  clusterNames = attrNames preClusters;
 
   preCriomeSubmodule = {
     options = {
@@ -64,9 +64,9 @@ let
     };
   };
 
-  komynUserOptions = {
+  commonUserOptions = {
     size = mkOption {
-      type = enum magnytiud;
+      type = enum magnitude;
       default = 0;
     };
 
@@ -183,13 +183,13 @@ in
 
   config.species = {
     inherit
-      komynUserOptions
+      commonUserOptions
       IoOptions
       machineSpecies
       keyboards
       bootloaders
-      magnytiud
-      metnodeNames
+      magnitude
+      clusterNames
       nodeSpecies
       systems
       ;
