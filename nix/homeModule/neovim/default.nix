@@ -259,13 +259,13 @@ let
     };
   };
 
-  nioviNiks = {
+  nioviNix = {
     inherit lsp_capabilities langServers sizedAtLeast;
   };
 
-  nioviNiksFile = writeText "niovi-niks.json" (toJSON nioviNiks);
-  niksPathLuaKod = ''
-    local niks_path = '${nioviNiksFile}'
+  nioviNixFile = writeText "niovi-nix.json" (toJSON nioviNix);
+  nixPathLuaKod = ''
+    local nix_path = '${nioviNixFile}'
   '';
 
   luaMods = [ ];
@@ -292,7 +292,7 @@ let
 
   initLuaKod =
     loadLuaPathsKod
-    + niksPathLuaKod
+    + nixPathLuaKod
     + (readFile ./vimLib.lua)
     + (readFile ./niovi.lua)
     + (optionalString useColemak readFile ./colemak.lua)

@@ -9,12 +9,7 @@ let
 in
 {
   fileSystem = {
-    niks = rec {
-      baseDyrektori = "/niks";
-      podzDyrektori = baseDyrektori + "/podz";
-    };
-
-    niks = rec {
+    nix = rec {
       stateDirectory = "/etc/nix";
       preCriad = "/etc/nix/preCriad";
     };
@@ -62,7 +57,7 @@ in
       };
     };
 
-    niks = {
+    nix = {
       serve = {
         ports = {
           external = 5000;

@@ -164,7 +164,7 @@ let
         in
         rec {
           isFullyTrusted = trust == 3;
-          sizedAtLeast = kor.mkSizeAtList size;
+          sizedAtLeast = kor.mkSizeAtLeast size;
           isBuilder =
             !typeIs.edge && isFullyTrusted && (sizedAtLeast.med || typeIs.center) && hasBasePrecriads;
           isDispatcher = !typeIs.center && isFullyTrusted && sizedAtLeast.min;
@@ -304,7 +304,7 @@ let
         {
           inherit hasPreCriome;
 
-          sizedAtLeast = kor.mkSizeAtList user.size;
+          sizedAtLeast = kor.mkSizeAtLeast user.size;
 
           emailAddress = "${user.name}@${cluster.name}.criome.me";
           matrixID = "@${user.name}:${cluster.name}.criome.me";
@@ -314,12 +314,13 @@ let
           useColemak = user.keyboard == "colemak";
 
           isMultimediaDev = elem user.species [
-            "Sema"
-            "Onlimityd"
+            "multimedia"
+            "unlimited"
           ];
+
           isCodeDev = elem user.species [
-            "Niks"
-            "Onlimityd"
+            "code"
+            "unlimited"
           ];
 
           sshCriomes = mapAttrsToList (n: pk: mkSshString pk.ssh) user.preCriomes;
@@ -340,7 +341,7 @@ let
     name = clusterName;
 
     methods = {
-      trustydBildPreCriomes = map (n: nodes.${n}.methods.nixPreCriome) nodeNames;
+      trustydBuildPreCriomes = map (n: nodes.${n}.methods.nixPreCriome) nodeNames;
     };
   };
 

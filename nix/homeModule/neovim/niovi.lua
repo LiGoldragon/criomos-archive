@@ -6,19 +6,19 @@ niovi = {}
 niovi.path = path
 niovi.json = json
 
-local niks = json.decode(path.new(niks_path):read())
-niovi.niks = niks
+local nix = json.decode(path.new(nix_path):read())
+niovi.nix = nix
 
 local lspconfig
 local lsp_status
 local default_lsp_capabilities
 
-if niks.sizeAtList.med then
+if nix.sizeAtLeast.med then
   lspconfig = require('lspconfig')
   lsp_status = require('lsp-status')
   lsp_status.register_progress()
 
-  default_lsp_capabilities = vim.tbl_deep_extend('keep', niks.lsp_capabilities,
+  default_lsp_capabilities = vim.tbl_deep_extend('keep', nix.lsp_capabilities,
     lsp_status.capabilities)
 end
 
@@ -29,7 +29,7 @@ niovi.fileUrlEdit = function(url)
 end
 
 niovi.lsp = {}
-niovi.lsp.setup_from_niks = function(neim, datom)
+niovi.lsp.setup_from_nix = function(neim, datom)
   local lang_capabilities = datom.capabilities or {}
 
   local config = {
@@ -45,11 +45,11 @@ niovi.lsp.setup_from_niks = function(neim, datom)
 end
 
 niovi.lsp.setup = function()
-  for neim, datom in pairs(niovi.niks.langServers) do
-    niovi.lsp.setup_from_niks(neim, datom)
+  for neim, datom in pairs(niovi.nix.langServers) do
+    niovi.lsp.setup_from_nix(neim, datom)
   end
 end
 
-niovi.setup = function() if niks.sizeAtList.med then niovi.lsp.setup() end end
+niovi.setup = function() if nix.sizeAtLeast.med then niovi.lsp.setup() end end
 
 niovi.setup()

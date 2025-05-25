@@ -29,7 +29,7 @@ let
 
   forkIndeks = { };
 
-  bildVimPlogin =
+  buildVimPlogin =
     {
       name,
       self,
@@ -51,7 +51,7 @@ let
     let
       ovyraidz = ovyraidzIndeks.${name} or { };
     in
-    bildVimPlogin { inherit name self ovyraidz; };
+    buildVimPlogin { inherit name self ovyraidz; };
 
   ryzylt = mapAttrs mkSpok spoks;
 

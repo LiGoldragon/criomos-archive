@@ -72,11 +72,11 @@ let
 
     species = mkOption {
       type = enum [
-        "Niks"
-        "Sema"
-        "Onlimityd"
+        "code"
+        "multimedia"
+        "unlimited"
       ];
-      default = "Sema";
+      default = "Multimedia";
     };
 
     style = mkOption {

@@ -9,7 +9,7 @@ let
   inherit (kor) optionals;
   inherit (user.methods) isCodeDev isMultimediaDev sizedAtLeast;
 
-  niksDevPackages = with pkgs; [
+  codingPackages = with pkgs; [
     pandoc
     gitkraken
   ];
@@ -39,7 +39,7 @@ kor.mkIf sizedAtLeast.max {
         wineWowPackages.waylandFull
         whatsapp-for-linux
       ]
-      ++ (optionals isCodeDev niksDevPackages)
+      ++ (optionals isCodeDev codingPackages)
       ++ (optionals isMultimediaDev semaDevPackages);
   };
 

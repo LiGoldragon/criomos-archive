@@ -3,13 +3,13 @@
   kor,
   lib,
   pkgs,
-  bildNvimPlogin,
+  buildNvimPlogin,
 }:
 let
   inherit (kor) mkLambda;
 
   ovyridynPkgs = pkgs // {
-    buildVimPluginFrom2Nix = bildNvimPlogin;
+    buildVimPluginFrom2Nix = buildNvimPlogin;
   };
 
   overridesLambda = import (self + /pkgs/misc/vim-plugins/overrides.nix);

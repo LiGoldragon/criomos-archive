@@ -50,7 +50,7 @@ let
     sbcl
   ];
 
-  niksDevPackages =
+  codingPackages =
     with pkgs;
     [
       qrencode
@@ -139,7 +139,7 @@ kor.mkIf sizedAtLeast.med {
         spotify-player
       ]
       ++ graphicalPackages
-      ++ optionals isCodeDev (niksDevPackages ++ lispDevPackages);
+      ++ optionals isCodeDev (codingPackages ++ lispDevPackages);
 
     file = {
       # ".config/jesseduffield/lazygit/config.yml".text = { };

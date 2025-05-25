@@ -7,8 +7,8 @@ let
       self = null;
     };
 
-    bildNvimPlogin = {
-      lambda = import ./bildNvimPlogin;
+    buildNvimPlogin = {
+      lambda = import ./buildNvimPlogin;
       mods = [
         "pkgs"
         "pkdjz"
@@ -144,8 +144,8 @@ let
       self = null;
     };
 
-    niks = {
-      lambda = import ./niks;
+    nix = {
+      lambda = import ./nix;
       mods = [
         "pkgs"
         "pkdjz"

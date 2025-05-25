@@ -69,9 +69,9 @@ let
     modules = nixosModules;
   };
 
-  bildNiksOSVM = evaluation.config.system.build.vm;
-  bildNiksOSIso = evaluation.config.system.build.isoImage;
-  bildNiksOS = evaluation.config.system.build.toplevel;
+  buildNixOSVM = evaluation.config.system.build.vm;
+  buildNixOSIso = evaluation.config.system.build.isoImage;
+  buildNixOS = evaluation.config.system.build.toplevel;
 
 in
-if useIsoModule then bildNiksOSIso else bildNiksOS
+if useIsoModule then buildNixOSIso else buildNixOS

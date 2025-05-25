@@ -1,4 +1,4 @@
-{ hob, bildNvimPlogin }:
+{ hob, buildNvimPlogin }:
 let
   inherit (builtins) mapAttrs;
 
@@ -17,7 +17,7 @@ let
     let
       ovyraidz = ovyraidzIndeks.${name} or { };
     in
-    bildNvimPlogin (
+    buildNvimPlogin (
       {
         pname = name;
         version = self.shortRev;

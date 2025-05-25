@@ -135,7 +135,7 @@ gls.right[7] = {
           return 'NoLSPServer'
         end
       end
-      if niks.saizAtList.med then
+      if nix.saizAtLeast.med then
         runit()
       else
         return 'Disabled'

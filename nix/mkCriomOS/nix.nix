@@ -21,7 +21,7 @@ let
     optionalAttrs
     ;
 
-  inherit (horizon.cluster.methods) trustydBildPreCriomes;
+  inherit (horizon.cluster.methods) trustydBuildPreCriomes;
   inherit (horizon) node;
   inherit (horizon.node.methods)
     builderConfigs
@@ -36,8 +36,8 @@ let
     nixCacheDomain
     ;
 
-  inherit (constants.fileSystem.niks) preCriad;
-  inherit (constants.network.niks) serve;
+  inherit (constants.fileSystem.nix) preCriad;
+  inherit (constants.network.nix) serve;
 
   jsonHorizonFail = eksportJSON "horizon.json" horizon;
 
@@ -159,7 +159,7 @@ in
       connect-timeout = 5;
       fallback = true;
 
-      trusted-public-keys = trustydBildPreCriomes;
+      trusted-public-keys = trustydBuildPreCriomes;
       substituters = cacheURLs;
       trusted-binary-caches = cacheURLs;
 

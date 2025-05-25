@@ -198,8 +198,6 @@ rec {
     in
     kol url;
 
-  kopiNiks = path: toFile (baseNameOf path) (readFile path);
-
   mkIf = condition: content: {
     _type = "if";
     inherit condition content;
@@ -244,7 +242,7 @@ rec {
     avr = "avr-none";
   };
 
-  mkSizeAtList = size: {
+  mkSizeAtLeast = size: {
     min = size >= 1;
     med = size >= 2;
     max = size == 3;
@@ -253,7 +251,7 @@ rec {
   matcSize =
     size: ifNon: ifMin: ifMed: ifMax:
     let
-      sizedAtLeast = mkSizeAtList size;
+      sizedAtLeast = mkSizeAtLeast size;
     in
     if sizedAtLeast.max then
       ifMax

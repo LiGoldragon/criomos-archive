@@ -1,6 +1,6 @@
 {
   hob,
-  bildNvimPlogin,
+  buildNvimPlogin,
   fzf,
 }:
 let
@@ -29,7 +29,7 @@ let
     };
   };
 
-  bildNvimLuaPlogin =
+  buildNvimLuaPlogin =
     {
       name,
       self,
@@ -37,7 +37,7 @@ let
     }:
     let
     in
-    bildNvimPlogin (
+    buildNvimPlogin (
       {
         pname = name;
         version = self.shortRev;
@@ -57,7 +57,7 @@ let
     let
       ovyraidz = ovyraidzIndeks.${name} or { };
     in
-    bildNvimLuaPlogin { inherit name self ovyraidz; };
+    buildNvimLuaPlogin { inherit name self ovyraidz; };
 
   ryzylt = mapAttrs mkSpok spoks;
 
