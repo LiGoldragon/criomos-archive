@@ -42,7 +42,7 @@ let
 
   enabledExtendedPowerSave = true;
 
-  cpuFreqGovernor = if enabledExtendedPowerSave then "powersave" else "schedutil";
+  cpuFreqGovernor = if enabledExtendedPowerSave then "powersave" else "ondemand";
 
   hasModelSpecificPowerTweaks = model == "ThinkPadE15Gen2Intel";
 
@@ -132,15 +132,13 @@ in
       ''
     );
 
-    kernelParams =
-      (optionals tcipIzIntel [ "intel_pstate=disable" ])
-      ++ (optionals computerIs.rpi3B [
-        "cma=32M"
-        "console=ttyS0,115200n8"
-        "console=ttyAMA0,11520n8"
-        "console=tty0"
-        "dtparam=audio=on"
-      ]);
+    kernelParams = optionals computerIs.rpi3B [
+      "cma=32M"
+      "console=ttyS0,115200n8"
+      "console=ttyAMA0,11520n8"
+      "console=tty0"
+      "dtparam=audio=on"
+    ];
 
   };
 
