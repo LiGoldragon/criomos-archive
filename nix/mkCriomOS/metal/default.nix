@@ -137,9 +137,16 @@ in
 
   };
 
-  powerManagement = {
-    powertop.enable = true;
-  } // (optionalAttrs hasModelSpecificPowerTweaks modelSpecificPowerTweaks."${model}");
+  powerManagement =
+    {
+      powertop.enable = true;
+    }
+    // (optionalAttrs hasModelSpecificPowerTweaks modelSpecificPowerTweaks."${model}")
+    // (optionalAttrs chipIsIntel {
+      powerUpCommands = ''
+        echo 1 > /sys/devices/system/cpu/intel_pstate/no_turbo
+      '';
+    });
 
   programs = { };
 
