@@ -40,10 +40,6 @@ let
   izX230 = model == "ThinkPadX230";
   izX240 = model == "ThinkPadX240";
 
-  enabledExtendedPowerSave = true;
-
-  cpuFreqGovernor = if enabledExtendedPowerSave then "powersave" else "ondemand";
-
   hasModelSpecificPowerTweaks = model == "ThinkPadE15Gen2Intel";
 
   modelSpecificPowerTweaks = {
@@ -143,7 +139,6 @@ in
   };
 
   powerManagement = {
-    inherit cpuFreqGovernor;
     powertop.enable = true;
   } // (optionalAttrs hasModelSpecificPowerTweaks modelSpecificPowerTweaks."${model}");
 
