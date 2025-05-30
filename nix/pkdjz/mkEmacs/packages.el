@@ -7,6 +7,11 @@
 (use-package envrc :config (envrc-global-mode))
 
 (use-package
+ nov
+ :config
+ (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
+
+(use-package
  org-remark
  :custom
  (org-remark-notes-file-name "~/git/wiki/remark.org")
