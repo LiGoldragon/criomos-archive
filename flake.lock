@@ -1265,7 +1265,7 @@
       },
       "original": {
         "owner": "criome",
-        "ref": "testing",
+        "ref": "stable",
         "repo": "nixpkgs",
         "type": "github"
       }
