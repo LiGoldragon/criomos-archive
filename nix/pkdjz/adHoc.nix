@@ -232,7 +232,7 @@ in
           sha256 = "sha256-PN3t3sVIFz1dKVtBEFLmPO9YAhXpbWcT5uurkNqtFqc=";
         };
 
-        cargoHash = "sha256-Jh8eXkj7109z9Sdk97Dy0Hsh5ulSgTrQVRYBvKq/P+I=";
+        cargoHash = "sha256-kcCGduZs1EbMkyfRKHSiMTWhdO2Fk0ipbblhndiGAls=";
 
         meta = with lib; {
           description = "GNOME-like workspace switching in Hyprland";

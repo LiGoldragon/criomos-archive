@@ -124,7 +124,7 @@ let
     pwvucontrol # Pipewire audio GTK UI
     sonata
     dino
-    ptask
+    # ptask # Broken
     transmission-remote-gtk
     bookworm
     # start("Qt")

@@ -57,7 +57,7 @@ lib.mkIf sizedAtLeast.max {
       plugins = with pkgs.obs-studio-plugins; [
         droidcam-obs
         wlrobs
-        pkdjz.obs-ndi
+        # pkdjz.obs-ndi # TODO broken
         obs-pipewire-audio-capture
         # advanced-scene-switcher # TODO broken.build
         obs-move-transition

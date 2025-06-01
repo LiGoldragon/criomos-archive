@@ -46,6 +46,10 @@
       url = "github:league/base16-emacs";
       flake = false;
     };
+    emacs-overlay = {
+      url = "github:nix-community/emacs-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     flake-registry = {
       url = "github:NixOS/flake-registry";
       flake = false;

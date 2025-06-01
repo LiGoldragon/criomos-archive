@@ -3,17 +3,16 @@
   src,
   pkgs,
   hob,
-  tdlib,
+# tdlib, # TODO
 }:
 with builtins;
 let
   emacs-overlay = src;
   inherit (pkgs) writeText emacsPackagesFor delta;
 
-  emacs = pkgs.emacs29-pgtk;
+  emacs = pkgs.emacs-pgtk;
   emacsPackages = emacsPackagesFor emacs;
   inherit (emacsPackages)
-    elpaBuild
     withPackages
     melpaBuild
     trivialBuild
