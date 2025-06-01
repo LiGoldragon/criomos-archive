@@ -208,20 +208,6 @@ in
       };
   };
 
-  postcss-scss = {
-    mods = [ "pkdjz" ];
-    lambda =
-      { src, pnpm2nix }:
-      let
-        inherit (pnpm2nix.v12) mkPnpmPackage;
-
-      in
-      mkPnpmPackage {
-        inherit src;
-        shrinkwrapYML = src + /pnpm-lock.yaml;
-      };
-  };
-
   hyprland-relative-workspace = {
     src = null;
     lambda =
@@ -286,15 +272,6 @@ in
       };
   };
 
-  tdlib = {
-    lambda =
-      { src, tdlib }:
-      tdlib.overrideAttrs (attrs: {
-        version = "1.8.16";
-        inherit src;
-      });
-  };
-
   wireguardNetresolved = {
     mods = [
       "pkgs"
@@ -319,7 +296,5 @@ in
         '';
       });
   };
-
-  xdg-desktop-portal-hyprland.lambda = { src, system }: src.packages.${system}.default;
 
 }

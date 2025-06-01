@@ -43,11 +43,6 @@ let
 
   flakeEntriesOverrides =
     {
-      hob = {
-        owner = "sajban";
-        ref = "autumnCleaning";
-      };
-
       lib = {
         owner = "nix-community";
         repo = "nixpkgs.lib";
@@ -65,14 +60,10 @@ let
         repo = "nixpkgs";
       };
 
-      xdg-desktop-portal-hyprland = {
-        owner = "hyprwm";
-      };
-
     }
     // optionalAttrs criomOS.cleanEvaluation {
       criomOS = {
-        owner = "sajban";
+        owner = "criome";
         inherit (criomOS) rev;
       };
     };

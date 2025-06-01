@@ -82,7 +82,6 @@ let
       tree-sitter
       gitAndTools.gitui
       # Python
-      # pkdjz.mach-nix.package # broken
       world.kibord.kpBootCli
       # Manuals
       unbound.man

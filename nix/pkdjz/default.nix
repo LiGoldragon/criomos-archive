@@ -103,15 +103,6 @@ let
       self = null;
     };
 
-    nix-dev = {
-      lambda = import ./nix;
-      mods = [
-        "pkgs"
-        "pkdjz"
-      ];
-      self = hob.nix.maisiliym.dev;
-    };
-
     pkgsNvimPloginz = {
       lambda = import ./pkgsNvimPloginz;
       mods = [

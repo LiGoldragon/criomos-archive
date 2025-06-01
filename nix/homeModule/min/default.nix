@@ -262,7 +262,6 @@ let
   worldPackages = with world; [
     pkdjz.shen-bootstrap
     skrips.user
-    # clojure-lsp.packages.default
   ];
 
 in

@@ -12,13 +12,6 @@ let
   inherit (kor) mkLambda optionalAttrs genAttrs;
   inherit (world) pkdjz mkZolaWebsite;
 
-  mkTypedZolaWebsite =
-    name: flake:
-    mkZolaWebsite {
-      src = flake;
-      name = flake.name or name;
-    };
-
   mkSubWorld =
     SubWorld@{
       lambda,
@@ -69,20 +62,9 @@ let
     in
     mkLambda { inherit closure lambda; };
 
-  mkWorldFunction =
-    flake:
-    mkSubWorld {
-      mods = [
-        "pkgs"
-        "pkdjz"
-      ];
-      src = flake;
-      lambda = flake.function;
-    };
-
   makeSpoke =
     spokName:
-    fleik@{ ... }:
+    spoke@{ ... }:
     let
       priMkSubWorld =
         name:
@@ -92,7 +74,7 @@ let
           ...
         }:
         let
-          src = SubWorld.src or (SubWorld.self or fleik);
+          src = SubWorld.src or (SubWorld.self or spoke);
           self = src;
         in
         mkSubWorld {
@@ -143,7 +125,7 @@ let
               ...
             }:
             let
-              src = SubWorld.src or (SubWorld.self or fleik);
+              src = SubWorld.src or (SubWorld.self or spoke);
               self = src;
             in
             mkSubWorld {
@@ -160,68 +142,25 @@ let
         in
         subWorlds;
 
-      mkNodeWebpageName = nodeName: [
-        (nodeName + "Webpage")
-        (nodeName + "Website")
-      ];
-
-      nodeWebpageSpokNames = lib.concatMap mkNodeWebpageName nodeNames;
-
-      isWebpageSpok = spokName: l.elem spokName nodeWebpageSpokNames;
+      # TODO - Bad design
+      spokeIsWebsite = spokeName: spokName == (spokeName + "Website");
 
       optionalSystemAttributes = {
-        packages = fleik.packages.${system} or { };
-        legacyPackages = fleik.legacyPackages.${system} or { };
+        packages = spoke.packages.${system} or { };
+        legacyPackages = spoke.legacyPackages.${system} or { };
       };
-
-      hasFleikFile =
-        let
-          fleikDirectoryFiles = readDir fleik;
-        in
-        hasAttr "fleik.nix" fleikDirectoryFiles;
-
-      makeFleik = { };
-
-      mkNixpkgsHob =
-        nixpkgsSet:
-        let
-          mkPkgsFromNameValue =
-            name: value:
-            mkPkgs {
-              inherit system;
-              nixpkgs = value;
-            };
-        in
-        mapAttrs mkPkgsFromNameValue nixpkgsSet;
-
-      typedFlakeMakerIndex = {
-        nixpkgsHob = mkNixpkgsHob fleik.value;
-        worldFunction = mkWorldFunction fleik;
-        zolaWebsite = mkTypedZolaWebsite spokName fleik;
-      };
-
-      mkTypedFlake =
-        let
-          inherit (fleik) type;
-        in
-        builtins.getAttr type typedFlakeMakerIndex;
 
     in
-    if (hasAttr "type" fleik) then
-      mkTypedFlake
-    else if (hasAttr "HobWorlds" fleik) then
-      mkHobWorlds fleik.HobWorlds
-    else if (hasAttr "HobWorld" fleik) then
-      priMkHobWorld spokName (fleik.HobWorld hob)
-    else if (hasAttr "SubWorlds" fleik) then
-      mkSubWorlds fleik.SubWorlds
-    else if (hasAttr "SubWorld" fleik) then
-      priMkSubWorld spokName fleik.SubWorld
-    else if (isWebpageSpok spokName) then
-      mkZolaWebsite { src = fleik; }
-    # else if hasFleikFile then makeFleik
+    if (hasAttr "HobWorlds" spoke) then
+      mkHobWorlds spoke.HobWorlds
+    else if (hasAttr "SubWorlds" spoke) then
+      mkSubWorlds spoke.SubWorlds
+    else if (hasAttr "SubWorld" spoke) then
+      priMkSubWorld spokName spoke.SubWorld
+    else if (spokeIsWebsite spokName) then
+      mkZolaWebsite { src = spoke; }
     else
-      fleik // optionalSystemAttributes;
+      spoke // optionalSystemAttributes;
 
   world = mapAttrs makeSpoke hob;
 
