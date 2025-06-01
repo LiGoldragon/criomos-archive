@@ -49,7 +49,8 @@ in
       "::1"
       "127.0.0.1"
     ];
-    hosts = lib.concatMapAttrs mkCriomeHostEntries exNodes;
+    # URGENT TODO broken
+    # hosts = lib.concatMapAttrs mkCriomeHostEntries exNodes;
   };
 
   services = {

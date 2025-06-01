@@ -47,7 +47,7 @@ let
     };
 
     system = mkOption {
-      type = enum systems;
+      type = str;
     };
 
     nbOfBuildCores = mkOption {

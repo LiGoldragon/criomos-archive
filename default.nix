@@ -53,7 +53,6 @@ let
           pkgs
           system
           hob
-          localSources
           ;
       };
     };
@@ -127,6 +126,7 @@ let
     {
       os = mkCriomOS {
         inherit
+          lib
           world
           horizon
           homeModule

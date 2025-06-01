@@ -1,8 +1,13 @@
 with builtins;
+
 rec {
   exportJSON = name: datom: toFile name (toJSON datom);
 
+  highestOf = list: tail (sort lessThan list);
+
   importJSON = path: fromJSON (readFile path);
+
+  lowestOf = list: head (sort lessThan list);
 
   matchSize =
     size: ifNon: ifMin: ifMed: ifMax:

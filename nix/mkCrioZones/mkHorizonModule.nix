@@ -44,14 +44,22 @@ let
     avr = "avr-none";
   };
 
+  # Hack begins - scope doesnt find libExtensions
+  mkSizeAtLeast = size: {
+    min = size >= 1;
+    med = size >= 2;
+    max = size == 3;
+  };
+  lowestOf = list: lib.head (lib.sort lib.lessThan list);
+  mkTrust = list: lowestOf (list ++ [ metaTrust ]);
+  # HACK ends
+
   nodeCriomeDomainName = concatStringsSep "." [
     clusterName
     "criome"
   ];
 
   metaTrust = inputCluster.trust.cluster;
-
-  mkTrust = yrei: lib.lowestOf (yrei ++ [ metaTrust ]);
 
   mkSshString =
     preCriome:
@@ -300,7 +308,7 @@ let
 
         inherit (inputUser) style species keyboard;
 
-        size = lib.lowestOf [
+        size = lowestOf [
           inputUser.size
           node.size
         ];
@@ -360,7 +368,7 @@ let
     };
   };
 
-  exNodes = lib.lib.filterAttrs (n: v: n != nodeName) nodes;
+  exNodes = lib.filterAttrs (n: v: n != nodeName) nodes;
 
   node =
     let
