@@ -74,6 +74,12 @@ let
     "meet.jit.si"
   ];
 
+  unsafeBetterDomains = [
+    "*.appflowy.io"
+    "*.appflowy.com"
+
+  ];
+
   unsafeBadDomains = [
     "*.koodomobile.com"
     "*.google.com"
@@ -90,7 +96,7 @@ let
     "*.amazon.ca"
   ];
 
-  unstrictWhitelist = unsafeBadDomains ++ bankingDomains;
+  unstrictWhitelist = unsafeBetterDomains ++ unsafeBadDomains ++ bankingDomains;
 
   strictWhitelist = betterDomains ++ undesirableDomains ++ badDomains;
 
