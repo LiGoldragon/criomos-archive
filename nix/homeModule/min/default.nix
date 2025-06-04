@@ -284,23 +284,6 @@ mkIf sizedAtLeast.min {
       };
     };
 
-    pantalaimon = {
-      enable = false; # TODO
-      settings = {
-        Default = {
-          LogLevel = "Debug";
-          SSL = true;
-        };
-        local-matrix = {
-          Homeserver = "https://matrix.org";
-          ListenAddress = "127.0.0.1";
-          ListenPort = 8009;
-          IgnoreVerification = true;
-          SSL = false;
-        };
-      };
-    };
-
     gammastep = {
       enable = true;
       provider = "geoclue2";

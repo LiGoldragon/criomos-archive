@@ -47,13 +47,6 @@ let
       repo = "nixpkgs.lib";
     };
 
-    # TODO - broken
-    nixpkgs = {
-      owner = "NixOS";
-      repo = "nixpkgs";
-      inherit (hob.nixpkgs) rev;
-    } // optionalAttrs (hob.nixpkgs ? ref) { inherit (hob.nixpkgs) ref; };
-
     nixpkgs-master = {
       owner = "NixOS";
       repo = "nixpkgs";

@@ -3,7 +3,6 @@
   src,
   pkgs,
   hob,
-# tdlib, # TODO
 }:
 with builtins;
 let
