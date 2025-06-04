@@ -46,10 +46,12 @@ lib.mkIf sizedAtLeast.max {
   programs = {
     chromium = {
       enable = true;
-      extensions = [
-        { id = "cjpalhdlnbpafiamejdnhcphjbkeiagm"; } # ublock origin
-        { id = "dbepggeogbaibhgnhhndojpepiihcmeb"; } # vimium
-      ];
+      package = pkgs.google-chrome;
+      # Broken with google's version
+      # extensions = [
+      #   { id = "cjpalhdlnbpafiamejdnhcphjbkeiagm"; } # ublock origin
+      #   { id = "dbepggeogbaibhgnhhndojpepiihcmeb"; } # vimium
+      # ];
     };
 
     obs-studio = {
