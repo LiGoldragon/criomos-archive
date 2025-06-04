@@ -296,7 +296,7 @@ mkIf sizedAtLeast.min {
     gpg-agent = {
       enable = true;
       verbose = true;
-      pinentryPackage = pkgs.pinentry-gnome3;
+      pinentry.package = pkgs.pinentry-gnome3;
       defaultCacheTtl = 10800;
       maxCacheTtl = 86400;
       defaultCacheTtlSsh = 3600;
@@ -474,7 +474,7 @@ mkIf sizedAtLeast.min {
         dsync = "rsync --checksum --progress --recursive --delete";
       };
 
-      initExtra =
+      initContent =
         builtins.readFile ../nonNix/zshrc
         + ''
           if [[ $options[zle] = on ]]; then

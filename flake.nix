@@ -66,11 +66,6 @@
     lojix = {
       url = "github:criome/lojix";
       flake = false;
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-        flake-utils.follows = "flake-utils";
-        clj-nix.follows = "clj-nix";
-      };
     };
     md-roam = {
       url = "github:nobiot/md-roam";

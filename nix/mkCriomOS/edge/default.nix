@@ -27,7 +27,6 @@ in
   hardware = {
     bluetooth.enable = true;
     graphics.enable32Bit = sizedAtLeast.max;
-    pulseaudio.enable = false;
   };
 
   environment = {
@@ -76,26 +75,27 @@ in
 
     dbus.packages = mkIf sizedAtLeast.med [ pkgs.gcr ];
 
+    displayManager.gdm = {
+      enable = sizedAtLeast.min;
+      autoSuspend = typeIs.edge;
+    };
+
     gnome = {
       at-spi2-core.enable = true;
-      core-utilities.enable = true;
+      core-apps.enable = true;
       evolution-data-server.enable = true;
       gnome-settings-daemon.enable = true;
     };
 
     tumbler.enable = sizedAtLeast.med;
 
+    desktopManager.gnome.enable = sizedAtLeast.med && typeIs.edge;
+
+    pulseaudio.enable = false;
+
     xserver = {
       enable = sizedAtLeast.min;
       excludePackages = with pkgs; [ xorg.xorgserver.out ];
-      desktopManager.gnome.enable = sizedAtLeast.med && typeIs.edge;
-      displayManager = {
-        gdm = {
-          enable = sizedAtLeast.min;
-          autoSuspend = typeIs.edge;
-        };
-      };
-
       windowManager.hypr.enable = typeIs.edgeTesting || typeIs.hybrid;
     };
   };
