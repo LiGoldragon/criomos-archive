@@ -227,6 +227,7 @@ let
       curl
       wget
       transmission_4
+      tremc
       aria2 # multi-protocol download
       rsync
       nload
