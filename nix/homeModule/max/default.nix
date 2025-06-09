@@ -9,6 +9,17 @@ let
   inherit (lib) optionals;
   inherit (user.methods) isCodeDev isMultimediaDev sizedAtLeast;
 
+  obs-beta = pkgs.obs-studio.overrideAttrs (attrs: {
+    src = pkgs.fetchFromGitHub {
+      owner = "obsproject";
+      repo = "obs-studio";
+      rev = "31.1.0-beta2";
+      hash = "sha256-HqiEIyi3lUUwkBUHgI0spXvwnXEg0V9XObGd58mfQXM=";
+      fetchSubmodules = true;
+    };
+    nativeBuildInputs = attrs.nativeBuildInputs ++ [ pkgs.kdePackages.extra-cmake-modules ];
+  });
+
   codingPackages = with pkgs; [
     pandoc
     gitkraken
@@ -56,6 +67,7 @@ lib.mkIf sizedAtLeast.max {
 
     obs-studio = {
       enable = true;
+      package = obs-beta;
       plugins = with pkgs.obs-studio-plugins; [
         droidcam-obs
         wlrobs
