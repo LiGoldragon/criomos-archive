@@ -249,13 +249,13 @@ in
       { stdenv, fetchurl }:
       let
         pname = "skylendar";
-        version = "5.0nn";
+        version = "5.1.1pn";
       in
       stdenv.mkDerivation {
         inherit pname version;
         src = fetchurl {
           url = "mirror://sourceforge/skylendar/${pname}-${version}.tar.xz";
-          sha256 = "sha256-j7iCCzHXwffHdhQcyzxPBvQK+RXaY3QSjXUtHu463fI=";
+          sha256 = "sha256-m7LvZsEbTz5n2wiO7WPuASQLRbj3eEPFuvkPs9AOE7U=";
         };
       };
   };
