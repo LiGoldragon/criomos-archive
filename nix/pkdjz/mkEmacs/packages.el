@@ -10,9 +10,9 @@
 (use-package envrc :config (envrc-global-mode))
 
 (use-package
- nov
- :config
- (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
+  nov
+  :config
+  (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
 
 (use-package
  org-remark
