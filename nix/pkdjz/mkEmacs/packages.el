@@ -9,6 +9,7 @@
 
 (use-package envrc :config (envrc-global-mode))
 
+(use-package go-translate)
 (use-package google-translate)
 
 (use-package
