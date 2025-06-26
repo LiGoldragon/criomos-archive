@@ -30,6 +30,9 @@ in
 {
   boot = {
     supportedFilesystems = mkOverride 10 [
+      "ext2"
+      "ext3"
+      "ext4"
       "btrfs"
       "vfat"
       "xfs"
