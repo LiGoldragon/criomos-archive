@@ -31,9 +31,10 @@ let
   # TODO
   hasTouchpad = true;
 
-  hasQuickSyncSupport = model == "ThinkPadE15Gen2Intel";
-  hasThunderbolt = model == "ThinkPadE15Gen2Intel";
-  hasNvme = model == "ThinkPadE15Gen2Intel";
+  hasQuickSyncSupport = builtins.elem model [
+    "ThinkPadE15Gen2Intel"
+    "ThinkPadT14Intel"
+  ];
   requiresSofFirmware = model == "ThinkPadE15Gen2Intel";
 
   izX230 = model == "ThinkPadX230";
@@ -58,6 +59,15 @@ let
   mainSoundCard = soundCardIndex."${model}" or "0";
 
   modelKernelModulesIndex = {
+    ThinkPadE15Gen2Intel = [
+      "nvme"
+      "thunderbolt"
+    ];
+    ThinkPadT14Intel = [
+      "nvme"
+      "thunderbolt"
+      "sd_mod"
+    ];
     ThinkPadX250 = [
       "usb_storage"
       "rtsx_pci_sdmmc"
@@ -115,8 +125,10 @@ in
       ++ (optional sizedAtLeast.max config.boot.kernelPackages.v4l2loopback);
 
     initrd = {
-      availableKernelModules =
-        modelSpecificKernelModules ++ (optional hasThunderbolt "thunderbolt") ++ (optional hasNvme "nvme");
+      availableKernelModules = [
+        "xhci_pci"
+        "usb_storage"
+      ] ++ modelSpecificKernelModules;
     };
 
     kernelModules = [ "coretemp" ];
