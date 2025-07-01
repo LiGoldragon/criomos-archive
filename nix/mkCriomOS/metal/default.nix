@@ -31,6 +31,8 @@ let
   # TODO
   hasTouchpad = true;
 
+  needsIntelThrottlingFix = model == "ThinkPadT14Intel";
+
   hasQuickSyncSupport = builtins.elem model [
     "ThinkPadE15Gen2Intel"
     "ThinkPadT14Intel"
@@ -206,6 +208,8 @@ in
       enable = true;
       cups-pdf.enable = sizedAtLeast.min;
     };
+
+    throttled.enable = needsIntelThrottlingFix;
 
     udev.extraRules = ''
       # USBasp - USB programmer for Atmel AVR controllers
