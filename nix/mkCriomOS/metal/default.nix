@@ -90,6 +90,7 @@ let
   hasOpenClSupport = sizedAtLeast.max;
 
   waydroidPackages = with pkgs; [
+    # Investigate: Clipboard passing still not working reliably
     wl-clipboard
     python3Packages.pyclip
   ];
