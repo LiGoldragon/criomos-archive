@@ -100,6 +100,26 @@ let
     ++ optional useVaapiIntel pkgs.vaapiIntel
     ++ optional hasOpenClSupport pkgs.intel-compute-runtime;
 
+  # TODO - sort out different `sizedatleast` sets
+  printingDriversPkgs = lib.optionals sizedAtLeast.max (
+    with pkgs;
+    [
+      gutenprint # Drivers for many different printers from many different vendors.
+      gutenprintBin # Additional, binary-only drivers for some printers.
+      hplip # Drivers for HP printers.
+      hplipWithPlugin # Drivers for HP printers, with the proprietary plugin.
+      postscript-lexmark # Postscript drivers for Lexmark
+      samsung-unified-linux-driver # Proprietary Samsung Drivers
+      splix # Drivers for printers supporting SPL (Samsung Printer Language).
+      brlaser # Drivers for some Brother printers
+      brgenml1lpr # Generic drivers for more Brother printers
+      brgenml1cupswrapper # ^^^
+      cnijfilter2 # Drivers for some Canon Pixma devices (Proprietary driver)
+      epson-escpr2 # Drivers for Epson AirPrint devices
+      epson-escpr # Drivers for some other Epson devices
+    ]
+  );
+
 in
 {
   hardware = {
@@ -208,6 +228,7 @@ in
     printing = {
       enable = true;
       cups-pdf.enable = sizedAtLeast.min;
+      drivers = printingDriversPkgs;
     };
 
     throttled.enable = needsIntelThrottlingFix;
