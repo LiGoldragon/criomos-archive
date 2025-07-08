@@ -7,7 +7,7 @@
 let
   inherit (lib) mkIf optionals;
   inherit (horizon.node) typeIs;
-  inherit (horizon.node.methods) sizedAtLeast;
+  inherit (horizon.node.methods) sizedAtLeast behavesAs;
 
   minPackages = optionals sizedAtLeast.min (
     with pkgs;
@@ -50,7 +50,7 @@ in
     firejail.enable = sizedAtLeast.med;
 
     hyprland = {
-      enable = typeIs.edgeTesting || typeIs.hybrid;
+      enable = behavesAs.nextGen;
     };
 
     regreet = {
@@ -96,7 +96,9 @@ in
     xserver = {
       enable = sizedAtLeast.min;
       excludePackages = with pkgs; [ xorg.xorgserver.out ];
-      windowManager.hypr.enable = typeIs.edgeTesting || typeIs.hybrid;
+
+      # TODO - investigate difference between this and `programs.hyprland`
+      windowManager.hypr.enable = behavesAs.nextGen;
     };
   };
 }

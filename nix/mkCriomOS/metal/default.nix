@@ -19,6 +19,7 @@ let
   inherit (horizon.node) typeIs;
   inherit (horizon.node.machine) model cores;
   inherit (horizon.node.methods)
+    behavesAs
     sizedAtLeast
     chipIsIntel
     modelIsThinkpad
@@ -26,7 +27,7 @@ let
     computerIs
     ;
 
-  enableWaydroid = sizedAtLeast.max && !typeIs.router;
+  enableWaydroid = sizedAtLeast.max && behavesAs.edge;
 
   # TODO
   hasTouchpad = true;
@@ -268,7 +269,7 @@ in
 
     logind = {
       lidSwitch = if typeIs.center then "ignore" else "suspend";
-      lidSwitchExternalPower = if typeIs.edge then "suspend" else "ignore";
+      lidSwitchExternalPower = if behavesAs.lowPower then "suspend" else "ignore";
     };
 
     thinkfan = mkIf modelIsThinkpad {
@@ -331,7 +332,7 @@ in
   };
 
   virtualisation = {
-    libvirtd.enable = (sizedAtLeast.max && !typeIs.router);
+    libvirtd.enable = (sizedAtLeast.max && behavesAs.edge);
     waydroid.enable = enableWaydroid;
     spiceUSBRedirection.enable = sizedAtLeast.max;
   };

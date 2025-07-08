@@ -21,7 +21,12 @@ let
   inherit (pkgs) mksh writeScript gnupg;
   inherit (horizon) node exNodes;
   inherit (horizon.node) typeIs;
-  inherit (horizon.node.methods) chipIsIntel sizedAtLeast useColemak;
+  inherit (horizon.node.methods)
+    chipIsIntel
+    sizedAtLeast
+    useColemak
+    behavesAs
+    ;
 
   # TODO
   hasAudioOutput = true;
@@ -101,7 +106,7 @@ in
   nixpkgs.overlays = mkOverride 0 [ ];
 
   networking.networkmanager = {
-    enable = sizedAtLeast.min && !typeIs.router;
+    enable = sizedAtLeast.min && !behavesAs.router;
   };
 
   programs = {

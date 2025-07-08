@@ -214,6 +214,13 @@ let
           nixCacheDomain = if isNixCache then ("nix." + criomeDomainName) else null;
           nixUrl = if isNixCache then ("http://" + nixCacheDomain) else null;
 
+          behavesAs = {
+            router = typeIs.hybrid || typeIs.router;
+            edge = typeIs.edge || typeIs.hybrid || typeIs.edgeTesting;
+            nextGen = typeIs.edgeTesting || typeIs.hybrid;
+            lowPower = typeIs.edge || typeIs.edgeTesting;
+          };
+
         };
 
     in

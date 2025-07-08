@@ -10,12 +10,12 @@ let
   inherit (world) pkdjz home-manager;
   inherit (pkdjz) evalNixos;
   inherit (horizon.node) machine io typeIs;
+  inherit (horizon.node.methods) behavesAs;
 
   usePodModule = (machine.species == "pod");
   useMetalModule = (machine.species == "metal");
-
-  useRouterModule = typeIs.hybrid || typeIs.router;
-  useEdgeModule = typeIs.edge || typeIs.hybrid || typeIs.edgeTesting;
+  useRouterModule = behavesAs.router;
+  useEdgeModule = behavesAs.edge;
   useIsoModule = !usePodModule && (io.disks == { });
 
   usersModule = import ./users.nix;
