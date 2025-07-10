@@ -4,20 +4,15 @@
   world,
   horizon,
   hob,
+  _withUsers ? true,
 }:
 let
-  inherit (lib) optional;
+  inherit (lib) optional optionals;
   inherit (world) pkdjz home-manager;
   inherit (pkdjz) evalNixos;
-  inherit (horizon.node) machine io typeIs;
   inherit (horizon.node.methods) behavesAs;
 
-  usePodModule = (machine.species == "pod");
-  useMetalModule = (machine.species == "metal");
-  useRouterModule = behavesAs.router;
-  useEdgeModule = behavesAs.edge;
-  useIsoModule = !usePodModule && (io.disks == { });
-
+  constants = import ./constants.nix;
   usersModule = import ./users.nix;
   nixModule = import ./nix.nix;
   normalizeModule = import ./normalize.nix;
@@ -25,14 +20,19 @@ let
   edgeModule = import ./edge;
 
   disksModule =
-    if usePodModule then
+    if behavesAs.virtualMachine then
       import ./pod.nix
-    else if useIsoModule then
+    else if behavesAs.iso then
       import ./liveIso.nix
     else
       import ./preInstalled.nix;
 
   metalModule = import ./metal;
+
+  homeModules = [
+    ./userHomes.nix
+    home-manager.nixosModules.default
+  ];
 
   baseModules = [
     usersModule
@@ -44,13 +44,14 @@ let
 
   nixosModules =
     baseModules
-    ++ (optional useEdgeModule edgeModule)
-    ++ (optional useRouterModule ./router)
-    ++ (optional useIsoModule home-manager.nixosModules.default)
-    ++ (optional useMetalModule metalModule);
+    ++ (optional behavesAs.edge edgeModule)
+    ++ (optional behavesAs.router ./router)
+    ++ (optional behavesAs.bareMetal metalModule)
+    ++ (optionals _withUsers homeModules);
 
   nixosArgs = {
     inherit
+      constants
       lib
       world
       pkdjz
@@ -58,18 +59,19 @@ let
       homeModule
       hob
       ;
-    constants = import ./constants.nix;
   };
 
   evaluation = evalNixos {
-    inherit useIsoModule;
+    useIsoModule = behavesAs.iso;
     moduleArgs = nixosArgs;
     modules = nixosModules;
   };
 
+  # TODO - unused leftover
   buildNixOSVM = evaluation.config.system.build.vm;
+
   buildNixOSIso = evaluation.config.system.build.isoImage;
   buildNixOS = evaluation.config.system.build.toplevel;
 
 in
-if useIsoModule then buildNixOSIso else buildNixOS
+if behavesAs.iso then buildNixOSIso else buildNixOS

@@ -2,29 +2,14 @@
   pkgs,
   lib,
   horizon,
-  world,
-  homeModule,
   ...
 }:
 let
-  inherit (builtins) mapAttrs;
   inherit (lib) mkOverride;
-  inherit (world) pkdjz;
   inherit (horizon) node;
+  inherit (horizon.node.methods) behavesAs;
 
   criomosVersion = "unversioned"; # TODO
-
-  useMetalModule = node.machine.species == "metal";
-
-  profile = {
-    dark = false;
-  };
-
-  mkUserConfig = name: user: {
-    _module.args = {
-      inherit user profile;
-    };
-  };
 
 in
 {
@@ -41,15 +26,7 @@ in
     ];
   };
 
-  hardware.enableAllFirmware = useMetalModule;
-
-  home-manager = {
-    backupFileExtension = "backup";
-    extraSpecialArgs = { inherit pkdjz world horizon; };
-    sharedModules = [ homeModule ];
-    useGlobalPkgs = true;
-    users = mapAttrs mkUserConfig horizon.users;
-  };
+  hardware.enableAllFirmware = behavesAs.bareMetal;
 
   isoImage = {
     isoBaseName = lib.mkForce "CriomOS-isoImage-${node.criomeDomainName}";

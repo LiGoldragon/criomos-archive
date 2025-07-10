@@ -124,9 +124,7 @@ let
         in
         mapAttrs mkProfileEmacs userProfiles;
 
-    in
-    {
-      os = mkCriomOS {
+      commonArgs = {
         inherit
           lib
           world
@@ -135,6 +133,11 @@ let
           hob
           ;
       };
+
+    in
+    {
+      os = mkCriomOS ({ _withUsers = false; } // commonArgs);
+      fullOs = mkCriomOS ({ _withUsers = true; } // commonArgs);
       hom = mapAttrs mkUserHomes users;
       emacs = mapAttrs mkUserEmacs users;
     };
