@@ -78,6 +78,11 @@ let
       "thunderbolt"
       "sd_mod"
     ];
+    ThinkPadT14Gen5Intel = [
+      "nvme"
+      "thunderbolt"
+      "sd_mod"
+    ];
     ThinkPadX250 = [
       "usb_storage"
       "rtsx_pci_sdmmc"
