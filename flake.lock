@@ -270,11 +270,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1748737919,
-        "narHash": "sha256-5kvBbLYdp+n7Ftanjcs6Nv+UO6sBhelp6MIGJ9nWmjQ=",
+        "lastModified": 1752402455,
+        "narHash": "sha256-mCHfZhQKdTj2JhCFcqfOfa3uKZbwUkPQbd0/zPnhOE8=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "5675a9686851d9626560052a032c4e14e533c1fa",
+        "rev": "bf893ad4cbf46610dd1b620c974f824e266cd1df",
         "type": "github"
       },
       "original": {
@@ -313,11 +313,11 @@
         "v-usb": "v-usb"
       },
       "locked": {
-        "lastModified": 1748785954,
-        "narHash": "sha256-GuKpkcx3ot+kBtUIDus99iCUUMv42shw3Nbt6gnwUhM=",
+        "lastModified": 1752323550,
+        "narHash": "sha256-TnVV9D0lULqXNkp/KK+ITOPBTCN63ODAs2T5inG3/Mg=",
         "owner": "LiGoldragon",
         "repo": "kibord",
-        "rev": "b7726b278ff3fa5ea0b5d119c5afb876adf299d3",
+        "rev": "c4be664641e7343d9eb197c54bcbd2442451d69b",
         "type": "github"
       },
       "original": {
@@ -546,16 +546,16 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1748727990,
-        "narHash": "sha256-dEAycxK0k2adFOB75TDniBTksA9I5k5BH13xzN154zs=",
+        "lastModified": 1752327859,
+        "narHash": "sha256-bteeX3HD34qn6oolwuPWIIXUoHM0dmjeOeHmXmHQCPU=",
         "owner": "criome",
         "repo": "nixpkgs",
-        "rev": "f680c938e74df308e5c957791613b7d20b90578b",
+        "rev": "89d08cd9b446fb5312754ed4c1483d37c45b0c45",
         "type": "github"
       },
       "original": {
         "owner": "criome",
-        "ref": "testing",
+        "ref": "next-testing",
         "repo": "nixpkgs",
         "type": "github"
       }
