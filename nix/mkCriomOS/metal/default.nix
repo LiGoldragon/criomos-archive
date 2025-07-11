@@ -102,8 +102,7 @@ let
   ];
 
   intelGraphicsPackages =
-    optionals enableWaydroid waydroidPackages
-    ++ optional useVaapiIntel pkgs.vaapiIntel
+    optional useVaapiIntel pkgs.vaapiIntel
     ++ optional hasOpenClSupport pkgs.intel-compute-runtime;
 
   # TODO - sort out different `sizedatleast` sets
@@ -125,6 +124,11 @@ let
       epson-escpr # Drivers for some other Epson devices
     ]
   );
+
+  intelUtils = with pkgs; [
+    libva-utils
+    i7z
+  ];
 
 in
 {
@@ -196,11 +200,9 @@ in
     systemPackages =
       with pkgs;
       [ lm_sensors ]
-      ++ optionals chipIsIntel [
-        libva-utils
-        i7z
-      ]
-      ++ optionals sizedAtLeast.max [ v4l-utils ];
+      ++ optionals chipIsIntel intelUtils
+      ++ optionals sizedAtLeast.max [ v4l-utils ]
+      ++ optionals enableWaydroid waydroidPackages;
 
   };
 
