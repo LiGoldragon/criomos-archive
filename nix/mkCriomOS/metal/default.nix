@@ -102,8 +102,11 @@ let
     python3Packages.pyclip
   ];
 
+  hasRecentIntelGpu = builtins.elem model [ "ThinkPadT14Gen5Intel" ];
+
   intelGraphicsPackages =
     optional useVaapiIntel pkgs.vaapiIntel
+    ++ optional hasRecentIntelGpu pkgs.vpl-gpu-rt
     ++ optional hasOpenClSupport pkgs.intel-compute-runtime;
 
   # TODO - sort out different `sizedatleast` sets
