@@ -8,9 +8,10 @@ let
   l = lib // builtins;
   inherit (horizon.node) typeIs;
 
-  wanInterface = "enp0s20u2c2";
-  lanInterfaceOne = "enp0s25";
-  lanInterfaceTwo = "enp0s20u1";
+  # TODO - massive hack
+  wanInterface = "enp0s25";
+  lanInterfaceOne = "enp0s20u1";
+  # lanInterfaceTwo = "enp0s20u1";
   lanBridgeInterface = "br-lan";
   lanSubnetPrefix = "10.18.0";
   lanAddress = "${lanSubnetPrefix}.1";
@@ -70,7 +71,7 @@ in
     hostapd = {
       enable = true;
       radios = {
-        wlan0 = {
+        wlp3s0 = {
           band = "2g";
           channel = 1;
           countryCode = "PL";
@@ -145,14 +146,14 @@ in
         linkConfig.RequiredForOnline = "enslaved";
       };
 
-      "30-lan3" = {
-        matchConfig.Name = lanInterfaceTwo;
-        networkConfig = {
-          Bridge = lanBridgeInterface;
-          ConfigureWithoutCarrier = true;
-        };
-        linkConfig.RequiredForOnline = "enslaved";
-      };
+      # "30-lan3" = {
+      #   matchConfig.Name = lanInterfaceTwo;
+      #   networkConfig = {
+      #     Bridge = lanBridgeInterface;
+      #     ConfigureWithoutCarrier = true;
+      #   };
+      #   linkConfig.RequiredForOnline = "enslaved";
+      # };
 
       "40-br-lan" = {
         matchConfig.Name = lanBridgeInterface;
