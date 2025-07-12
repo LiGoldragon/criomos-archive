@@ -43,12 +43,15 @@ in
             ip6 saddr fe80::/64 ip6 daddr fe80::/64 udp dport 9001 accept
             ip6 saddr fe80::/64 ip6 daddr fe80::/64 tcp dport 10001 accept
 
+            tcp dport ssh accept
+
             iifname { ${lanBridgeInterface}, yggTun } accept comment "Allow local network to access the router"
             iifname "${wanInterface}" ct state { established, related } accept comment "Allow established traffic"
             iifname "${wanInterface}" icmp type { echo-request, destination-unreachable, time-exceeded } counter accept comment "Allow select ICMP"
             iifname "${wanInterface}" counter drop comment "Drop all other unsolicited traffic from ${wanInterface}"
             iifname "lo" accept comment "Accept everything from loopback interface"
           }
+          
           chain forward {
             type filter hook forward priority filter; policy drop;
 
