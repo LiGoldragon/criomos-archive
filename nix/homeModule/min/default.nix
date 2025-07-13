@@ -390,7 +390,7 @@ mkIf sizedAtLeast.min {
       settings = {
         ui = {
           diff-instructions = false;
-          diff.tool = [
+          diff-formatter = [
             "difft"
             "--color=always"
             "$left"
