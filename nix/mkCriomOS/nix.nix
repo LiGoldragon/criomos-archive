@@ -164,12 +164,14 @@ in
       ${lib.optionalString hasNixPreCriad "secret-key-files = ${preCriad}"}
       keep-derivations = ${boolToString sizedAtLeast.med}
       keep-outputs = ${boolToString sizedAtLeast.max}
+
       # !include <path>:  include without an error for missing file. 
       !include nixTokens
     '';
 
-    distributedBuilds = isDispatcher;
-    buildMachines = optionals isDispatcher builderConfigs;
+    # TODO - broken
+    # distributedBuilds = isDispatcher;
+    # buildMachines = optionals isDispatcher builderConfigs;
 
   };
 
