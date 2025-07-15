@@ -448,11 +448,9 @@ mkIf sizedAtLeast.min {
       extensions = [ ];
     };
 
-    htop = {
+    bottom = {
       enable = true;
-      settings = {
-        highlight_base_name = 1;
-      };
+      settings = { };
     };
 
     starship = {
