@@ -270,7 +270,7 @@ in
 mkIf sizedAtLeast.min {
   services = {
     dunst = {
-      enable = true;
+      enable = !sizedAtLeast.min;
       # (TODO theme)
       settings = {
         global = {
