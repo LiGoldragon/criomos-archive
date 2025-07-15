@@ -112,7 +112,6 @@ let
     swaylock
     grim
     slurp
-    waybar
     wayland-warpd
     zathura
     wl-clipboard
@@ -325,6 +324,10 @@ mkIf sizedAtLeast.min {
           default_parallel_tasks = 1;
         };
       };
+    };
+
+    swaync = {
+      enable = sizedAtLeast.min;
     };
   };
 

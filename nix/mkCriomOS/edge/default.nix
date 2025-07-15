@@ -95,10 +95,6 @@ in
 
     pulseaudio.enable = false;
 
-    swaync = {
-      enable = sizedAtLeast.min;
-    };
-
     xserver = {
       enable = sizedAtLeast.min;
       excludePackages = with pkgs; [ xorg.xorgserver.out ];
