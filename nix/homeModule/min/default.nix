@@ -137,8 +137,12 @@ let
     waylandPass
     # helvum # Broken? Pipewire nodes UI
     coppwr # Pipewire Nodes UI
+
     # TODO('horizon language')
-    (hunspellWithDicts [ hunspellDicts.en-us-large ])
+    (pkgs.hunspell.withDicts (dicts: [
+      dicts.en_GB-ize
+      dicts.en_US
+    ]))
     (aspellWithDicts (
       ds: with ds; [
         en
@@ -146,7 +150,7 @@ let
         en-science
       ]
     ))
-    hunspellDicts.en-us-large
+
   ];
 
   brootConfig = toJSON { };
