@@ -107,8 +107,10 @@ in
     bind = $SUPER_SHIFT, Return, exec, ${terminal}
     bind = $SUPER, O, exec, ${keyboardLauncher}
     bind = $SUPER, Q, killactive
-    bind = $SUPER, P, exec, dunstify --icon=$(grimblast save screen) Screenshot Captured.
+
+    bind = $SUPER, P, exec, toastify --icon=$(grimblast save screen) Screenshot Captured.
     bind = $SUPER, Print, exec, grimblast copy area
+
     bind = $SUPER_ALT, delete, exit
     bind = $SUPER, ${float}, togglefloating
     bind = $SUPER, B, centerwindow
