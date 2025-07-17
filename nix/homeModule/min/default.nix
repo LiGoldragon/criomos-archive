@@ -74,13 +74,13 @@ let
 
   mkFcCache = pkgs.makeFontsCache { fontDirectories = fontPackages; };
 
-  mkFontPaths = lib.concatMapStringsSep "\n" (path: "<dir>${path}/share/fonts</dir>") fontPackages;
+  mkFontPaths = lib.concatMapStringsSep "\n" (path: "  <dir>${path}/share/fonts</dir>") fontPackages;
 
   mkFontConf = ''
     <?xml version='1.0'?>
     <!DOCTYPE fontconfig SYSTEM 'fonts.dtd'>
     <fontconfig>
-      ${mkFontPaths}
+    ${mkFontPaths}
       <cachedir>${mkFcCache}</cachedir>
     </fontconfig>
   '';
