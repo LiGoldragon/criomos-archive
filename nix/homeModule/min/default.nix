@@ -36,7 +36,7 @@ let
 
   homeDir = config.home.homeDirectory;
 
-  terminalFontFamily = if sizedAtLeast.med then "Fira Code" else "DejaVu Sans Mono";
+  terminalFontFamily = if sizedAtLeast.med then "FiraMono Nerd Font" else "DejaVu Sans Mono";
 
   colemakZedKeys = lib.importJSON ./zed_colemak_keybindings.json;
 
@@ -361,7 +361,7 @@ mkIf sizedAtLeast.min {
       settings = {
         main = {
           include = toString footThemeFile;
-          font = "${terminalFontFamily}:size=10.8";
+          font = "${terminalFontFamily}:size=14";
         };
       };
     };
