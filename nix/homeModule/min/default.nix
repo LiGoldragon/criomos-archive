@@ -66,19 +66,15 @@ let
     waylandSupport = true;
   };
 
-  fontDeriveicynz =
-    [ pkgs.noto-fonts-cjk-sans ]
-    ++ (optionals sizedAtLeast.med (
-      with pkgs;
-      [
-        pkdjz.nerd-fonts.firaCode
-        fira-code
-      ]
-    ));
+  fontPackages = with pkgs; [
+    dejavu_fonts
+    nerd-fonts.fira-mono
+    nerd-fonts.fira-code
+  ];
 
-  mkFcCache = pkgs.makeFontsCache { fontDirectories = fontDeriveicynz; };
+  mkFcCache = pkgs.makeFontsCache { fontDirectories = fontPackages; };
 
-  mkFontPaths = lib.concatMapStringsSep "\n" (path: "<dir>${path}/share/fonts</dir>") fontDeriveicynz;
+  mkFontPaths = lib.concatMapStringsSep "\n" (path: "<dir>${path}/share/fonts</dir>") fontPackages;
 
   mkFontConf = ''
     <?xml version='1.0'?>
