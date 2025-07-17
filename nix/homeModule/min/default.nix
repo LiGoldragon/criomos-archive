@@ -267,6 +267,17 @@ let
 
 in
 mkIf sizedAtLeast.min {
+  fonts.fontconfig = {
+    enable = true;
+    # TODO
+    defaultFonts = {
+      monospace = [ ];
+      sansSerif = [ ];
+      serif = [ ];
+      emoji = [ ];
+    };
+  };
+
   services = {
     dunst = {
       enable = !sizedAtLeast.min;
@@ -494,7 +505,7 @@ mkIf sizedAtLeast.min {
   };
 
   home = {
-    packages = nixpkgsPackages ++ worldPackages;
+    packages = fontPackages ++ nixpkgsPackages ++ worldPackages;
 
     pointerCursor = {
       package = pkgs.vanilla-dmz;
@@ -541,7 +552,7 @@ mkIf sizedAtLeast.min {
 
   xdg = {
     configFile = {
-      "fontconfig/conf.d/10-nixHomeManager-fonts.conf".text = mkFontConf;
+      "fontconfig/conf.d/10-CriomOS-fonts-paths.conf".text = mkFontConf;
     };
 
     mimeApps = {
