@@ -1,7 +1,7 @@
 {
   horizon,
   world,
-  homeModule,
+  homeModules,
   ...
 }:
 let
@@ -23,7 +23,7 @@ in
   home-manager = {
     backupFileExtension = "backup";
     extraSpecialArgs = { inherit pkdjz world horizon; };
-    sharedModules = [ homeModule ];
+    sharedModules = homeModules;
     useGlobalPkgs = true;
     users = mapAttrs mkUserConfig horizon.users;
   };

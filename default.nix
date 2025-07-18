@@ -24,7 +24,7 @@ let
 
   hob =
     let
-      hobInputs = removeAttrs inputs nodeNames;
+      hobInputs = removeAttrs inputs local.nodeNames;
       adHocHobSpokes = {
         inherit (local) mkWebpage;
         pkdjz.HobWorlds = local.pkdjz;
@@ -32,21 +32,19 @@ let
     in
     hobInputs // adHocHobSpokes;
 
-  inherit (local)
-    nodeNames
-    mkPkgs
-    homeModule
-    mkWorld
-    ;
+  homeModules = [
+    inputs.stylix.homeModules.stylix
+    local.criomOSHomeModule
+  ];
 
   mkPkgsAndWorldFromSystem =
     system:
     let
-      pkgs = mkPkgs { inherit nixpkgs lib system; };
+      pkgs = local.mkPkgs { inherit nixpkgs lib system; };
     in
     {
       inherit pkgs;
-      world = mkWorld {
+      world = local.mkWorld {
         inherit
           lib
           pkgs
@@ -96,10 +94,7 @@ let
           mkProfileHome =
             profileName: profile:
             let
-              modules = [
-                inputs.stylix.homeModules.stylix
-                homeModule
-              ];
+              modules = homeModules;
               extraSpecialArgs = {
                 inherit
                   pkdjz
@@ -130,8 +125,8 @@ let
           lib
           world
           horizon
-          homeModule
           hob
+          homeModules
           ;
       };
 

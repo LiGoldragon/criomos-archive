@@ -1,9 +1,9 @@
 {
-  homeModule,
   lib,
   world,
   horizon,
   hob,
+  homeModules,
   _withUsers ? true,
 }:
 let
@@ -29,7 +29,7 @@ let
 
   metalModule = import ./metal;
 
-  homeModules = [
+  usersModules = [
     ./userHomes.nix
     home-manager.nixosModules.default
   ];
@@ -47,7 +47,7 @@ let
     ++ (optional behavesAs.edge edgeModule)
     ++ (optional behavesAs.router ./router)
     ++ (optional behavesAs.bareMetal metalModule)
-    ++ (optionals _withUsers homeModules);
+    ++ (optionals _withUsers usersModules);
 
   nixosArgs = {
     inherit
@@ -56,7 +56,7 @@ let
       world
       pkdjz
       horizon
-      homeModule
+      homeModules
       hob
       ;
   };
