@@ -9,7 +9,7 @@ let
 
   mkCriomOS = import ./nix/mkCriomOS;
 
-  localSources =
+  local =
     let
       importInput = name: value: import value;
       modulePaths = {
@@ -29,13 +29,13 @@ let
     let
       hobInputs = removeAttrs inputs nodeNames;
       adHocHobSpokes = {
-        inherit (localSources) mkWebpage;
-        pkdjz.HobWorlds = localSources.pkdjz;
+        inherit (local) mkWebpage;
+        pkdjz.HobWorlds = local.pkdjz;
       };
     in
     hobInputs // adHocHobSpokes;
 
-  inherit (localSources)
+  inherit (local)
     nodeNames
     mkPkgs
     homeModule
@@ -61,7 +61,7 @@ let
 
   inherit (builtins) mapAttrs;
 
-  generateCrioSphereProposalFromName =
+  crioSphereProposalFromName =
     name:
     let
       subCriomeConfig = inputs."${name}".NodeProposal or { };
@@ -71,7 +71,7 @@ let
     in
     subCriomeConfig // { nodes = allNodes; };
 
-  uncheckedCrioSphereProposal = lib.genAttrs nodeNames generateCrioSphereProposalFromName;
+  uncheckedCrioSphereProposal = lib.genAttrs local.nodeNames crioSphereProposalFromName;
 
   mkNodeDerivations =
     preNodeName: crioZone:
@@ -188,8 +188,8 @@ let
   # TODO: Consider using a 'system' input
   perSystemAllOutputs = inputs.flake-utils.lib.eachDefaultSystem mkNixApiOutputsPerSystem;
 
-  proposedCrioSphere = localSources.mkCrioSphere { inherit uncheckedCrioSphereProposal lib; };
-  proposedCrioZones = localSources.mkCrioZones { inherit lib proposedCrioSphere; };
+  proposedCrioSphere = local.mkCrioSphere { inherit uncheckedCrioSphereProposal lib; };
+  proposedCrioZones = local.mkCrioZones { inherit lib proposedCrioSphere; };
 
 in
 perSystemAllOutputs
