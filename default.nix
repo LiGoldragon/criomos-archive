@@ -96,7 +96,7 @@ let
         let
           inherit (world) pkdjz;
 
-          mkProfileHom =
+          mkProfileHome =
             profileName: profile:
             let
               modules = [ homeModule ];
@@ -114,7 +114,7 @@ let
             in
             evaluation.config.home.activationPackage;
         in
-        mapAttrs mkProfileHom userProfiles;
+        mapAttrs mkProfileHome userProfiles;
 
       mkUserEmacs =
         userName: user:
