@@ -152,7 +152,7 @@ in
 
         passthru.updateScript = ./update.py;
 
-        meta = with lib; {
+        meta = {
           homepage = "https://ndi.tv/sdk/";
           description = "NDI Software Developer Kit";
           platforms = [ "x86_64-linux" ];
@@ -209,37 +209,6 @@ in
           "rust-analyzer"
           "rust-src"
         ];
-      };
-  };
-
-  hyprland-relative-workspace = {
-    src = null;
-    lambda =
-      {
-        lib,
-        rustPlatform,
-        fetchFromGitHub,
-      }:
-
-      rustPlatform.buildRustPackage rec {
-        pname = "hyprland-relative-workspace";
-        version = "1.1.8-unstable-2023-04-25";
-
-        src = fetchFromGitHub {
-          owner = "CheesyPhoenix";
-          repo = pname;
-          rev = "708e9bf22f100a33948d7ab10bee390b2a454ff8";
-          sha256 = "sha256-PN3t3sVIFz1dKVtBEFLmPO9YAhXpbWcT5uurkNqtFqc=";
-        };
-
-        cargoHash = "sha256-kcCGduZs1EbMkyfRKHSiMTWhdO2Fk0ipbblhndiGAls=";
-
-        meta = with lib; {
-          description = "GNOME-like workspace switching in Hyprland";
-          homepage = "https://github.com/CheesyPhoenix/hyprland-relative-workspace";
-          license = licenses.mit;
-          maintainers = with maintainers; [ donovanglover ];
-        };
       };
   };
 
