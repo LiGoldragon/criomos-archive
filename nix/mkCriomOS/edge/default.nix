@@ -69,11 +69,11 @@ in
   services = {
     avahi.enable = sizedAtLeast.min;
 
-    blueman.enable = sizedAtLeast.med;
+    blueman.enable = sizedAtLeast.min;
 
     power-profiles-daemon.enable = false;
 
-    dbus.packages = mkIf sizedAtLeast.med [ pkgs.gcr ];
+    dbus.packages = mkIf sizedAtLeast.min [ pkgs.gcr ];
 
     displayManager.gdm = {
       enable = sizedAtLeast.min;
@@ -83,10 +83,12 @@ in
     gvfs.enable = sizedAtLeast.min;
 
     gnome = {
-      at-spi2-core.enable = true;
-      core-apps.enable = true;
-      evolution-data-server.enable = true;
-      gnome-settings-daemon.enable = true;
+      at-spi2-core.enable = sizedAtLeast.min;
+      core-apps.enable = sizedAtLeast.min;
+      evolution-data-server.enable = sizedAtLeast.min;
+      gnome-keyring.enable = sizedAtLeast.min;
+      gnome-online-accounts.enable = sizedAtLeast.min;
+      gnome-settings-daemon.enable = sizedAtLeast.min;
     };
 
     tumbler.enable = sizedAtLeast.med;
