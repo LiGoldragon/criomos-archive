@@ -144,7 +144,7 @@ in
 
     firmware = modelSpecificFirmware;
 
-    ledger.enable = typeIs.edge;
+    ledger.enable = behavesAs.edge;
 
     graphics.extraPackages =
       optionals chipIsIntel intelGraphicsPackages
