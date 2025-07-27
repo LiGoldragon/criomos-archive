@@ -5,6 +5,13 @@
 (use-package sublimity)
 (use-package sublimity-map)
 
+(use-package ultra-scroll
+  :init
+  (setq scroll-conservatively 3
+	scroll-margin 0)
+  :config
+  (ultra-scroll-mode 1))
+
 (use-package telega)
 
 (use-package envrc :config (envrc-global-mode))
