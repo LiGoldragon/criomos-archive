@@ -102,6 +102,16 @@ let
         commit = src.rev;
       };
 
+    ultra-scroll =
+      let
+        src = hob.ultra-scroll;
+      in
+      trivialBuild {
+        pname = "ultra-scroll";
+        version = src.shortRev;
+        inherit src;
+      };
+
     xah-fly-keys =
       let
         src = hob.xah-fly-keys;

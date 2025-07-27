@@ -102,6 +102,10 @@
       url = "github:svavs/tera-mode";
       flake = false;
     };
+    ultra-scroll = {
+      url = "github:jdtsmith/ultra-scroll";
+      flake = false;
+    };
     videocut = {
       url = "github:kanehekili/VideoCut";
       flake = false;
