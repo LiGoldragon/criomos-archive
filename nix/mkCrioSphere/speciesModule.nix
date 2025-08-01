@@ -43,6 +43,7 @@ let
     "edgeTesting"
     "mediaBroadcast"
     "router"
+    "routerTesting"
   ];
 
   clusterNames = attrNames preClusters;

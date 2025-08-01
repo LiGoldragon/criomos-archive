@@ -19,6 +19,8 @@ let
   lanAddress = "${lanSubnetPrefix}.1";
   lanFullAdress = "${lanAddress}/24";
 
+  useNftables = typeIs.routerTesting;
+
 in
 {
   boot.kernel = {
@@ -31,12 +33,11 @@ in
   networking = {
     useNetworkd = true;
     useDHCP = false;
-
     nat.enable = false;
-    firewall.enable = false;
+    firewall.enable = !useNftables;
 
     nftables = {
-      enable = true;
+      enable = useNftables;
       ruleset = ''
         table inet filter {
           chain input {
