@@ -39,6 +39,10 @@ let
     pavucontrol # TODO: pwvucontrol doesnt display virtual sources
   ];
 
+  windowsEmulationsPackages = with pkgs; [
+    bottles
+  ];
+
 in
 lib.mkIf sizedAtLeast.max {
   home = {
@@ -46,10 +50,10 @@ lib.mkIf sizedAtLeast.max {
       with pkgs;
       [
         # freecad # broken
-        wineWowPackages.waylandFull
         whatsapp-for-linux
         gitkraken
       ]
+      ++ windowsEmulationsPackages
       ++ (optionals isCodeDev codingPackages)
       ++ (optionals isMultimediaDev semaDevPackages);
   };
