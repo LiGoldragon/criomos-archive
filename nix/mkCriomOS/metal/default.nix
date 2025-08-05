@@ -6,18 +6,15 @@
   ...
 }:
 let
-  inherit (builtins) readFile genList concatStringsSep;
   inherit (lib)
     mkIf
     optional
     optionals
     optionalString
     optionalAttrs
-    isOdd
     ;
-  inherit (lib.generators) toINI;
   inherit (horizon.node) typeIs;
-  inherit (horizon.node.machine) model cores;
+  inherit (horizon.node.machine) model;
   inherit (horizon.node.methods)
     behavesAs
     sizedAtLeast
@@ -47,10 +44,6 @@ let
 
   modelSpecificFirmware = modelFirmwareIndex."${model}" or [ ];
 
-  izX230 = model == "ThinkPadX230";
-  izX240 = model == "ThinkPadX240";
-
-  hasModelSpecificPowerTweaks = model == "ThinkPadE15Gen2Intel";
 
   modelSpecificPowerTweaks = {
     ThinkPadE15Gen2Intel = {
@@ -61,12 +54,7 @@ let
     };
   };
 
-  soundCardIndex = {
-    ThinkPadX230 = "PCH";
-    ThinkPadX240 = "PCH";
-  };
-
-  mainSoundCard = soundCardIndex."${model}" or "0";
+  hasModelSpecificPowerTweaks = builtins.hasAttr model modelSpecificPowerTweaks;
 
   modelKernelModulesIndex = {
     ThinkPadE15Gen2Intel = [
