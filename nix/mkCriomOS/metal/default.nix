@@ -31,11 +31,6 @@ let
 
   needsIntelThrottlingFix = model == "ThinkPadT14Intel";
 
-  hasQuickSyncSupport = builtins.elem model [
-    "ThinkPadE15Gen2Intel"
-    "ThinkPadT14Intel"
-  ];
-
   modelFirmwareIndex = with pkgs; {
     ThinkPadE15Gen2Intel = [ sof-firmware ];
     ThinkPadT14Intel = [ sof-firmware ];
@@ -43,7 +38,6 @@ let
   };
 
   modelSpecificFirmware = modelFirmwareIndex."${model}" or [ ];
-
 
   modelSpecificPowerTweaks = {
     ThinkPadE15Gen2Intel = {
@@ -80,22 +74,11 @@ let
 
   modelSpecificKernelModules = modelKernelModulesIndex."${model}" or [ ];
 
-  # (Todo Hack)
-  useVaapiIntel = true;
-  hasOpenClSupport = sizedAtLeast.max;
-
   waydroidPackages = with pkgs; [
     # Investigate: Clipboard passing still not working reliably
     wl-clipboard
     python3Packages.pyclip
   ];
-
-  hasRecentIntelGpu = builtins.elem model [ "ThinkPadT14Gen5Intel" ];
-
-  intelGraphicsPackages =
-    optional useVaapiIntel pkgs.vaapiIntel
-    ++ optional hasRecentIntelGpu pkgs.vpl-gpu-rt
-    ++ optional hasOpenClSupport pkgs.intel-compute-runtime;
 
   # TODO - sort out different `sizedatleast` sets
   printingDriversPkgs = lib.optionals sizedAtLeast.max (
@@ -122,6 +105,33 @@ let
     i7z
   ];
 
+  unknownIntelGpuError = throw "Model ${model} missing in Intel GPU drivers lists";
+
+  gpuUsesMediaDriver = builtins.elem model [
+    "ThinkPadT14Gen5Intel"
+    "ThinkPadT14Intel"
+  ];
+
+  gpuUsesVaapi = builtins.elem model [
+    "ThinkPadX230"
+    "ThinkPadX240"
+    "ThinkPadX250"
+  ];
+
+  intelMediaDrivers = with pkgs; [
+    intel-media-driver
+    intel-compute-runtime
+    vpl-gpu-rt
+  ];
+
+  intelGpuDrivers =
+    if gpuUsesVaapi then
+      [ pkgs.intel-vaapi-driver ]
+    else if gpuUsesMediaDriver then
+      intelMediaDrivers
+    else
+      unknownIntelGpuError;
+
 in
 {
   hardware = {
@@ -134,10 +144,7 @@ in
 
     ledger.enable = behavesAs.edge;
 
-    graphics.extraPackages =
-      optionals chipIsIntel intelGraphicsPackages
-      ++ optional hasQuickSyncSupport pkgs.intel-media-driver;
-
+    graphics.extraPackages = optionals chipIsIntel intelGpuDrivers;
   };
 
   location.provider = if sizedAtLeast.min then "geoclue2" else "manual";
