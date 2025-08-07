@@ -133,16 +133,13 @@ lib.mkIf sizedAtLeast.med {
           c.fonts.web.size.default = 18
 
           config.set('content.javascript.enabled', False)
-          config.set('content.javascript.enabled', True, 'http://[::1]*')
-
-          config.set('content.javascript.enabled', True, 'file://${config.home.homeDirectory}/html/*')
 
           ${domainListBlok}
 
           c.url.start_pages = ["qute://history/"]
 
           c.url.searchengines = {
-          "DEFAULT": "https://duckduckgo.com/?q={}",
+          "DEFAULT": "https://google.com/search?hl=en&q={}",
           "g": "https://google.com/search?hl=en&q={}",
           "s": "https://www.startpage.com/do/dsearch?query={}",
           "sx": "https://searx.me/?q={}",
