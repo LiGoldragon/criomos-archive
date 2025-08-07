@@ -45,10 +45,20 @@ let
 
   sshKnownHosts = concatStringsSep "\n" (mapAttrsToList mkNodeKnownHost exNodes);
 
-  audioPackages = with pkgs; [
-    # To get all codecs in pipewire
-    pulseaudioFull
-  ];
+  libpulseaudioFull = pkgs.pulseaudio.override {
+    libOnly = true;
+    x11Support = true;
+    jackaudioSupport = true;
+    airtunesSupport = true;
+    bluetoothSupport = true;
+    advancedBluetoothCodecs = true;
+    remoteControlSupport = true;
+    zeroconfSupport = true;
+  };
+
+  pipewireFull = pkgs.pipewire.override {
+    libpulseaudio = libpulseaudioFull;
+  };
 
 in
 {
@@ -84,18 +94,15 @@ in
       };
     };
 
-    systemPackages =
-      with pkgs;
-      [
-        world.skrips.root
-        tcpdump
-        librist
-        openssh
-        ntfs3g
-        fuse
-        ifmetric
-      ]
-      ++ audioPackages;
+    systemPackages = with pkgs; [
+      world.skrips.root
+      tcpdump
+      librist
+      openssh
+      ntfs3g
+      fuse
+      ifmetric
+    ];
 
     interactiveShellInit = optionalString useColemak "stty -ixon";
     sessionVariables = (
@@ -128,6 +135,7 @@ in
 
     pipewire = mkIf hasAudioOutput {
       enable = true;
+      package = pipewireFull;
       alsa.enable = true;
       jack.enable = false;
       pulse.enable = true;
