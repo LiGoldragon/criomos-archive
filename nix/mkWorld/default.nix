@@ -60,7 +60,7 @@ let
     spokName:
     spoke@{ ... }:
     let
-      priMkSubWorld =
+      preMkSubWorld =
         name:
         SubWorld@{
           mods ? [ ],
@@ -116,7 +116,7 @@ let
     if (l.hasAttr "HobWorlds" spoke) then
       mkHobWorlds spoke.HobWorlds
     else if (l.hasAttr "SubWorld" spoke) then
-      priMkSubWorld spokName spoke.SubWorld
+      preMkSubWorld spokName spoke.SubWorld
     else if (spokeIsWebsite spokName) then
       mkZolaWebsite { src = spoke; }
     else
