@@ -139,11 +139,13 @@ let
   commonPackagesEl = readFile ./packages.el;
   launcherCommonEl = readFile ./selector-common.el;
   launcherStyleEl = readFile ./vertico.el;
+  syntEl = readFile ./synth.el;
 
   packagesEl = concatStringsSep "\n" [
     commonPackagesEl
     launcherCommonEl
     launcherStyleEl
+    syntEl
   ];
 
   usePackagesNames = lib.unique (parsePackagesFromUsePackage {
