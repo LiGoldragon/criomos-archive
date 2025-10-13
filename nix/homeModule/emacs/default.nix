@@ -15,7 +15,14 @@ in
   home = {
     file.".emacs".text = builtins.readFile ./init.el;
 
-    packages = [ package ] ++ (with pkgs; [ nil ]);
+    packages =
+      [ package ]
+      ++ (with pkgs; [
+        nil
+        (python3Packages.aider-chat)
+        nodejs
+        gh
+      ]);
 
     sessionVariables = {
       EDITOR = "emacsclient -c";
