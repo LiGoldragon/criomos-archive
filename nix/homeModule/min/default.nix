@@ -561,8 +561,10 @@ mkIf sizedAtLeast.min {
         let
           defaultBrowser = "chromium.desktop";
           defaultMailer = "evolution.desktop";
+          defaultAudioPlayer = "mpv.desktop";
         in
         {
+          "audio/x-m4b" = defaultAudioPlayer;
           "application/zip" = "org.gnome.FileRoller.desktop";
 
           "x-scheme-handler/tg" = "org.telegram.desktop.desktop";
