@@ -1,4 +1,4 @@
-(defgroup crio/devloop nil
+(defgroup crio/develop nil
   "CriomOS development loop helpers."
   :group 'tools
   :prefix "crio/")
@@ -7,18 +7,18 @@
   "aider --model openai/gpt-4o-mini --no-auto-commit"
   "Shell command used by `crio/aider-vterm' to start aider."
   :type 'string
-  :group 'crio/devloop)
+  :group 'crio/develop)
 
 (defcustom crio/gptel-system-prompt
   "You are an expert NixOS, Emacs and systems programming pair-programmer."
   "System prompt supplied to gptel helper commands."
   :type 'string
-  :group 'crio/devloop)
+  :group 'crio/develop)
 
 (defcustom crio/gptel-default-model "gpt-4o-mini"
   "Default model identifier used for gptel sessions."
   :type 'string
-  :group 'crio/devloop)
+  :group 'crio/develop)
 
 (defun crio/gptel--read-api-key ()
   "Return API key strictly from OPENAI_API_KEY, auth-source(:host api.openai.com),
