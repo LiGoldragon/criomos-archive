@@ -60,7 +60,7 @@ or pass entry 'openai/api-key'. Never use 'openapi/api-key'."
 (use-package gptel
   :commands (gptel gptel-send gptel-rewrite gptel-menu)
   :custom
-  (gptel-default-mode 'org-mode)
+  (gptel-default-mode 'markdown-mode)
   (gptel-use-curl t)
   :init
   (setq gptel-model crio/gptel-default-model)
