@@ -2,10 +2,6 @@ hob:
 
 let
   pkdjz = {
-    beaker = {
-      lambda = import ./beaker;
-    };
-
     buildNvimPlogin = {
       lambda = import ./buildNvimPlogin;
       mods = [
