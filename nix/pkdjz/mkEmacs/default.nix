@@ -80,6 +80,53 @@ let
         '';
       };
 
+    superchat =
+      let
+        src = hob.superchat;
+      in
+      trivialBuild {
+        pname = "superchat";
+        version = src.shortRev;
+        inherit src;
+
+        # Superchat rides GPTel (chat), writes Markdown, and optionally uses Org for memory.
+        packageRequires = with emacsPackages; [
+          gptel
+          markdown-mode
+          org
+          dash
+          s
+          transient
+        ];
+
+        /*
+          Nix sandbox notes:
+          - Emacs runs in batch with HOME=/homeless-shelter (not writable).
+          - Superchat enables auto tasks at load time and tries to create ~/.emacs.d/superchat.
+          - We both export a writable HOME and turn those timers off during byte-compile.
+        */
+        preBuild = ''
+          export HOME="$TMPDIR"
+        '';
+
+        # These -evals run before files are loaded for compilation.
+        byteCompileFlags = [
+          # Disable any auto tasks that would mkdir in HOME during build
+          "-eval"
+          "(setq superchat-memory-auto-prune-enabled nil)"
+          "-eval"
+          "(setq superchat-memory-auto-insights-enabled nil)"
+          "-eval"
+          "(setq superchat-session-auto-save nil)"
+          # Point data dir somewhere harmless during build just in case
+          "-eval"
+          "(setq superchat-data-directory (expand-file-name \"superchat-build/\" temporary-file-directory))"
+        ];
+
+        # Optional: quiet native compilation issues if you use native-comp Emacs
+        # nativeCompile = false;
+      };
+
     tera-mode =
       let
         src = hob.tera-mode;
