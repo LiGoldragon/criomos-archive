@@ -384,6 +384,22 @@
         "type": "github"
       }
     },
+    "gptel": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1761961417,
+        "narHash": "sha256-66MicF9uYiAcsD1lAdpzzUdqWAEpC3IDD8J7bolVEjg=",
+        "owner": "karthink",
+        "repo": "gptel",
+        "rev": "961d534c134ae3133f7dd2120dd643510c47c68f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "karthink",
+        "repo": "gptel",
+        "type": "github"
+      }
+    },
     "hexdumpSrc": {
       "flake": false,
       "locked": {
@@ -839,6 +855,7 @@
         "flake-utils": "flake-utils",
         "goldragon": "goldragon",
         "goldragonWebsite": "goldragonWebsite",
+        "gptel": "gptel",
         "home-manager": "home-manager",
         "jujutsu-el": "jujutsu-el",
         "kibord": "kibord",
