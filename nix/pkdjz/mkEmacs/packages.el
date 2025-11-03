@@ -1,3 +1,7 @@
+(use-package eat
+  :ensure t
+  :defer t)
+
 (use-package chatgpt-shell)
 
 (use-package apheleia)
