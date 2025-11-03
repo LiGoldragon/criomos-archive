@@ -17,8 +17,46 @@ let
     # gh
   ];
 
+  tokenizedAider =
+    let
+      # Pin Aider to Python 3.12 until 3.13 fully works upstream.
+      # (Ref: aider #1984, nixpkgs #417098)
+      aiderPackage = pkgs.python312.withPackages (ps: [ ps.aider-chat ]);
+
+      gopassPath = "openai/api-key"; # gopass: first line is the key
+      anthropicPath = "anthropic/api-key"; # optional
+      baseUrl = null; # e.g. "https://api.openai.com/v1" or null
+      aiderBin = "${aiderPackage}/bin/aider"; # use pinned aider
+    in
+    pkgs.writeScriptBin "aider" ''
+      #!${pkgs.mksh}/bin/mksh
+      set -euo pipefail
+
+      _firstline() { ${pkgs.coreutils}/bin/head -n1; }
+      _gp() { ${pkgs.gopass}/bin/gopass show -o "$1" | _firstline; }
+
+      # Export only into this process env (not globally)
+      : "''${OPENAI_API_KEY:=}"
+      if [ -z "$OPENAI_API_KEY" ]; then
+        OPENAI_API_KEY="$(_gp ${gopassPath})"
+        export OPENAI_API_KEY
+      fi
+
+      : "''${ANTHROPIC_API_KEY:=}"
+      if [ -z "$ANTHROPIC_API_KEY" ] && ${pkgs.gopass}/bin/gopass ls >/dev/null 2>&1; then
+        if ${pkgs.gopass}/bin/gopass ls | ${pkgs.gnugrep}/bin/grep -qxF "${anthropicPath}" 2>/dev/null; then
+          ANTHROPIC_API_KEY="$(_gp ${anthropicPath})"
+          export ANTHROPIC_API_KEY
+        fi
+      fi
+
+      ${if baseUrl != null then ''export OPENAI_BASE_URL="${baseUrl}"'' else ""}
+
+      exec "${aiderBin}" "$@"
+    '';
+
   synthElDependencies = [
-    (pkgs.python312.withPackages (ps: [ ps.aider-chat ]))
+    tokenizedAider
   ];
 
 in
