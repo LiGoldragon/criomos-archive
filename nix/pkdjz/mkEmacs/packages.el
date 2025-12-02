@@ -1,6 +1,4 @@
-(use-package eat
-  :ensure t
-  :defer t)
+(use-package eat :ensure t :defer t)
 
 (use-package chatgpt-shell)
 
@@ -11,12 +9,13 @@
 (use-package sublimity)
 (use-package sublimity-map)
 
-(use-package ultra-scroll
-  :init
-  (setq scroll-conservatively 3
-	scroll-margin 0)
-  :config
-  (ultra-scroll-mode 1))
+(use-package
+ ultra-scroll
+ :init
+ (setq
+  scroll-conservatively 3
+  scroll-margin 0)
+ :config (ultra-scroll-mode 1))
 
 (use-package telega)
 
@@ -26,9 +25,9 @@
 (use-package google-translate)
 
 (use-package
-  nov
-  :config
-  (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
+ nov
+ :config
+ (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
 
 (use-package
  org-remark
@@ -409,9 +408,7 @@
 ;; in an Emacs-Lisp buffer, eros displays the result briefly
 ;; beside the expression instead of only echoing it.
 ;; Lightweight: adds one overlay and then removes it.
-(use-package eros
-  :ensure t
-  :hook (emacs-lisp-mode . eros-mode))
+(use-package eros :ensure t :hook (emacs-lisp-mode . eros-mode))
 
 ;; Helpful: richer describe-commands
 ;; ---------------------------------
@@ -420,11 +417,13 @@
 ;; source, references, call sites, and links to definitions.
 ;; Use:
 ;;   M-x describe-function  →  Helpful buffer with docs + code
-(use-package helpful
-  :ensure t
-  :bind (([remap describe-function] . helpful-function)
-         ([remap describe-variable] . helpful-variable)
-         ([remap describe-key]      . helpful-key)))
+(use-package
+ helpful
+ :ensure t
+ :bind
+ (([remap describe-function] . helpful-function)
+  ([remap describe-variable] . helpful-variable)
+  ([remap describe-key] . helpful-key)))
 
 ;; Eldoc-box: hover popups for documentation
 ;; -----------------------------------------
@@ -432,9 +431,10 @@
 ;; a floating child-frame near point.  Activates automatically
 ;; when editing Emacs Lisp so you can see symbol docs as you
 ;; type or hover.
-(use-package eldoc-box
-  :ensure t
-  :hook (emacs-lisp-mode . eldoc-box-hover-mode))
+(use-package
+ eldoc-box
+ :ensure t
+ :hook (emacs-lisp-mode . eldoc-box-hover-mode))
 
 ;; Org-babel async: run Org source blocks asynchronously
 ;; -----------------------------------------------------
@@ -442,6 +442,4 @@
 ;; to execute in the background without blocking the UI.
 ;; Results are inserted when finished, useful for long-running
 ;; snippets or API calls.
-(use-package ob-async
-  :ensure t
-  :after org)
+(use-package ob-async :ensure t :after org)
