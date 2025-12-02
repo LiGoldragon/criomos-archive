@@ -21,6 +21,11 @@ let
   inherit (parseLib) parsePackagesFromUsePackage;
 
   customPackages = {
+    elisp-autofmt = pkgs.emacsPackages.elisp-autofmt.overrideAttrs (old: {
+      # or use wrapProgram on the backend if needed
+      buildInputs = (old.buildInputs or [ ]) ++ [ pkgs.python3 ];
+    });
+
     base16-theme =
       let
         src = hob.base16-theme;
