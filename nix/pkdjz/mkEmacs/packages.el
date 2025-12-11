@@ -75,8 +75,8 @@
 (use-package tera-mode)
 
 (use-package
- rust-mode
- :custom (rust-mode-treesitter-derive t) (rust-format-on-save t))
+  rust-mode
+  :custom (rust-mode-treesitter-derive t) (rust-format-on-save t))
 
 (use-package magit-delta :hook (magit-mode . magit-delta-mode))
 
