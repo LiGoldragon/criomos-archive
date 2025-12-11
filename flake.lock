@@ -878,7 +878,6 @@
         "superchat": "superchat",
         "tera-mode": "tera-mode",
         "ultra-scroll": "ultra-scroll",
-        "videocut": "videocut",
         "xah-fly-keys": "xah-fly-keys"
       }
     },
@@ -1203,22 +1202,6 @@
       "original": {
         "owner": "qmk",
         "repo": "v-usb",
-        "type": "github"
-      }
-    },
-    "videocut": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1737324991,
-        "narHash": "sha256-+5VbudB0QhYPKuDz4D9Z6RgQOFC1vS5PmmU9KakfH3w=",
-        "owner": "kanehekili",
-        "repo": "VideoCut",
-        "rev": "f42250e8ff0e9ef65697dcbc63627bc777ada0e4",
-        "type": "github"
-      },
-      "original": {
-        "owner": "kanehekili",
-        "repo": "VideoCut",
         "type": "github"
       }
     },
