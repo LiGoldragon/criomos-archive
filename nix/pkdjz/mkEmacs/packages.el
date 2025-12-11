@@ -1,3 +1,8 @@
+;; This file contains only use-package blocks.
+;; All Tree-sitter grammars, libraries, and dependencies are guaranteed
+;; to be installed and provided by Nix. No checks, conditions, or
+;; installation logic should ever be added here.
+
 (use-package eat :ensure t :defer t)
 
 (use-package chatgpt-shell)
