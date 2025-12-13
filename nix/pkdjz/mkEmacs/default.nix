@@ -212,7 +212,10 @@ let
   mkPackageError =
     name:
     let
-      coreEmacsPackageNames = [ "auth-source-pass" ];
+      coreEmacsPackageNames = [
+        "auth-source-pass"
+        "treesit"
+      ];
       packageIsInCore = elem name coreEmacsPackageNames;
     in
     if packageIsInCore then
@@ -237,7 +240,16 @@ let
     packageRequires = usePackages;
   };
 
-  treeSitterPackages = [ (emacsPackages.treesit-grammars.with-all-grammars) ];
+  tree-sitter-capnp = pkgs.tree-sitter.buildGrammar {
+    language = "capnp";
+    src = hob.tree-sitter-capnp;
+    version = hob.tree-sitter-capnp.shortRev;
+  };
+
+  treeSitterPackages = [
+    (emacsPackages.treesit-grammars.with-all-grammars)
+    tree-sitter-capnp
+  ];
 
   allEmacsPackages = usePackages ++ [ defaultElPackage ] ++ treeSitterPackages;
 

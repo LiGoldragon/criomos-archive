@@ -94,6 +94,10 @@
       url = "github:LiGoldragon/ndi";
       flake = false;
     };
+    tree-sitter-capnp = {
+      url = "github:tree-sitter-grammars/tree-sitter-capnp";
+      flake = false;
+    };
     shen = {
       url = "github:criome/shen";
       flake = false;

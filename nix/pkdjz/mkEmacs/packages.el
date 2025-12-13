@@ -5,6 +5,9 @@
 
 (use-package eat :ensure t :defer t)
 
+;; Cap’n Proto (regex-based, non–Tree-Sitter)
+(use-package capnp-mode :mode ("\\.capnp\\'" . capnp-mode))
+
 (use-package chatgpt-shell)
 
 (use-package apheleia)
@@ -74,22 +77,27 @@
 
 (use-package tera-mode)
 
-(use-package treesit
-  :config
-  (define-derived-mode capnp-ts-mode prog-mode "Capnp-TS"
-    (treesit-parser-create 'capnp)
-    (treesit-major-mode-setup))
+;; Non-working - requires an elisp package, like nix-ts-mode
+(use-package
+ treesit
+ :config
+ (define-derived-mode
+  capnp-ts-mode
+  prog-mode
+  "Capnp-TS"
+  (treesit-parser-create 'capnp)
+  (treesit-major-mode-setup))
 
-  (define-derived-mode proto-ts-mode prog-mode "Proto-TS"
-    (treesit-parser-create 'proto)
-    (treesit-major-mode-setup))
-
-  (add-to-list 'auto-mode-alist '("\\.capnp\\'" . capnp-ts-mode))
-  (add-to-list 'auto-mode-alist '("\\.proto\\'" . proto-ts-mode)))
+ (define-derived-mode
+  proto-ts-mode
+  prog-mode
+  "Proto-TS"
+  (treesit-parser-create 'proto)
+  (treesit-major-mode-setup)))
 
 (use-package
-  rust-mode
-  :custom (rust-mode-treesitter-derive t) (rust-format-on-save t))
+ rust-mode
+ :custom (rust-mode-treesitter-derive t) (rust-format-on-save t))
 
 (use-package magit-delta :hook (magit-mode . magit-delta-mode))
 
