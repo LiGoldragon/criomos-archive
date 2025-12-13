@@ -877,6 +877,7 @@
         "stylix": "stylix",
         "superchat": "superchat",
         "tera-mode": "tera-mode",
+        "tree-sitter-capnp": "tree-sitter-capnp",
         "ultra-scroll": "ultra-scroll",
         "xah-fly-keys": "xah-fly-keys"
       }
@@ -1154,6 +1155,22 @@
       "original": {
         "owner": "tinted-theming",
         "repo": "base16-zed",
+        "type": "github"
+      }
+    },
+    "tree-sitter-capnp": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1713615349,
+        "narHash": "sha256-WKrZuOMxmdGlvUI9y8JgwCNMdJ8MULucMhkmW8JCiXM=",
+        "owner": "tree-sitter-grammars",
+        "repo": "tree-sitter-capnp",
+        "rev": "7b0883c03e5edd34ef7bcf703194204299d7099f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "tree-sitter-grammars",
+        "repo": "tree-sitter-capnp",
         "type": "github"
       }
     },
