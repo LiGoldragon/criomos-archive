@@ -313,12 +313,35 @@ in
   tree-sitter-capnp = {
     mods = [ "pkgs" ];
     src = hob.tree-sitter-capnp;
+
     lambda =
-      { pkgs, src }:
-      pkgs.tree-sitter.buildGrammar {
-        language = "capnp";
+      {
+        src,
+        stdenv,
+        tree-sitter,
+      }:
+
+      stdenv.mkDerivation {
+        pname = "tree-sitter-capnp";
         inherit src;
-        version = hob.tree-sitter-capnp.shortRev;
+        version = src.shortRev;
+
+        nativeBuildInputs = [ tree-sitter ];
+
+        buildPhase = ''
+          runHook preBuild
+          $CC -fPIC -c -I. -O2 src/parser.c -o parser.o
+          $CC -shared -o libtree-sitter-capnp.so parser.o
+          runHook postBuild
+        '';
+
+        installPhase = ''
+          runHook preInstall
+          mkdir -p $out/lib $out/queries
+          cp -v libtree-sitter-capnp.so $out/lib/
+          cp -rv queries/* $out/queries/
+          runHook postInstall
+        '';
       };
   };
 
