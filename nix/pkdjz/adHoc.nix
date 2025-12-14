@@ -310,6 +310,18 @@ in
       };
   };
 
+  tree-sitter-capnp = {
+    mods = [ "pkgs" ];
+    src = hob.tree-sitter-capnp;
+    lambda =
+      { pkgs, src }:
+      pkgs.tree-sitter.buildGrammar {
+        language = "capnp";
+        inherit src;
+        version = hob.tree-sitter-capnp.shortRev;
+      };
+  };
+
   videomass.lambda =
     {
       python3,

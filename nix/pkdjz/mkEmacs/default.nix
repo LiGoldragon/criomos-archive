@@ -3,6 +3,7 @@
   src,
   pkgs,
   hob,
+  tree-sitter-capnp,
 }:
 with builtins;
 let
@@ -238,12 +239,6 @@ let
     version = shortHashString defaultEl;
     src = writeText "default.el" defaultEl;
     packageRequires = usePackages;
-  };
-
-  tree-sitter-capnp = pkgs.tree-sitter.buildGrammar {
-    language = "capnp";
-    src = hob.tree-sitter-capnp;
-    version = hob.tree-sitter-capnp.shortRev;
   };
 
   treeSitterPackages = [
