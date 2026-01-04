@@ -399,24 +399,39 @@
 
 (use-package ztree)
 
-(use-package format-all
-  :commands format-all-mode
-  :hook (prog-mode . format-all-mode)
-  :config
-  (define-format-all-formatter elisp-autofmt
-    (:executable)
-    (:install nil)
-    (:languages "Emacs Lisp")
-    (:features region)
-    (:format
-     (format-all--buffer-native
-      'elisp-autofmt-mode
-      (if region
-          (lambda () (elisp-autofmt-region (car region) (cdr region)))
-        (lambda () (elisp-autofmt-buffer))))))
+(use-package
+ format-all
+ :commands (format-all-mode format-all-buffer format-all-region-or-buffer)
+ ;; markdown-mode is not prog-mode, so it needs its own hook.
+ :hook
+ ((prog-mode . format-all-mode)
+  (markdown-mode . format-all-mode)
+  (gfm-mode . format-all-mode))
+ :init
+ (setq format-all-formatters
+       '(("Emacs Lisp" elisp-autofmt)
+         ("Nix" nixfmt)
+         ("Shell" (shfmt "-i" "4" "-ci"))
+         ("Rust" rustfmt)
+         ("Markdown" (prettier "--parser" "markdown"))
+         ("JSON" prettier)
+         ("YAML" prettier)
+         ("Clojure" zprint)))
+ :config
+ ;; Native Emacs Lisp formatter (no external executable for format-all itself).
+ (define-format-all-formatter
+  elisp-autofmt
+  (:executable)
+  (:install nil)
+  (:languages "Emacs Lisp")
+  (:features region)
+  (:format
+   (format-all--buffer-native
+    'elisp-autofmt-mode
+    (if region
+        (lambda () (elisp-autofmt-region (car region) (cdr region)))
+      (lambda () (elisp-autofmt-buffer)))))))
 
-  (setq format-all-formatters
-        (cons '("Emacs Lisp" elisp-autofmt) format-all-formatters)))
 
 ;; ─────────────────────────────────────────────────────────────
 ;; Live evaluation & introspection helpers
