@@ -266,9 +266,9 @@ in
       digimend.enable = false; # !typeIs.center; # Broken
     };
 
-    logind = {
-      lidSwitch = if typeIs.center then "ignore" else "suspend";
-      lidSwitchExternalPower = if behavesAs.lowPower then "suspend" else "ignore";
+    logind.settings.Login = {
+      HandleLidSwitch = if typeIs.center then "ignore" else "suspend";
+      HandleLidSwitchExternalPower = if behavesAs.lowPower then "suspend" else "ignore";
     };
 
     thinkfan = mkIf modelIsThinkpad {
