@@ -91,11 +91,6 @@ in
       special_scale_factor = 1
     }
 
-    gestures {
-      workspace_swipe = yes
-    }
-
-
     binds {
       allow_workspace_cycles = yes
     }
@@ -153,10 +148,6 @@ in
     bind = SUPER_CONTROL, ${down}, exec, hyprnome
     bind = SUPER_CONTROL, ${left}, exec, hyprnome --previous --move
     bind = SUPER_CONTROL, ${right}, exec, hyprnome --move
-
-    layerrule = blur,ironbar
-    layerrule = blur,rofi
-    layerrule = blur,notifications
 
     windowrulev2 = nomaxsize,class:^(winecfg\.exe)$
     windowrulev2 = nomaxsize,class:^(osu\.exe)$
