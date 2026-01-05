@@ -45,7 +45,6 @@ in
     dconf.enable = true;
     droidcam.enable = sizedAtLeast.max;
     evolution.enable = true;
-    file-roller.enable = sizedAtLeast.med;
 
     firejail.enable = sizedAtLeast.med;
 
