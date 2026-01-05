@@ -13,6 +13,16 @@
     # Nixpkgs overlays
     rust-overlay.url = "github:oxalica/rust-overlay";
     rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
+    emacs-overlay = {
+      url = "github:nix-community/emacs-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    # Nix ecosystem
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # Horizon
     maisiliym.url = "github:LiGoldragon/maisiliym/testing";
@@ -57,10 +67,6 @@
       url = "github:league/base16-emacs";
       flake = false;
     };
-    emacs-overlay = {
-      url = "github:nix-community/emacs-overlay";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     flake-registry = {
       url = "github:NixOS/flake-registry";
       flake = false;
@@ -69,10 +75,6 @@
     gptel = {
       url = "github:karthink/gptel";
       flake = false;
-    };
-    home-manager = {
-      url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
     };
     jujutsu-el = {
       url = "github:bennyandresen/jujutsu.el";
