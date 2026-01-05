@@ -95,6 +95,10 @@ in
       allow_workspace_cycles = yes
     }
 
+    # gesture = fingers, direction, action, options...
+    # Workspace switching (classic 3-finger vertical swipe)
+    gesture = 3, vertical, workspace
+
     $SUPER = ${modifier}
     $SUPER_SHIFT = ${modifier}_SHIFT
     $SUPER_ALT = ${modifier}_ALT
