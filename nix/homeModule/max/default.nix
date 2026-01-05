@@ -39,7 +39,7 @@ lib.mkIf sizedAtLeast.max {
       with pkgs;
       [
         # freecad # broken
-        whatsapp-for-linux
+        wasistlos
         gitkraken
       ]
       ++ windowsEmulationsPackages

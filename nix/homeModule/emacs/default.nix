@@ -19,14 +19,10 @@ let
 
   tokenizedAider =
     let
-      # Pin Aider to Python 3.12 until 3.13 fully works upstream.
-      # (Ref: aider #1984, nixpkgs #417098)
-      aiderPackage = pkgs.python312.withPackages (ps: [ ps.aider-chat ]);
-
       gopassPath = "openai/api-key"; # gopass: first line is the key
       anthropicPath = "anthropic/api-key"; # optional
       baseUrl = null; # e.g. "https://api.openai.com/v1" or null
-      aiderBin = "${aiderPackage}/bin/aider"; # use pinned aider
+      aiderBin = "${pkgs.aider-chat}/bin/aider"; # use pinned aider
     in
     pkgs.writeScriptBin "aider" ''
       #!${pkgs.mksh}/bin/mksh

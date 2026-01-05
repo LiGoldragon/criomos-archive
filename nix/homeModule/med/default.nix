@@ -24,7 +24,7 @@ let
     #!${mksh}/bin/mksh
     export GITHUB_TOKEN=''${GITHUB_TOKEN:-''$(${pkgs.gopass}/bin/gopass show -o github.com/token)}
     export GITHUB_USER=''${GITHUB_USER:-''$(${pkgs.gopass}/bin/gopass show github.com/token login)}
-    exec "${pkgs.gitAndTools.hub}/bin/hub" "$@"
+    exec "${pkgs.hub}/bin/hub" "$@"
   '';
 
   tokenizedWrappedHub = pkgs.runCommand "hub" { } ''
@@ -79,7 +79,6 @@ let
       zola
       git-series
       tree-sitter
-      gitAndTools.gitui
       # Python
       world.kibord.kpBootCli
       # Manuals
