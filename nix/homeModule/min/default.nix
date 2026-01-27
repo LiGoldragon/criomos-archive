@@ -190,6 +190,7 @@ let
     # lisp
     zprint
     # Python
+    python3
     ruff
     # Flashing
     avrdude
