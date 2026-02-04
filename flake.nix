@@ -2,7 +2,12 @@
 {
   description = "CriomOS";
 
-  outputs = inputs: import ./default.nix inputs;
+  outputs =
+    inputs:
+    let
+      nonSelfInputs = removeAttrs inputs [ "self" ];
+    in
+    import ./default.nix nonSelfInputs;
 
   inputs = {
     # Nixpkgs & lib
