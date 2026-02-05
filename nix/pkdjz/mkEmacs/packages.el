@@ -64,6 +64,8 @@
 
 (use-package nixfmt :hook (nix-ts-mode . nixfmt-on-save-mode))
 
+(use-package nix-update)
+
 (use-package justl)
 
 (use-package json-mode)
