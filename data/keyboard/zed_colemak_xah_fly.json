@@ -1,0 +1,94 @@
+[
+  {
+    "context": "Editor",
+    "bindings": {
+      "escape": ["workspace::SwitchMode", "Normal"]
+    }
+  },
+  {
+    "context": "Editor && mode == 'Insert'",
+    "bindings": {
+      "escape": ["workspace::SwitchMode", "Normal"]
+    }
+  },
+  {
+    "context": "Editor && mode == 'Normal'",
+    "bindings": {
+      "k": ["workspace::SwitchMode", "Insert"],
+      "u": "editor::MoveUp",
+      "e": "editor::MoveDown",
+      "n": "editor::MoveLeft",
+      "i": "editor::MoveRight",
+      "t": "editor::Undo",
+      "a": "workspace::NewCommandPalette",
+      "r": "editor::MoveToEndOfLine",
+      "s": "editor::MoveToBeginningOfLine",
+      "c": "editor::CopyLine",
+      "v": "editor::Paste",
+      "q": "editor::CutLine",
+      "l": "editor::MoveToPreviousWordStart",
+      "g": "editor::MoveToNextWordStart",
+      "j": "editor::DeleteBackward",
+      "f": "editor::DeletePreviousWord",
+      ";": "editor::DeleteNextWord",
+      "o": "editor::ToggleComments",
+      "y": "editor::InsertNewline",
+      "x": "project_search::Deploy",
+      "d": "editor::SelectNext",
+      "z": "editor::GoToMatchingBracket",
+      "b": "editor::GoToNextBracket",
+      "m": "workspace::ActivateNextPane",
+      "w": "xah-shrink-whitespaces",
+      "'": "editor::Format",
+      "space": ["workspace::ToggleSubMode", "Leader"],
+      "backspace": ["workspace::ToggleSubMode", "Leader"]
+    }
+  },
+  {
+    "context": "Editor && mode == 'Normal' && sub_mode == 'Leader'",
+    "bindings": {
+      "space": ["workspace::SwitchMode", "Insert"],
+      "r": "workspace::Save",
+      "s": "editor::MoveToBeginningOfDocument",
+      "x": "editor::MoveToEndOfDocument",
+      "l": "workspace::CloseActiveItem",
+      "a": "editor::SelectAll",
+      "h": "editor::Recenter",
+      "k": "workspace::NewBufferFinder",
+      "t": "editor::FindNext",
+      "y": {
+        "zed_action": "project_search::Deploy",
+        "zed_action_args": [{ "replace": true }]
+      },
+      "c": ["editor::SelectAll", "editor::Copy"],
+      "q": ["editor::SelectAll", "editor::Cut"],
+      "v": "editor::ShowClipboard",
+      "m": "project_panel::ToggleFocus",
+      "j": ["workspace::ToggleSubMode", "MultiCursor"],
+      "u": ["workspace::ToggleSubMode", "NavigateFS"]
+    }
+  },
+  {
+    "context": "Editor && mode == 'Normal' && sub_mode == 'MultiCursor'",
+    "bindings": {
+      "s": "editor::SelectAllMatches",
+      "n": "editor::SelectPreviousMatch",
+      "u": "editor::SelectPreviousMatch",
+      "e": "editor::SelectNextMatch",
+      "i": "editor::SelectNextMatch",
+      "l": "editor::FindPrevious",
+      "g": "editor::FindNext"
+    }
+  },
+  {
+    "context": "Editor && mode == 'Normal' && sub_mode == 'NavigateFS'",
+    "bindings": {
+      "s": "project_search::Deploy",
+      "n": "workspace::NewBufferFinder",
+      "e": "workspace::NewFileFinder",
+      "u": "project_panel::ToggleFocus",
+      "i": "git::OpenGitFiles",
+      "r": "workspace::NewFileFinder"
+    }
+  }
+]

@@ -1,0 +1,231 @@
+{
+  "name": "Xah-Fly-Keys Colemak Layout with User Modifications",
+  "description": "Generated mapping of Colemak keys to Emacs actions based on xah-fly-keys.el source and user-provided config. Dvorak source keys are translated to their Colemak positional equivalents.",
+  "command_map": {
+    "space": {
+      "is_prefix": true,
+      "name": "xah-fly-leader-key-map"
+    },
+    "'": "xah-reformat-lines",
+    "w": "xah-shrink-whitespaces",
+    "=": "delete-other-windows",
+    "f": "backward-kill-word",
+    "/": "hippie-expand",
+    "o": "xah-comment-dwim",
+    "[": "split-window-below",
+    "-": "xah-cycle-hyphen-lowline-space",
+    "]": "split-window-right",
+    "~": "other-frame",
+    "a": "execute-extended-command",
+    "x": "phi-search",
+    "u": "previous-line",
+    "s": "xah-beginning-of-line-or-block",
+    "j": "xah-smart-delete",
+    "J": "delete-backward-char",
+    "t": "undo",
+    "l": "backward-word",
+    "n": "backward-char",
+    "d": "xah-extend-selection",
+    "c": "xah-copy-line-or-region",
+    "v": "xah-paste-or-paste-previous",
+    "i": "forward-char",
+    "y": "open-line",
+    ";": "kill-word",
+    "q": "xah-cut-line-or-region",
+    "g": "forward-word",
+    "r": "xah-end-of-line-or-block",
+    "e": "next-line",
+    "k": "xah-fly-insert-mode-activate",
+    "b": "xah-forward-right-bracket",
+    "m": "xah-next-window-or-frame",
+    ",": "xah-toggle-letter-case",
+    "z": "xah-goto-matching-bracket",
+    "backspace": {
+      "is_prefix": true,
+      "name": "xah-fly-leader-key-map"
+    },
+    ".": "backward-kill-word"
+  },
+  "leader_map": {
+    "space": "xah-fly-insert-mode-activate",
+    "enter": "execute-extended-command",
+    "tab": {
+      "is_prefix": true,
+      "name": "leader-tab-map"
+    },
+    "f": {
+      "is_prefix": true,
+      "name": "leader-dot-map"
+    },
+    "'": "xah-fill-or-unfill",
+    "w": {
+      "is_prefix": true,
+      "name": "leader-comma-map"
+    },
+    "-": "toggle-input-method",
+    "a": "mark-whole-buffer",
+    "x": "end-of-buffer",
+    "u": {
+      "is_prefix": true,
+      "name": "leader-c-map"
+    },
+    "s": "beginning-of-buffer",
+    "j": {
+      "is_prefix": true,
+      "name": "leader-e-map"
+    },
+    "t": "xah-search-current-word",
+    "l": "xah-close-current-buffer",
+    "n": {
+      "is_prefix": true,
+      "name": "leader-h-map"
+    },
+    "d": {
+      "is_prefix": true,
+      "name": "leader-i-map"
+    },
+    "c": "xah-copy-all-or-region",
+    "v": {
+      "is_prefix": true,
+      "name": "leader-k-map"
+    },
+    "h": "recenter-top-bottom",
+    "m": "dired-jump",
+    "i": {
+      "is_prefix": true,
+      "name": "leader-n-map"
+    },
+    "y": "query-replace",
+    "q": "xah-cut-all-or-region",
+    "g": {
+      "is_prefix": true,
+      "name": "leader-r-map"
+    },
+    "r": "save-buffer",
+    "e": {
+      "is_prefix": true,
+      "name": "leader-t-map"
+    },
+    "k": "switch-to-buffer",
+    ",": "xah-toggle-previous-letter-case",
+    "/": {
+      "is_prefix": true,
+      "name": "leader-z-map"
+    }
+  },
+  "user_modifications": {
+    "command_map": {
+      "~": null,
+      "y": null,
+      "'": "xah-reformat-lines",
+      "w": "xah-shrink-whitespaces",
+      "-": "xah-cycle-hyphen--space",
+      "f": "backward-kill-word",
+      "o": "xah-comment-dwim",
+      "q": "xah-extend-selection",
+      "1": "xah-extend-selection",
+      "2": "xah-select-line",
+      "3": "delete-other-windows",
+      "4": "split-window-below",
+      "5": "delete-char",
+      "6": "xah-select-block",
+      "7": "xah-select-line",
+      "8": "xah-extend-selection",
+      "9": "xah-select-text-in-quote",
+      "0": "xah-pop-local-mark-ring",
+      "B": "phi-search-backward",
+      "u": "previous-line",
+      "s": "xah-beginning-of-line-or-block",
+      "j": "xah-delete-left-char-or-selection",
+      "t": "undo",
+      "l": "backward-word",
+      "n": "backward-char",
+      "p": "xah-delete-current-text-block",
+      "c": "xah-copy-line-or-region",
+      "v": "xah-paste-or-paste-previous",
+      "m": "xah-backward-left-bracket",
+      "i": "forward-char",
+      "y": "open-line",
+      ";": "kill-word",
+      "q": "xah-cut-line-or-region",
+      "g": "forward-word",
+      "r": "xah-end-of-line-or-block",
+      "e": "next-line",
+      "k": "xah-fly-insert-mode-activate",
+      "b": "xah-forward-right-bracket",
+      ",": "consult-imenu",
+      "j": "set-mark-command"
+    },
+    "navigate_filesystem": {
+      "x": "consult-line",
+      "s": "deadgrep",
+      "n": "consult-buffer",
+      "e": "find-file-in-project",
+      "u": "projectile-switch-project",
+      "i": "magit-find-file",
+      "r": "find-file"
+    },
+    "multi_cursors": {
+      "x": "mc/mark-all-in-region-regexp",
+      "s": "mc/mark-all-like-this",
+      "n": "mc/mark-previous-like-this",
+      "u": "mc/cycle-backward",
+      "e": "mc/cycle-forward",
+      "i": "mc/mark-next-like-this",
+      "r": "mc/mark-all-dwim",
+      "l": "mc/skip-to-previous-like-this",
+      "g": "mc/skip-to-next-like-this"
+    },
+    "leader_map": {
+      "backspace": "xah-fly-insert-mode-activate",
+      "enter": "xah-fly-M-x",
+      "f": {
+        "is_prefix": true,
+        "name": "leader-dot-map"
+      },
+      "'": "xah-fill-or-unfill",
+      "w": {
+        "is_prefix": true,
+        "name": "leader-comma-map"
+      },
+      "-": "xah-show-formfeed-as-line",
+      "3": "delete-window",
+      "4": "split-window-right",
+      "5": "balance-windows",
+      "6": "xah-upcase-sentence",
+      "9": "ispell-word",
+      "a": "mark-whole-buffer",
+      "x": "end-of-buffer",
+      "s": "beginning-of-buffer",
+      "j": "multi-cursors",
+      "t": "xah-search-current-word",
+      "l": "xah-close-current-buffer",
+      "n": {
+        "is_prefix": true,
+        "name": "leader-h-map"
+      },
+      "p": "kill-line",
+      "c": "xah-copy-all-or-region",
+      "v": "consult-yank-from-kill-ring",
+      "h": "recenter-top-bottom",
+      "m": "dired-jump",
+      "i": {
+        "is_prefix": true,
+        "name": "leader-n-map"
+      },
+      "y": "exchange-point-and-mark",
+      "g": {
+        "is_prefix": true,
+        "name": "leader-r-map"
+      },
+      "r": "save-buffer",
+      "e": {
+        "is_prefix": true,
+        "name": "leader-t-map"
+      },
+      "k": "navigate-filesystem",
+      ",": "xah-toggle-previous-letter-case",
+      "j": "xah-show-kill-ring"
+    }
+  }
+}
