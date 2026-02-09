@@ -38,7 +38,6 @@
       "z": "editor::GoToMatchingBracket",
       "b": "editor::GoToNextBracket",
       "m": "workspace::ActivateNextPane",
-      "w": "xah-shrink-whitespaces",
       "'": "editor::Format",
       "space": ["workspace::ToggleSubMode", "Leader"],
       "backspace": ["workspace::ToggleSubMode", "Leader"]
@@ -56,12 +55,9 @@
       "h": "editor::Recenter",
       "k": "workspace::NewBufferFinder",
       "t": "editor::FindNext",
-      "y": {
-        "zed_action": "project_search::Deploy",
-        "zed_action_args": [{ "replace": true }]
-      },
-      "c": ["editor::SelectAll", "editor::Copy"],
-      "q": ["editor::SelectAll", "editor::Cut"],
+      "y": "project_search::Deploy",
+      "c": "editor::SelectAll",
+      "q": "editor::SelectAll",
       "v": "editor::ShowClipboard",
       "m": "project_panel::ToggleFocus",
       "j": ["workspace::ToggleSubMode", "MultiCursor"],
