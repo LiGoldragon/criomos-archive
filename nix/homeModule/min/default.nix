@@ -8,6 +8,7 @@
   config,
   profile,
   world,
+  # Todo(data)
   ...
 }:
 let
@@ -38,7 +39,8 @@ let
 
   terminalFontFamily = if sizedAtLeast.med then "FiraMono Nerd Font" else "DejaVu Sans Mono";
 
-  colemakZedKeys = criomos-lib.importJSON ./zed_colemak_keybindings.json;
+  # Todo(Those data files should be in a top arg called data)
+  colemakZedKeys = criomos-lib.importJSON ./../../../data/keyboard/zed_colemak_xah_fly.json;
 
   fzfColemakBinds = import ./fzfColemak.nix;
 
