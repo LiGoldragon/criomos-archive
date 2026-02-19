@@ -213,6 +213,7 @@ let
     gemini-cli
     claude-code
     codex
+    opencode
   ];
 
   nixpkgsPackages =
