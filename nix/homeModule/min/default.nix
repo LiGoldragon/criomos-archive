@@ -549,14 +549,6 @@ mkIf sizedAtLeast.min {
 
       ".config/broot/conf.toml".text = brootConfig;
 
-      ".cargo/config.toml".source = kynvyrt {
-        name = "cargo-config";
-        format = "toml";
-        value = {
-          build.target-dir = "${homeDir}/.cargo/sharedTarget";
-          unstable.weak-dep-features = true;
-        };
-      };
     };
   };
 
