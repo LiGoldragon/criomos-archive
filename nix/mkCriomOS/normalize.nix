@@ -10,19 +10,18 @@
 let
   inherit (lib)
     mapAttrsToList
-    concatStringsSep
     mkOverride
     optional
     mkIf
     optionalString
     optionalAttrs
     ;
+
+  concatSep = lib.concatStringsSep;
   inherit (pkdjz) exportJSON;
-  inherit (pkgs) mksh writeScript gnupg;
-  inherit (horizon) node exNodes;
-  inherit (horizon.node) typeIs;
+  inherit (pkgs) mksh;
+  inherit (horizon) exNodes;
   inherit (horizon.node.methods)
-    chipIsIntel
     sizedAtLeast
     useColemak
     behavesAs
@@ -38,12 +37,12 @@ let
 
   mkNodeKnownHost =
     n: node:
-    concatStringsSep " " [
+    concatSep " " [
       node.criomeDomainName
       node.ssh
     ];
 
-  sshKnownHosts = concatStringsSep "\n" (mapAttrsToList mkNodeKnownHost exNodes);
+  sshKnownHosts = concatSep "\n" (mapAttrsToList mkNodeKnownHost exNodes);
 
   pipewireFull = pkgs.pipewire.override {
     libpulseaudio = pkgs.pulseaudioFull;

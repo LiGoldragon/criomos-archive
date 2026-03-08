@@ -1,11 +1,10 @@
 {
   lib,
-  config,
   preClusters,
   ...
 }:
 let
-  inherit (builtins) attrNames attrValues;
+  inherit (builtins) attrNames;
   inherit (lib) mkOption;
   inherit (lib.types)
     enum
@@ -13,7 +12,6 @@ let
     attrsOf
     submodule
     nullOr
-    bool
     int
     listOf
     attrs

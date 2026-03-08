@@ -3,10 +3,10 @@
   preClusters,
   config,
   ...
-}@topArgs:
+}:
 let
-  inherit (builtins) mapAttrs attrNames listToAttrs;
-  inherit (lib) mkOption nameValuePair;
+  inherit (builtins) mapAttrs;
+  inherit (lib) mkOption;
   inherit (lib.types)
     enum
     str
@@ -18,7 +18,6 @@ let
     ;
   inherit (config.species)
     magnitude
-    clusterNames
     nodeSpecies
     commonUserOptions
     machineSpecies
@@ -105,31 +104,6 @@ let
     };
   };
 
-  defaultTrust = 1;
-
-  mkDefaultTrustFromNames = names: listToAttrs (map (n: nameValuePair n defaultTrust)) names;
-
-  trustSubmodule = {
-    options = {
-      cluster = mkOption {
-        type = enum magnitude;
-        default = 1;
-      };
-
-      clusters = mkOption {
-        type = attrsOf (enum magnitude);
-      };
-
-      nodes = mkOption {
-        type = attrsOf (enum magnitude);
-      };
-
-      users = mkOption {
-        type = attrsOf (enum magnitude);
-      };
-    };
-  };
-
   domainSubmodule = {
     options = {
       species = mkOption {
@@ -143,8 +117,8 @@ let
     options = commonUserOptions;
   };
 
-  clusterSubmodule = (
-    { name, config, ... }@clusterArgs:
+  clusterSubmodule =
+    { name, ... }:
     let
       preCluster = preClusters."${name}";
       mkDefaultNodeTrust = name: node: preCluster.trust.nodes."${name}" or 1;
@@ -165,7 +139,7 @@ let
         };
 
         trust = mkOption {
-          type = submodule ({
+          type = submodule {
             options = {
               cluster = mkOption {
                 type = enum magnitude;
@@ -188,11 +162,11 @@ let
             config = {
               nodes = mapAttrs mkDefaultNodeTrust preCluster.nodes;
             };
-          });
+          };
         };
       };
     }
-  );
+  ;
 
 in
 {

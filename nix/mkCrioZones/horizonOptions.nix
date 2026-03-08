@@ -1,5 +1,4 @@
 {
-  config,
   lib,
   clustersSpecies,
   ...
@@ -12,7 +11,6 @@ let
     attrsOf
     submodule
     nullOr
-    bool
     int
     listOf
     attrs
@@ -22,7 +20,6 @@ let
     clusterNames
     nodeSpecies
     magnitude
-    systems
     commonUserOptions
     machineSpecies
     IoOptions

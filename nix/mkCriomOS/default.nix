@@ -4,7 +4,6 @@
   world,
   horizon,
   hob, # TODO: deprecate for `inputs`
-  inputs,
   homeModules,
   _withUsers ? true,
 }:
@@ -69,9 +68,6 @@ let
     moduleArgs = nixosArgs;
     modules = nixosModules;
   };
-
-  # TODO - unused leftover
-  buildNixOSVM = evaluation.config.system.build.vm;
 
   buildNixOSIso = evaluation.config.system.build.isoImage;
   buildNixOS = evaluation.config.system.build.toplevel;

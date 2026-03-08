@@ -24,16 +24,13 @@ let
   inherit (horizon.cluster.methods) trustedBuildPreCriomes;
   inherit (horizon) node;
   inherit (horizon.node.methods)
-    builderConfigs
     cacheURLs
     dispatchersSshPreCriomes
     exNodesSshPreCriomes
     sizedAtLeast
     isBuilder
     isNixCache
-    isDispatcher
     hasNixPreCriad
-    nixCacheDomain
     ;
 
   inherit (constants.fileSystem.nix) preCriad;
@@ -71,13 +68,10 @@ let
           id = name;
           type = "indirect";
         };
-        to = (
-          {
-            repo = name;
-            type = "github";
-          }
-          // value
-        );
+        to = {
+          repo = name;
+          type = "github";
+        } // value;
       };
     in
     mapAttrsToList mkFlakeEntry entriesMap;
@@ -97,7 +91,7 @@ let
       flakeOverrideNames = attrNames flakeEntriesOverrides;
       entryIsOverridden = elem flakeName flakeOverrideNames;
     in
-    !(entryIsOverridden);
+    !entryIsOverridden;
 
   filteredNixosFlakeEntries = filter filterOutRegistry nixOSFlakeEntries;
 

@@ -12,7 +12,7 @@ rec {
 
   highestOf = list: tail (sort lessThan list);
 
-  importJSON = path: fromJSON (readFile path);
+  importJSON = filePath: fromJSON (readFile filePath);
 
   lowestOf = list: head (sort lessThan list);
 

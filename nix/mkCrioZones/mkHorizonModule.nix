@@ -24,8 +24,8 @@ let
 
   inherit (criomos-lib) lowestOf mkSizeAtLeast;
 
-  inherit (config) clusterName nodeName species;
-  inherit (clustersSpecies) clusterNames nodeSpecies;
+  inherit (config) clusterName nodeName;
+  inherit (clustersSpecies) nodeSpecies;
 
   inputCluster = Clusters.${clusterName};
   inputNodes = inputCluster.nodes;
@@ -174,10 +174,8 @@ let
       methods =
         let
           inherit (node)
-            species
             trust
             size
-            nixPreCriome
             yggAddress
             criomeDomainName
             typeIs
@@ -267,8 +265,6 @@ let
         "ThinkPadX240"
         "ThinkPadX230"
       ];
-      imposedHTModels = [ "ThinkPadX240" ];
-
       computerModels = thinkpadModels ++ [ "rpi3B" ];
 
       computerIsNotMap = listToAttrs (map (n: lib.nameValuePair n false) computerModels);

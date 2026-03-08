@@ -9,7 +9,7 @@ let
 in
 {
   fileSystem = {
-    nix = rec {
+    nix = {
       stateDirectory = "/etc/nix";
       preCriad = "/etc/nix/preCriad";
     };
