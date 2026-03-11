@@ -183,26 +183,39 @@ in
       ''
     );
 
-    kernelParams = optionals computerIs.rpi3B [
-      "cma=32M"
-      "console=ttyS0,115200n8"
-      "console=ttyAMA0,11520n8"
-      "console=tty0"
-      "dtparam=audio=on"
-    ];
+    kernelParams =
+      lib.concatLists [
+        (if computerIs.rpi3B then [
+          "cma=32M"
+          "console=ttyS0,115200n8"
+          "console=ttyAMA0,11520n8"
+          "console=tty0"
+          "dtparam=audio=on"
+        ] else [])
+        (if (typeIs.largeAI || model == "GMKtec EVO-X2") then [
+          "amd_iommu=off"
+          "amdgpu.gttsize=131072"
+          "ttm.pages_limit=33554432"
+          "ttm.page_pool_size=33554432"
+        ] else [])
+      ];
 
   };
 
   powerManagement =
-    {
-      powertop.enable = true;
-    }
-    // (optionalAttrs hasModelSpecificPowerTweaks modelSpecificPowerTweaks."${model}")
-    // (optionalAttrs chipIsIntel {
-      powerUpCommands = ''
-        echo 1 > /sys/devices/system/cpu/intel_pstate/no_turbo
-      '';
-    });
+    let
+      pmBase = {
+        powertop.enable = true;
+      };
+      intelPowerCommands = optionalAttrs chipIsIntel {
+        # Linux path expects firmware configured with a small fixed UMA (UMA_SPECIFIED), a modest framebuffer (≈1G/512MiB), and Linux-side GTT/TTM tuning.
+        powerUpCommands = ''
+          echo 1 > /sys/devices/system/cpu/intel_pstate/no_turbo
+        '';
+      };
+    in pmBase
+      // (optionalAttrs hasModelSpecificPowerTweaks modelSpecificPowerTweaks."${model}")
+      // intelPowerCommands;
 
   programs = { };
 
