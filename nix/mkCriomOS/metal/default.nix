@@ -227,11 +227,64 @@ in
       [ lm_sensors ]
       ++ optionals chipIsIntel intelUtils
       ++ optionals sizedAtLeast.max [ v4l-utils ]
-      ++ optionals enableWaydroid waydroidPackages;
+      ++ optionals enableWaydroid waydroidPackages
+      ++ optionals typeIs.largeAI [
+        ollama
+        curl
+        jq
+        htop
+      ];
 
   };
 
+  systemd = {
+    services = optionalAttrs typeIs.largeAI {
+      ollama = {
+        description = "Local Ollama inference service for largeAI nodes";
+        wants = [ "network.target" "network-online.target" ];
+        after = [ "network.target" "network-online.target" ];
+        requires = [ "network.target" ];
+        wantedBy = [ "multi-user.target" ];
+        serviceConfig = {
+          ExecStart = "${pkgs.ollama}/bin/ollama serve";
+          Restart = "on-failure";
+          RestartSec = "5s";
+          PrivateTmp = true;
+          ProtectSystem = "full";
+          ProtectHome = "read-only";
+          NoNewPrivileges = true;
+          User = "ollama";
+          Group = "ollama";
+          StateDirectory = "ollama";
+          RuntimeDirectory = "ollama";
+          StateDirectoryMode = "0755";
+          RuntimeDirectoryMode = "0755";
+          WorkingDirectory = "/var/lib/ollama";
+          AmbientCapabilities = [];
+          CapabilityBoundingSet = [];
+        };
+        environment = {
+          OLLAMA_HTTP_BIND = "127.0.0.1:11434";
+          OLLAMA_HOME = "/var/lib/ollama";
+          OLLAMA_MODELS = "/var/lib/ollama/models";
+        };
+      };
+    };
+  };
+
   users.groups.plugdev = { };
+
+  users.groups.ollama = mkIf typeIs.largeAI { };
+
+  users.users.ollama = mkIf typeIs.largeAI {
+    isSystemUser = true;
+    createHome = true;
+    home = "/var/lib/ollama";
+    group = "ollama";
+    description = "Ollama inference runtime user";
+    shell = pkgs.bash;
+    extraGroups = [ "plugdev" ];
+  };
 
   services = {
     # TODO
