@@ -269,8 +269,9 @@ let
 
         preset=${lib.escapeShellArg prometheusLlamaPreset}
         models_dir=${lib.escapeShellArg prometheusLlamaModelDir}
+        coreutils=${lib.escapeShellArg pkgs.coreutils}/bin
 
-        mkdir -p "$(dirname "$preset")"
+        "$coreutils/mkdir" -p "$("$coreutils/dirname" "$preset")"
 
         {
           echo "version = 1"
