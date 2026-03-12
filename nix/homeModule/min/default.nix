@@ -217,8 +217,66 @@ let
 
   piAgentGatewayProvider = "prometheus";
   piAgentGatewayApiKey = "sk-no-key-required";
+  prometheusCanonicalModelIds = [
+    "deepseek-r1-distill-llama-70b"
+    "qwen-2.5-72b-instruct"
+    "llama-3.3-70b-instruct"
+  ];
   piAgentModelAliases = [ "main-deepseek" "subagent-qwen25" "fast-llama33" ];
-  piAgentEnabledModels = builtins.map (alias: "${piAgentGatewayProvider}/${alias}") piAgentModelAliases;
+  piAgentEnabledModels =
+    builtins.concatLists [
+      builtins.map (model: "${piAgentGatewayProvider}/${model}") prometheusCanonicalModelIds
+      builtins.map (model: "${piAgentGatewayProvider}/${model}") piAgentModelAliases
+    ];
+
+  prometheusModelMetadata = {
+    "deepseek-r1-distill-llama-70b" = {
+      descriptor = "DeepSeek-R1 Distill Llama 70B";
+      reasoning = true;
+    };
+    "qwen-2.5-72b-instruct" = {
+      descriptor = "Qwen 2.5 72B Instruct";
+      reasoning = false;
+    };
+    "llama-3.3-70b-instruct" = {
+      descriptor = "Llama 3.3 70B Instruct";
+      reasoning = false;
+    };
+  };
+
+  prometheusAliasTargets = {
+    "main-deepseek" = "deepseek-r1-distill-llama-70b";
+    "subagent-qwen25" = "qwen-2.5-72b-instruct";
+    "fast-llama33" = "llama-3.3-70b-instruct";
+  };
+
+  mkPrometheusModelEntry = modelId:
+    let
+      aliasTarget =
+        if builtins.hasAttr modelId prometheusAliasTargets
+        then builtins.getAttr modelId prometheusAliasTargets
+        else null;
+      canonicalId = if aliasTarget == null then modelId else aliasTarget;
+      info = builtins.getAttr canonicalId prometheusModelMetadata;
+      label =
+        if aliasTarget == null
+        then info.descriptor
+        else "alias for ${info.descriptor}";
+    in
+    {
+      id = modelId;
+      name = "prometheus/${modelId} (${label})";
+      reasoning = info.reasoning;
+      input = [ "text" ];
+      contextWindow = 128000;
+      maxTokens = 32768;
+      cost = {
+        input = 0;
+        output = 0;
+        cacheRead = 0;
+        cacheWrite = 0;
+      };
+    };
 
   piAgentModels = {
     providers = {
@@ -226,50 +284,7 @@ let
         baseUrl = "http://127.0.0.1:11435/v1";
         api = "openai-completions";
         apiKey = piAgentGatewayApiKey;
-        models = [
-          {
-            id = "main-deepseek";
-            name = "prometheus/main-deepseek (DeepSeek-R1 Distill Llama 70B)";
-            reasoning = true;
-            input = [ "text" ];
-            contextWindow = 128000;
-            maxTokens = 32768;
-            cost = {
-              input = 0;
-              output = 0;
-              cacheRead = 0;
-              cacheWrite = 0;
-            };
-          }
-          {
-            id = "subagent-qwen25";
-            name = "prometheus/subagent-qwen25 (Qwen 2.5 72B Instruct)";
-            reasoning = false;
-            input = [ "text" ];
-            contextWindow = 128000;
-            maxTokens = 32768;
-            cost = {
-              input = 0;
-              output = 0;
-              cacheRead = 0;
-              cacheWrite = 0;
-            };
-          }
-          {
-            id = "fast-llama33";
-            name = "prometheus/fast-llama33 (Llama 3.3 70B Instruct)";
-            reasoning = false;
-            input = [ "text" ];
-            contextWindow = 128000;
-            maxTokens = 32768;
-            cost = {
-              input = 0;
-              output = 0;
-              cacheRead = 0;
-              cacheWrite = 0;
-            };
-          }
-        ];
+        models = builtins.map mkPrometheusModelEntry (prometheusCanonicalModelIds ++ piAgentModelAliases);
       };
     };
   };
@@ -639,15 +654,15 @@ mkIf sizedAtLeast.min {
 
         [prometheus-main-deepseek]
         model = ${prometheusLlamaModelDir}/DeepSeek-R1-Distill-Llama-70B-Q8_0.gguf
-        alias = prometheus-main-deepseek
+        alias = prometheus-deepseek-r1-distill-llama-70b
 
         [prometheus-subagent-qwen25]
         model = ${prometheusLlamaModelDir}/Qwen-2.5-72B-Instruct.gguf
-        alias = prometheus-subagent-qwen25
+        alias = prometheus-qwen-2.5-72b-instruct
 
         [prometheus-fast-llama33]
         model = ${prometheusLlamaModelDir}/Llama-3.3-70B-Instruct.gguf
-        alias = prometheus-fast-llama33
+        alias = prometheus-llama-3.3-70b-instruct
       '';
       ".local/share/prometheus-llama/.keep".text = "";
       ".pi/agent/models.json".text = piAgentModelsJson;
