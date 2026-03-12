@@ -213,6 +213,12 @@ let
   prometheusOllamaTunnelPort = 21434;
   prometheusOllamaSshTarget = "li@192.168.0.17";
 
+  prometheusLlamaPort = 11436;
+  prometheusLlamaApiKey = "sk-no-key-required";
+  prometheusLlamaModelDir = "${homeDir}/.local/share/prometheus-llama/models";
+  prometheusLlamaPreset = "${homeDir}/.config/prometheus-llama/models.ini";
+  prometheusUseOllamaFallback = false;
+
   piAgentGatewayProvider = "ouranos-lite-gateway";
   piAgentGatewayApiKey = "ouranos-lite-gateway";
   piAgentModelAliases = [ "main" "subagent" "fast" ];
@@ -264,6 +270,7 @@ let
     claude-code
     codex
     opencode
+    llama-cpp
     litellmProxy
   ];
 
@@ -601,6 +608,18 @@ mkIf sizedAtLeast.min {
       ".config/broot/conf.toml".text = brootConfig;
 
       ".config/litellm-router.yaml".source = ./litellm-router.yaml;
+      ".config/prometheus-llama/models.ini".text = ''
+        version = 1
+
+        [*]
+        models-dir = ${prometheusLlamaModelDir}
+        load-on-startup = false
+
+        [prometheus-deepseek]
+        model = ${prometheusLlamaModelDir}/DeepSeek-R1-Distill-Llama-70B-Q8_0.gguf
+        alias = prometheus-deepseek
+      '';
+      ".local/share/prometheus-llama/.keep".text = "";
       ".pi/agent/models.json".text = piAgentModelsJson;
       ".pi/agent/settings.json".text = piAgentSettingsJson;
 
@@ -608,52 +627,91 @@ mkIf sizedAtLeast.min {
   };
 
   systemd = {
-    user.services = {
-      prometheus-ollama-tunnel = {
-        Unit = {
-          Description = "Ouranos tunnel to Prometheus Ollama";
-          Wants = [ "network-online.target" ];
-          After = [ "network-online.target" ];
+    user.services =
+      {
+        prometheus-llama-server = {
+          Unit = {
+            Description = "Local llama.cpp server for Prometheus";
+            Wants = [ "network-online.target" ];
+            After = [ "network-online.target" ];
+          };
+          Service = {
+            ExecStart = ''
+              ${pkgs.llama-cpp}/bin/llama-server \
+                --models-preset ${prometheusLlamaPreset} \
+                --host 127.0.0.1 \
+                --port ${toString prometheusLlamaPort} \
+                --api-key ${prometheusLlamaApiKey} \
+                --jinja \
+                --reasoning-format deepseek \
+                --sleep-idle-seconds 600 \
+                --models-max 1 \
+                --no-webui
+            '';
+            Restart = "on-failure";
+            RestartSec = 5;
+            PrivateTmp = true;
+            WorkingDirectory = homeDir;
+            StandardOutput = "journal";
+            StandardError = "journal";
+          };
+          Install = {
+            WantedBy = [ "default.target" ];
+          };
         };
-        Service = {
-          Environment = [ "SSH_AUTH_SOCK=%t/gnupg/S.gpg-agent.ssh" ];
-          ExecStart = ''
-            ${pkgs.openssh}/bin/ssh -N \
-              -o BatchMode=yes \
-              -o ExitOnForwardFailure=yes \
-              -o ServerAliveInterval=30 \
-              -o ServerAliveCountMax=3 \
-              -o StrictHostKeyChecking=accept-new \
-              -L 127.0.0.1:${toString prometheusOllamaTunnelPort}:127.0.0.1:11434 \
-              ${prometheusOllamaSshTarget}
-          '';
-          Restart = "on-failure";
-          RestartSec = 5;
-        };
-        Install = {
-          WantedBy = [ "default.target" ];
-        };
-      };
 
-      litellm-gateway = {
-        Unit = {
-          Description = "Ouranos LiteLLM gateway";
-          Wants = [ "network-online.target" "prometheus-ollama-tunnel.service" ];
-          After = [ "network-online.target" "prometheus-ollama-tunnel.service" ];
+        litellm-gateway = {
+          Unit = {
+            Description = "Ouranos LiteLLM gateway";
+            Wants = lib.concatLists [
+              [ "network-online.target" ]
+              (optionals prometheusUseOllamaFallback [ "prometheus-ollama-tunnel.service" ])
+            ];
+            After = lib.concatLists [
+              [ "network-online.target" ]
+              (optionals prometheusUseOllamaFallback [ "prometheus-ollama-tunnel.service" ])
+            ];
+          };
+          Service = {
+            ExecStart = ''
+              ${litellmProxy}/bin/litellm --config ${homeDir}/.config/litellm-router.yaml --host 127.0.0.1 --port 11435
+            '';
+            Restart = "on-failure";
+            RestartSec = 5;
+            PrivateTmp = true;
+          };
+          Install = {
+            WantedBy = [ "default.target" ];
+          };
         };
-        Service = {
-          ExecStart = ''
-            ${litellmProxy}/bin/litellm --config ${homeDir}/.config/litellm-router.yaml --host 127.0.0.1 --port 11435
-          '';
-          Restart = "on-failure";
-          RestartSec = 5;
-          PrivateTmp = true;
-        };
-        Install = {
-          WantedBy = [ "default.target" ];
+      }
+      // optionalAttrs prometheusUseOllamaFallback {
+        prometheus-ollama-tunnel = {
+          Unit = {
+            Description = "Ouranos tunnel to Prometheus Ollama";
+            Wants = [ "network-online.target" ];
+            After = [ "network-online.target" ];
+          };
+          Service = {
+            Environment = [ "SSH_AUTH_SOCK=%t/gnupg/S.gpg-agent.ssh" ];
+            ExecStart = ''
+              ${pkgs.openssh}/bin/ssh -N \
+                -o BatchMode=yes \
+                -o ExitOnForwardFailure=yes \
+                -o ServerAliveInterval=30 \
+                -o ServerAliveCountMax=3 \
+                -o StrictHostKeyChecking=accept-new \
+                -L 127.0.0.1:${toString prometheusOllamaTunnelPort}:127.0.0.1:11434 \
+                ${prometheusOllamaSshTarget}
+            '';
+            Restart = "on-failure";
+            RestartSec = 5;
+          };
+          Install = {
+            WantedBy = [ "default.target" ];
+          };
         };
       };
-    };
   };
 
   xdg = {

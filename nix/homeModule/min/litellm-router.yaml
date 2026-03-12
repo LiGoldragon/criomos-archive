@@ -2,15 +2,15 @@
 model_list:
   - model_name: prometheus-deepseek
     litellm_params:
-      model: deepseek-r1:latest
-      custom_llm_provider: ollama
-      api_base: http://127.0.0.1:21434
+      model: prometheus-deepseek
+      api_base: http://127.0.0.1:11436/v1
+      api_key: sk-no-key-required
     order: 1
-  - model_name: prometheus-qwen
+  - model_name: prometheus-subagent
     litellm_params:
-      model: qwen2.5-coder:7b
-      custom_llm_provider: ollama
-      api_base: http://127.0.0.1:21434
+      model: prometheus-deepseek
+      api_base: http://127.0.0.1:11436/v1
+      api_key: sk-no-key-required
     order: 2
   - model_name: cloud-reasoning
     litellm_params:
@@ -34,7 +34,7 @@ router_settings:
   enable_pre_call_checks: true
   model_group_alias:
     main: prometheus-deepseek
-    subagent: prometheus-qwen
+    subagent: prometheus-subagent
     fast: cloud-fast
   fallbacks:
     - main:
