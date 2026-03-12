@@ -719,7 +719,7 @@ mkIf sizedAtLeast.min {
                 --jinja \
                 --reasoning-format deepseek \
                 --sleep-idle-seconds 600 \
-                --models-max 3 \
+                --models-max 4 \
                 --no-webui
             '';
             Restart = "on-failure";
