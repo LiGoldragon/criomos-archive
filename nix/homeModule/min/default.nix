@@ -210,18 +210,14 @@ let
 
   unixDeveloperPackages = unixUtilities ++ programmingTools;
 
-  prometheusOllamaTunnelPort = 21434;
-  prometheusOllamaSshTarget = "li@192.168.0.17";
-
   prometheusLlamaPort = 11436;
   prometheusLlamaApiKey = "sk-no-key-required";
-  prometheusLlamaModelDir = "${homeDir}/.local/share/prometheus-llama/models";
+  prometheusLlamaModelDir = "${homeDir}/.local/share/prometheus-llama/models"; # Directory currently empty in this workspace; download the canonical GGUF assets before relying on the server.
   prometheusLlamaPreset = "${homeDir}/.config/prometheus-llama/models.ini";
-  prometheusUseOllamaFallback = false;
 
-  piAgentGatewayProvider = "ouranos-lite-gateway";
-  piAgentGatewayApiKey = "ouranos-lite-gateway";
-  piAgentModelAliases = [ "main" "subagent" "fast" ];
+  piAgentGatewayProvider = "prometheus";
+  piAgentGatewayApiKey = "sk-no-key-required";
+  piAgentModelAliases = [ "main-deepseek" "subagent-qwen25" "fast-llama33" ];
   piAgentEnabledModels = builtins.map (alias: "${piAgentGatewayProvider}/${alias}") piAgentModelAliases;
 
   piAgentModels = {
@@ -230,14 +226,11 @@ let
         baseUrl = "http://127.0.0.1:11435/v1";
         api = "openai-completions";
         apiKey = piAgentGatewayApiKey;
-        models = builtins.map (alias:
-          let
-            isMain = alias == "main";
-          in
+        models = [
           {
-            id = alias;
-            name = "ouranos-${alias}";
-            reasoning = isMain;
+            id = "main-deepseek";
+            name = "prometheus/main-deepseek (DeepSeek-R1 Distill Llama 70B)";
+            reasoning = true;
             input = [ "text" ];
             contextWindow = 128000;
             maxTokens = 32768;
@@ -248,14 +241,42 @@ let
               cacheWrite = 0;
             };
           }
-        ) piAgentModelAliases;
+          {
+            id = "subagent-qwen25";
+            name = "prometheus/subagent-qwen25 (Qwen 2.5 72B Instruct)";
+            reasoning = false;
+            input = [ "text" ];
+            contextWindow = 128000;
+            maxTokens = 32768;
+            cost = {
+              input = 0;
+              output = 0;
+              cacheRead = 0;
+              cacheWrite = 0;
+            };
+          }
+          {
+            id = "fast-llama33";
+            name = "prometheus/fast-llama33 (Llama 3.3 70B Instruct)";
+            reasoning = false;
+            input = [ "text" ];
+            contextWindow = 128000;
+            maxTokens = 32768;
+            cost = {
+              input = 0;
+              output = 0;
+              cacheRead = 0;
+              cacheWrite = 0;
+            };
+          }
+        ];
       };
     };
   };
 
   piAgentSettings = {
     defaultProvider = piAgentGatewayProvider;
-    defaultModel = "main";
+    defaultModel = "main-deepseek";
     enabledModels = piAgentEnabledModels;
     hideThinkingBlock = false;
     defaultThinkingLevel = "medium";
@@ -614,10 +635,19 @@ mkIf sizedAtLeast.min {
         [*]
         models-dir = ${prometheusLlamaModelDir}
         load-on-startup = false
+        # The directory above is empty in this workspace; download the GGUF artifacts into it before the server can respond to requests.
 
-        [prometheus-deepseek]
+        [prometheus-main-deepseek]
         model = ${prometheusLlamaModelDir}/DeepSeek-R1-Distill-Llama-70B-Q8_0.gguf
-        alias = prometheus-deepseek
+        alias = prometheus-main-deepseek
+
+        [prometheus-subagent-qwen25]
+        model = ${prometheusLlamaModelDir}/Qwen-2.5-72B-Instruct.gguf
+        alias = prometheus-subagent-qwen25
+
+        [prometheus-fast-llama33]
+        model = ${prometheusLlamaModelDir}/Llama-3.3-70B-Instruct.gguf
+        alias = prometheus-fast-llama33
       '';
       ".local/share/prometheus-llama/.keep".text = "";
       ".pi/agent/models.json".text = piAgentModelsJson;
@@ -645,7 +675,7 @@ mkIf sizedAtLeast.min {
                 --jinja \
                 --reasoning-format deepseek \
                 --sleep-idle-seconds 600 \
-                --models-max 1 \
+                --models-max 3 \
                 --no-webui
             '';
             Restart = "on-failure";
@@ -663,14 +693,8 @@ mkIf sizedAtLeast.min {
         litellm-gateway = {
           Unit = {
             Description = "Ouranos LiteLLM gateway";
-            Wants = lib.concatLists [
-              [ "network-online.target" ]
-              (optionals prometheusUseOllamaFallback [ "prometheus-ollama-tunnel.service" ])
-            ];
-            After = lib.concatLists [
-              [ "network-online.target" ]
-              (optionals prometheusUseOllamaFallback [ "prometheus-ollama-tunnel.service" ])
-            ];
+            Wants = [ "network-online.target" ];
+            After = [ "network-online.target" ];
           };
           Service = {
             ExecStart = ''
@@ -679,33 +703,6 @@ mkIf sizedAtLeast.min {
             Restart = "on-failure";
             RestartSec = 5;
             PrivateTmp = true;
-          };
-          Install = {
-            WantedBy = [ "default.target" ];
-          };
-        };
-      }
-      // optionalAttrs prometheusUseOllamaFallback {
-        prometheus-ollama-tunnel = {
-          Unit = {
-            Description = "Ouranos tunnel to Prometheus Ollama";
-            Wants = [ "network-online.target" ];
-            After = [ "network-online.target" ];
-          };
-          Service = {
-            Environment = [ "SSH_AUTH_SOCK=%t/gnupg/S.gpg-agent.ssh" ];
-            ExecStart = ''
-              ${pkgs.openssh}/bin/ssh -N \
-                -o BatchMode=yes \
-                -o ExitOnForwardFailure=yes \
-                -o ServerAliveInterval=30 \
-                -o ServerAliveCountMax=3 \
-                -o StrictHostKeyChecking=accept-new \
-                -L 127.0.0.1:${toString prometheusOllamaTunnelPort}:127.0.0.1:11434 \
-                ${prometheusOllamaSshTarget}
-            '';
-            Restart = "on-failure";
-            RestartSec = 5;
           };
           Install = {
             WantedBy = [ "default.target" ];

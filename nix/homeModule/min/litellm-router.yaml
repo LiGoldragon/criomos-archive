@@ -1,17 +1,23 @@
 ---
 model_list:
-  - model_name: prometheus-deepseek
+  - model_name: prometheus-main-deepseek
     litellm_params:
-      model: prometheus-deepseek
+      model: prometheus-main-deepseek
       api_base: http://127.0.0.1:11436/v1
       api_key: sk-no-key-required
     order: 1
-  - model_name: prometheus-subagent
+  - model_name: prometheus-subagent-qwen25
     litellm_params:
-      model: prometheus-deepseek
+      model: prometheus-subagent-qwen25
       api_base: http://127.0.0.1:11436/v1
       api_key: sk-no-key-required
     order: 2
+  - model_name: prometheus-fast-llama33
+    litellm_params:
+      model: prometheus-fast-llama33
+      api_base: http://127.0.0.1:11436/v1
+      api_key: sk-no-key-required
+    order: 3
   - model_name: cloud-reasoning
     litellm_params:
       model: openai/gpt-4o
@@ -33,9 +39,9 @@ model_list:
 router_settings:
   enable_pre_call_checks: true
   model_group_alias:
-    main: prometheus-deepseek
-    subagent: prometheus-subagent
-    fast: cloud-fast
+    main: prometheus-main-deepseek
+    subagent: prometheus-subagent-qwen25
+    fast: prometheus-fast-llama33
   fallbacks:
     - main:
       - cloud-reasoning
