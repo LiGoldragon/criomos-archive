@@ -856,7 +856,7 @@ mkIf sizedAtLeast.min {
             ExecStart = ''
               ${pkgs.llama-cpp}/bin/llama-server \
                 --models-preset ${prometheusLlamaPreset} \
-                --host 127.0.0.1 \
+                --host 0.0.0.0 \
                 --port ${toString prometheusLlamaPort} \
                 --api-key ${prometheusLlamaApiKey} \
                 --jinja \
