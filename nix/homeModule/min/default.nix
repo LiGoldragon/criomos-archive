@@ -215,41 +215,66 @@ let
   prometheusLlamaModelDir = "${homeDir}/.local/share/prometheus-llama/models"; # Directory currently empty in this workspace; download the canonical GGUF assets before relying on the server.
   prometheusLlamaPreset = "${homeDir}/.config/prometheus-llama/models.ini";
 
-  piAgentGatewayProvider = "prometheus";
+  prometheusModelCatalogPath = ../../../data/config/pi/prometheus-model-catalog.json;
+  prometheusModelCatalog = builtins.fromJSON (builtins.readFile prometheusModelCatalogPath);
+  piAgentGatewayProvider =
+    if builtins.hasAttr "provider" prometheusModelCatalog
+    then prometheusModelCatalog.provider
+    else "prometheus";
   piAgentGatewayApiKey = "sk-no-key-required";
-  prometheusCanonicalModelIds = [
-    "deepseek-r1-distill-llama-70b"
-    "qwen-2.5-72b-instruct"
-    "llama-3.3-70b-instruct"
-  ];
-  piAgentModelAliases = [ "main-deepseek" "subagent-qwen25" "fast-llama33" ];
+  prometheusAliasPrefix = "${piAgentGatewayProvider}/";
+  prometheusAliasPrefixLen = builtins.stringLength prometheusAliasPrefix;
+  stripProviderPrefix = alias:
+    let
+      aliasLen = builtins.stringLength alias;
+    in if aliasLen >= prometheusAliasPrefixLen && builtins.substring 0 prometheusAliasPrefixLen alias == prometheusAliasPrefix
+       then builtins.substring prometheusAliasPrefixLen (aliasLen - prometheusAliasPrefixLen) alias
+       else alias;
+  prometheusModels =
+    if builtins.hasAttr "models" prometheusModelCatalog
+    then prometheusModelCatalog.models
+    else [];
+  prometheusCanonicalModelIds = builtins.map (model: model.id) prometheusModels;
+  prometheusAliasQualifiedEnabled =
+    if builtins.hasAttr "enabledAliases" prometheusModelCatalog
+    then prometheusModelCatalog.enabledAliases
+    else [];
+  piAgentModelAliases = builtins.map stripProviderPrefix prometheusAliasQualifiedEnabled;
   piAgentEnabledModels =
     builtins.concatLists [
-      builtins.map (model: "${piAgentGatewayProvider}/${model}") prometheusCanonicalModelIds
-      builtins.map (model: "${piAgentGatewayProvider}/${model}") piAgentModelAliases
+      (builtins.map (model: "${piAgentGatewayProvider}/${model}") prometheusCanonicalModelIds)
+      prometheusAliasQualifiedEnabled
     ];
-
-  prometheusModelMetadata = {
-    "deepseek-r1-distill-llama-70b" = {
-      descriptor = "DeepSeek-R1 Distill Llama 70B";
-      reasoning = true;
-    };
-    "qwen-2.5-72b-instruct" = {
-      descriptor = "Qwen 2.5 72B Instruct";
-      reasoning = false;
-    };
-    "llama-3.3-70b-instruct" = {
-      descriptor = "Llama 3.3 70B Instruct";
-      reasoning = false;
-    };
-  };
-
-  prometheusAliasTargets = {
-    "main-deepseek" = "deepseek-r1-distill-llama-70b";
-    "subagent-qwen25" = "qwen-2.5-72b-instruct";
-    "fast-llama33" = "llama-3.3-70b-instruct";
-  };
-
+  prometheusModelMetadata =
+    builtins.listToAttrs (
+      builtins.map (model:
+        {
+          name = model.id;
+          value = {
+            descriptor =
+              if builtins.hasAttr "descriptor" model
+              then model.descriptor
+              else model.id;
+            reasoning =
+              if builtins.hasAttr "reasoning" model
+              then model.reasoning
+              else false;
+            contextWindow =
+              if builtins.hasAttr "contextWindow" model
+              then model.contextWindow
+              else 128000;
+            maxTokens =
+              if builtins.hasAttr "maxTokens" model
+              then model.maxTokens
+              else 32768;
+          };
+        }
+      ) prometheusModels
+    );
+  prometheusAliasTargets =
+    if builtins.hasAttr "aliasTargets" prometheusModelCatalog
+    then prometheusModelCatalog.aliasTargets
+    else { };
   mkPrometheusModelEntry = modelId:
     let
       aliasTarget =
@@ -268,8 +293,8 @@ let
       name = "prometheus/${modelId} (${label})";
       reasoning = info.reasoning;
       input = [ "text" ];
-      contextWindow = 128000;
-      maxTokens = 32768;
+      contextWindow = info.contextWindow;
+      maxTokens = info.maxTokens;
       cost = {
         input = 0;
         output = 0;
@@ -277,7 +302,6 @@ let
         cacheWrite = 0;
       };
     };
-
   piAgentModels = {
     providers = {
       ${piAgentGatewayProvider} = {
@@ -288,16 +312,20 @@ let
       };
     };
   };
-
   piAgentSettings = {
-    defaultProvider = piAgentGatewayProvider;
-    defaultModel = "main-deepseek";
+    defaultProvider =
+      if builtins.hasAttr "defaultProvider" prometheusModelCatalog
+      then prometheusModelCatalog.defaultProvider
+      else piAgentGatewayProvider;
+    defaultModel =
+      if builtins.hasAttr "defaultModel" prometheusModelCatalog
+      then prometheusModelCatalog.defaultModel
+      else (if builtins.length piAgentModelAliases > 0 then builtins.head piAgentModelAliases else "main-deepseek");
     enabledModels = piAgentEnabledModels;
     hideThinkingBlock = false;
     defaultThinkingLevel = "medium";
     compaction = { enabled = false; };
   };
-
   piAgentModelsJson = toJSON piAgentModels;
   piAgentSettingsJson = toJSON piAgentSettings;
 
@@ -370,6 +398,7 @@ let
   ];
 
 in
+assert builtins.length prometheusModels > 0;
 mkIf sizedAtLeast.min {
   fonts.fontconfig = {
     enable = true;
