@@ -87,12 +87,12 @@ let
         if alias == null || alias == "" || address == null then
           []
         else
-          [ mkRecord { name = alias; rtype = recordTypeForIp address; value = address; } ];
+          [ (mkRecord { name = alias; rtype = recordTypeForIp address; value = address; }) ];
     in
       if address == null then
         []
       else
-        [ mkRecord { name = entry.criomeDomainName; rtype = recordTypeForIp address; value = address; } ] ++ aliasRecords;
+        [ (mkRecord { name = entry.criomeDomainName; rtype = recordTypeForIp address; value = address; }) ] ++ aliasRecords;
 
   localDnsRecords = concatLists (map mkPrimaryRecords horizonNodes);
 
