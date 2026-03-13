@@ -3,8 +3,8 @@
   "defaultModel": "main-deepseek",
   "provider": "prometheus",
   "serviceEndpoints": {
-    "canonical": "http://prometheus.maisiliym.criome:11434/v1",
-    "backup": "http://prometheus.maisiliym.criome:11436/v1"
+    "canonical": "http://[202:68bc:1221:1b13:5397:2a56:4aea:d4a9]:11434/v1",
+    "backup": "http://[202:68bc:1221:1b13:5397:2a56:4aea:d4a9]:11436/v1"
   },
   "models": [
     {

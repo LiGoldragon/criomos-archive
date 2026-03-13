@@ -363,10 +363,15 @@ let
         cacheWrite = 0;
       };
     };
+  piAgentGatewayBaseUrl =
+    if builtins.hasAttr "serviceEndpoints" prometheusModelCatalog
+      && builtins.hasAttr "canonical" prometheusModelCatalog.serviceEndpoints
+    then prometheusModelCatalog.serviceEndpoints.canonical
+    else "http://[202:68bc:1221:1b13:5397:2a56:4aea:d4a9]:11434/v1";
   piAgentModels = {
     providers = {
       ${piAgentGatewayProvider} = {
-        baseUrl = "http://127.0.0.1:11435/v1";
+        baseUrl = piAgentGatewayBaseUrl;
         api = "openai-completions";
         apiKey = piAgentGatewayApiKey;
         models = builtins.map mkPrometheusModelEntry (prometheusCanonicalModelIds ++ piAgentModelAliases);
@@ -701,6 +706,16 @@ mkIf sizedAtLeast.min {
   home = {
     packages = fontPackages ++ nixpkgsPackages ++ worldPackages ++ AIPackages;
 
+    activation = optionalAttrs isOuranosNode {
+      removeLegacyLitellmGateway = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        export XDG_RUNTIME_DIR="/run/user/$(id -u)"
+        systemctl --user stop litellm-gateway.service 2>/dev/null || true
+        systemctl --user disable litellm-gateway.service 2>/dev/null || true
+        systemctl --user daemon-reload 2>/dev/null || true
+        rm -f ${homeDir}/.config/litellm-router.yaml
+      '';
+    };
+
     pointerCursor = {
       package = pkgs.vanilla-dmz;
       name = "Vanilla-DMZ";
@@ -735,7 +750,6 @@ mkIf sizedAtLeast.min {
         ".config/broot/conf.toml".text = brootConfig;
       }
       // (optionalAttrs isOuranosNode {
-        ".config/litellm-router.yaml".text = litellmRouterYaml;
         ".pi/agent/models.json".text = piAgentModelsJson;
         ".pi/agent/settings.json".text = piAgentSettingsJson;
       })
@@ -747,27 +761,7 @@ mkIf sizedAtLeast.min {
   };
 
   systemd = {
-    user.services =
-      (optionalAttrs isOuranosNode {
-        litellm-gateway = {
-          Unit = {
-            Description = "Ouranos LiteLLM gateway";
-            Wants = [ "network-online.target" ];
-            After = [ "network-online.target" ];
-          };
-          Service = {
-            ExecStart = ''
-              ${litellmProxy}/bin/litellm --config ${homeDir}/.config/litellm-router.yaml --host 127.0.0.1 --port 11435
-            '';
-            Restart = "on-failure";
-            RestartSec = 5;
-            PrivateTmp = true;
-          };
-          Install = {
-            WantedBy = [ "default.target" ];
-          };
-        };
-      });
+    user.services = { };
   };
 
   xdg = {
