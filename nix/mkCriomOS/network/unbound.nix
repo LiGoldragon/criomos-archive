@@ -95,8 +95,8 @@ in
         interface = listenIPs;
         do-not-query-localhost = false;
         tls-cert-bundle = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
+        local-data = localDnsRecords;
       };
-      local-data = localDnsRecords;
       forward-zone =
         (lib.optionals headscaleEnabled [
           {
