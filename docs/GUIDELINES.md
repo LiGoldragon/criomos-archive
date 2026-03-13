@@ -241,22 +241,26 @@ directly instead of hardcoding the behavior inside a module.
 
 ## Operator Node/Network Truth Authority
 
-**MUST UPDATE WHEN EDITING REPO:** When node or network behavior is touched, operators update the Maisiliym source (`/home/li/git/maisiliym/datom.nix`) first, then reread this guidance and the mirror in `Components/CriomOS/docs/AGENTS.md` before touching CriomOS artifacts.
+**MUST UPDATE WHEN EDITING REPO:** When node or network behavior is touched, operators update the Maisiliym source (`datom.nix` / `NodeProposal.nodes.*`) first, then reread this guidance and the mirror in `Components/CriomOS/docs/AGENTS.md` before touching CriomOS artifacts. For deployment/build consumption, prefer the GitHub flake source `github:LiGoldragon/maisiliym`; do not rely on ad-hoc local checkout overrides in this lane.
 
 ### Edit authority
-- Maisiliym owns node/network truth inside `/home/li/git/maisiliym/datom.nix` via `NodeProposal.nodes.*`. Any node name, role, connectivity, or identity change begins by editing the corresponding `NodeProposal` entry so horizon data exports the new truth before any CriomOS consumer is built or deployed.
+- Maisiliym owns node/network truth inside `datom.nix` via `NodeProposal.nodes.*`. Any node name, role, connectivity, or identity change begins by editing the corresponding `NodeProposal` entry so horizon data exports the new truth before any CriomOS consumer is built or deployed.
 - Maintain the Maisiliym trust model (users, hardware assignments, disk layout) in the same `NodeProposal` block and test via the toparranged validation (`nix flake check` or the Maisiliym validation job) before downstream operators consume it.
+- For deployment/build consumption, operators and deploy agents should treat `github:LiGoldragon/maisiliym` as the canonical flake source. Local path overrides such as `/home/li/git/maisiliym` are historical/operator scratch only and are not the preferred deploy lane anymore.
 
 ### Build/deploy authority
 - CriomOS consumes that Maisiliym truth through horizon exports (see `Components/CriomOS/nix/mkCrioZones/mkHorizonModule.nix` for the export wiring) and the network modules (`Components/CriomOS/nix/mkCriomOS/network/default.nix`, `Components/CriomOS/nix/mkCriomOS/network/unbound.nix`). Builders read `node.name`, `node.yggAddress`, and `exNodes` from horizon data rather than adding new literals.
 - Update horizon exports before adjusting CriomOS DNS, host tables, or kube provisioning. After the Maisiliym change lands, rerun the exact CriomOS attr build and deployment flow so unbound, DHCP, and activation regenerate from the fresh node truth.
+- Use flake-native commands only. Do not use `<nixpkgs>` / `NIX_PATH` style invocations in this repo; when you need environment packages, use flake registry references such as `nix shell nixpkgs#jq`.
 - Exact build commands:
   - `nix build .#crioZones.maisiliym.ouranos.os --no-link --print-out-paths --refresh`
   - `nix build .#crioZones.maisiliym.prometheus.os --no-link --print-out-paths --refresh`
   - `nix build .#crioZones.maisiliym.ouranos.deployManifest --no-link --print-out-paths --refresh`
   - `nix build .#crioZones.maisiliym.prometheus.deployManifest --no-link --print-out-paths --refresh`
+  - If an override is required for the Maisiliym source, use only `--override-input maisiliym github:LiGoldragon/maisiliym`.
 - Exact deployment flow:
   - `execute deploy-manifest --manifest $(nix build .#crioZones.maisiliym.<node>.deployManifest --no-link --print-out-paths --refresh) --node <node>` is the canonical activation shape.
   - `prometheus`: the generated manifest prefers Yggdrasil transport first. Current Ygg transport target remains `202:68bc:1221:1b13:5397:2a56:4aea:d4a9` while the Maisiliym node truth stays unchanged.
   - `ouranos`: use `--allow-localhost` only when remote transport fails. Localhost activation is guarded by a mandatory `hostname` check and must abort when `hostname != nodeName`.
   - Temporary fallback: use the current LAN IP for `prometheus` only when the generated manifest is extended with that transport or when the operator performs a separate explicitly documented override.
+  - Prefer the project-local `criomos-deployer` agent when exact attr build + manifest deploy + cross-node verification must happen in one bounded lane.

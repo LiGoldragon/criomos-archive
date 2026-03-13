@@ -10,11 +10,13 @@
 
 ## Build, Test, and Development Commands
 - For operator work, prefer exact attr builds over broad flake evaluation.
+- Never use `<nixpkgs>` / `NIX_PATH` style commands in this repo. Use flake attrs from the current repo and flake-registry package references such as `nix shell nixpkgs#jq` when you need an environment package.
 - `nix build .#crioZones.maisiliym.ouranos.os --no-link --print-out-paths --refresh` builds the current Ouranos system payload.
 - `nix build .#crioZones.maisiliym.prometheus.os --no-link --print-out-paths --refresh` builds the current Prometheus system payload.
 - `nix build .#crioZones.maisiliym.ouranos.deployManifest --no-link --print-out-paths --refresh` builds the Ouranos deployment manifest.
 - `nix build .#crioZones.maisiliym.prometheus.deployManifest --no-link --print-out-paths --refresh` builds the Prometheus deployment manifest.
 - `execute deploy-manifest --manifest $(nix build .#crioZones.maisiliym.<node>.deployManifest --no-link --print-out-paths --refresh) --node <node>` is the canonical activation shape.
+- If an override is required for Maisiliym truth, use only the GitHub flake source form: `--override-input maisiliym github:LiGoldragon/maisiliym`.
 - Temporary transport ladder: the generated manifest prefers Yggdrasil first; `--allow-localhost` is override-only and must succeed through a `hostname == nodeName` guard before any local activation proceeds.
 - `nix develop` remains the entry point when an interactive development shell is needed.
 
@@ -29,7 +31,12 @@
 
 ## Node/Network Truth Guidance
 - `Components/CriomOS/docs/GUIDELINES.md` is the canonical operator reference for node/network behavior. Read the `Operator Node/Network Truth Authority` section and respect the **MUST UPDATE WHEN EDITING REPO** marker before touching network or horizon code.
-- Maisiliym owns node/network truth in `/home/li/git/maisiliym/datom.nix` (`NodeProposal.nodes.*`). CriomOS consumes/builds/deploys the resulting horizon exports from `Components/CriomOS/nix/mkCrioZones/mkHorizonModule.nix`, with network modules such as `Components/CriomOS/nix/mkCriomOS/network/default.nix` and `Components/CriomOS/nix/mkCriomOS/network/unbound.nix` deriving their host data from that truth.
+- Maisiliym owns node/network truth in `datom.nix` / `NodeProposal.nodes.*`, with the canonical deploy-consumption source carried through the GitHub flake input `github:LiGoldragon/maisiliym`. CriomOS consumes/builds/deploys the resulting horizon exports from `Components/CriomOS/nix/mkCrioZones/mkHorizonModule.nix`, with network modules such as `Components/CriomOS/nix/mkCriomOS/network/default.nix` and `Components/CriomOS/nix/mkCriomOS/network/unbound.nix` deriving their host data from that truth.
+
+## Deployment Agent Guidance
+- Prefer the project-local `criomos-deployer` agent for operator deployment tasks that must build exact attrs and deploy the right node.
+- That agent must avoid local path Maisiliym overrides and use only `github:LiGoldragon/maisiliym` when an override is necessary.
+- For Prometheus deployment work, the canonical pattern is exact attr build + manifest-driven activation, followed by DNS and service probes from another node.
 
 ## Commit & Pull Request Guidelines
 - Commit messages follow a lowercase verb + scoped parentheses style, often nested (example: `fix(emacs(errors(copilot)))`).

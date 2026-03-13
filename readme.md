@@ -8,15 +8,18 @@ an evolved version of NixOS, which is used for the bootstrap version.
 ## Node: maisiliym.prometheus (GMKtec EVO-X2)
 
 - Purpose: produces the Ethernet-first live-image that boots the GMKtec EVO-X2
-  as node `maisiliym.prometheus`, which is sourced from the `maisiliym`
-  `prometheus-node` branch and consumed by nested agents handling bootstrap
+  as node `maisiliym.prometheus`, which is sourced from the Maisiliym GitHub
+  source `github:LiGoldragon/maisiliym` and consumed by nested agents handling bootstrap
   tasks.
 - Build path: the image is built via the `crioZones.maisiliym.prometheus.os`
   attribute; agents should run `nix build .#crioZones.maisiliym.prometheus.os
   --no-link --print-out-paths --refresh` from the nested repo to reproduce the artifact.
+- Nix usage rule: do not use `<nixpkgs>` / `NIX_PATH` style commands here. Use flake attrs in this repo and registry references such as `nix shell nixpkgs#jq` for ad-hoc environment tools.
 - Temporary deployment transport: test the Prometheus Yggdrasil address first and use it when it responds (`202:68bc:1221:1b13:5397:2a56:4aea:d4a9` at the time of writing). Localhost is override-only and must pass a `hostname == nodeName` guard before any activation proceeds.
 - Deployment command: `execute deploy-manifest --manifest $(nix build .#crioZones.maisiliym.prometheus.deployManifest --no-link --print-out-paths --refresh) --node prometheus`.
-- Node/network truth reminder: update `/home/li/git/maisiliym/datom.nix` (`NodeProposal.nodes.*`) before touching CriomOS network behavior so the horizon export stays authoritative.
+- GitHub-only override form when needed: `--override-input maisiliym github:LiGoldragon/maisiliym`.
+- Deployment agent note: prefer the project-local `criomos-deployer` agent for exact-attr build + manifest deploy work so the right build is activated on the right node.
+- Node/network truth reminder: update `datom.nix` / `NodeProposal.nodes.*` in Maisiliym before touching CriomOS network behavior so the horizon export stays authoritative.
 - Hardware: the GMKtec EVO-X2 is AMD-based, so `nix/mkCriomOS/metal/default.nix`
   deliberately keeps it out of the Intel media-driver set and enables
   `hardware.amdgpu` only when `model == "GMKtec EVO-X2"` to keep the driver
