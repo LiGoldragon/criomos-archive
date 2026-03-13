@@ -1,6 +1,7 @@
 {
   lib,
   pkgs,
+  config,
   ...
 }:
 let
@@ -51,6 +52,9 @@ in
         + " --n-gpu-layers 99"
         + " --alias prometheus-main-deepseek"
         + " --api-key ${prometheusApiKey}"
+        + " --parallel 1"
+        + " --ctx-size 8192"
+        + " --no-warmup"
         + " --no-webui";
 
       Restart = "on-failure";
@@ -64,6 +68,8 @@ in
     description = "Prometheus LiteLLM gateway";
     wants = [ "network-online.target" ];
     after = [ "network-online.target" ];
+
+    restartTriggers = [ config.environment.etc."litellm-router.yaml".source ];
 
     serviceConfig = {
       Type = "simple";
