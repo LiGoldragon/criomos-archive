@@ -13,7 +13,9 @@ an evolved version of NixOS, which is used for the bootstrap version.
   tasks.
 - Build path: the image is built via the `crioZones.maisiliym.prometheus.os`
   attribute; agents should run `nix build .#crioZones.maisiliym.prometheus.os
-  --no-link` from the nested repo to reproduce the artifact.
+  --no-link --print-out-paths --refresh` from the nested repo to reproduce the artifact.
+- Temporary deployment transport: test the Prometheus Yggdrasil address first and use it when it responds (`202:68bc:1221:1b13:5397:2a56:4aea:d4a9` at the time of writing). Fall back to the current LAN IP only when Ygg transport fails. Ouranos remains temporarily deployable through `localhost`.
+- Node/network truth reminder: update `/home/li/git/maisiliym/datom.nix` (`NodeProposal.nodes.*`) before touching CriomOS network behavior so the horizon export stays authoritative.
 - Hardware: the GMKtec EVO-X2 is AMD-based, so `nix/mkCriomOS/metal/default.nix`
   deliberately keeps it out of the Intel media-driver set and enables
   `hardware.amdgpu` only when `model == "GMKtec EVO-X2"` to keep the driver

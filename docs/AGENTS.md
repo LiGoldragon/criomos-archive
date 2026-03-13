@@ -9,10 +9,12 @@
 - Inputs are pinned in `npins/` and `flake.lock`.
 
 ## Build, Test, and Development Commands
-- `nix flake show` to discover available outputs for this flake.
-- `nix build .#<output>` to build a specific output (for example, a system or package).
-- `nix flake check` to run flake checks and Nix-based tests.
-- `nix develop` to enter a dev shell, if one is defined for the output you are working on.
+- For operator work, prefer exact attr builds over broad flake evaluation.
+- `nix build .#crioZones.maisiliym.ouranos.os --no-link --print-out-paths --refresh` builds the current Ouranos system payload.
+- `nix build .#crioZones.maisiliym.prometheus.os --no-link --print-out-paths --refresh` builds the current Prometheus system payload.
+- `kriOSPush $(nix build .#crioZones.maisiliym.<node>.os --no-link --print-out-paths --refresh) <transport-target>` is the temporary activation shape.
+- Temporary transport ladder: use `localhost` for Ouranos while the local-host lane remains stable; test Yggdrasil first for Prometheus and fall back to the current LAN IP only when Ygg transport fails.
+- `nix develop` remains the entry point when an interactive development shell is needed.
 
 ## Coding Style & Naming Conventions
 - Adhere to the Nix-specific Sema object style defined in `NIX_GUIDELINES.md`. The universal principles, with their original Rust examples, are in `GUIDELINES.md` for context.

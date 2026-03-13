@@ -249,4 +249,12 @@ directly instead of hardcoding the behavior inside a module.
 
 ### Build/deploy authority
 - CriomOS consumes that Maisiliym truth through horizon exports (see `Components/CriomOS/nix/mkCrioZones/mkHorizonModule.nix` for the export wiring) and the network modules (`Components/CriomOS/nix/mkCriomOS/network/default.nix`, `Components/CriomOS/nix/mkCriomOS/network/unbound.nix`). Builders read `node.name`, `node.yggAddress`, and `exNodes` from horizon data rather than adding new literals.
-- Update horizon exports before adjusting CriomOS DNS, host tables, or kube provisioning. After the Maisiliym change lands, rerun the CriomOS build/deploy pipeline so unbound, DHCP, and deployment flows regenerate from the fresh node truth.
+- Update horizon exports before adjusting CriomOS DNS, host tables, or kube provisioning. After the Maisiliym change lands, rerun the exact CriomOS attr build and deployment flow so unbound, DHCP, and activation regenerate from the fresh node truth.
+- Exact build commands:
+  - `nix build .#crioZones.maisiliym.ouranos.os --no-link --print-out-paths --refresh`
+  - `nix build .#crioZones.maisiliym.prometheus.os --no-link --print-out-paths --refresh`
+- Exact deployment flow:
+  - `ouranos`: deploy the built `ouranos` system to `localhost` while local-host transport remains the temporary stable lane.
+  - `prometheus`: test Yggdrasil transport first and deploy over the Ygg address when it responds. Current Ygg transport target: `202:68bc:1221:1b13:5397:2a56:4aea:d4a9`.
+  - Temporary fallback: use the current LAN IP for `prometheus` only when Ygg transport fails.
+- Exact activation shape: `kriOSPush $(nix build .#crioZones.maisiliym.<node>.os --no-link --print-out-paths --refresh) <transport-target>`. 
