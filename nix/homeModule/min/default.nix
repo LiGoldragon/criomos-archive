@@ -59,6 +59,10 @@ let
     then prometheusNodeIp
     else prometheusDomainName;
 
+  # Current session runtime truth: the working overlay path is Prometheus tailnet IP.
+  # System MagicDNS integration is not yet authoritative for user-space consumers.
+  prometheusOverlayHost = if isOuranosNode then "100.64.0.1" else prometheusCriomeHost;
+
   terminalFontFamily = if sizedAtLeast.med then "FiraMono Nerd Font" else "DejaVu Sans Mono";
 
   # Todo(Those data files should be in a top arg called data)
@@ -243,7 +247,7 @@ let
   prometheusLlamaCanonicalModels = [
     {
       section = "prometheus-main-deepseek";
-      file = "DeepSeek-R1-Distill-Llama-70B-Q8_0.gguf";
+      file = "DeepSeek-R1-Distill-Llama-70B-Q8_0-merged.gguf";
       alias = "prometheus-deepseek-r1-distill-llama-70b";
     }
     {
@@ -314,20 +318,20 @@ let
     model_list:
       - model_name: prometheus-deepseek-r1-distill-llama-70b
         litellm_params:
-          model: prometheus-deepseek-r1-distill-llama-70b
-          api_base: http://${prometheusCriomeHost}:${toString prometheusLlamaPort}/v1
+          model: openai/prometheus-deepseek-r1-distill-llama-70b
+          api_base: http://${prometheusOverlayHost}:${toString prometheusLlamaPort}/v1
           api_key: ${prometheusLlamaApiKey}
         order: 1
       - model_name: prometheus-qwen-2.5-72b-instruct
         litellm_params:
-          model: prometheus-qwen-2.5-72b-instruct
-          api_base: http://${prometheusCriomeHost}:${toString prometheusLlamaPort}/v1
+          model: openai/prometheus-qwen-2.5-72b-instruct
+          api_base: http://${prometheusOverlayHost}:${toString prometheusLlamaPort}/v1
           api_key: ${prometheusLlamaApiKey}
         order: 2
       - model_name: prometheus-llama-3.3-70b-instruct
         litellm_params:
-          model: prometheus-llama-3.3-70b-instruct
-          api_base: http://${prometheusCriomeHost}:${toString prometheusLlamaPort}/v1
+          model: openai/prometheus-llama-3.3-70b-instruct
+          api_base: http://${prometheusOverlayHost}:${toString prometheusLlamaPort}/v1
           api_key: ${prometheusLlamaApiKey}
         order: 3
       - model_name: cloud-reasoning
