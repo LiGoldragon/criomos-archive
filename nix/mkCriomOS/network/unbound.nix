@@ -52,12 +52,12 @@ let
   forwardServerUrls = concatLists (map (name: mkForwardServerUrls name TLSDNServers.${name}) (attrNames TLSDNServers));
 
   mkRecord = { name, rtype, value }:
-    concatStringsSep " " [
+    "\"${concatStringsSep " " [
       name
       "IN"
       rtype
       value
-    ];
+    ]}\"";
 
   sanitizeIp = ip:
     if ip == null || ip == "" then
