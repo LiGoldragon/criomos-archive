@@ -318,19 +318,19 @@ let
     model_list:
       - model_name: prometheus-deepseek-r1-distill-llama-70b
         litellm_params:
-          model: openai/prometheus-deepseek-r1-distill-llama-70b
+          model: openai/prometheus-main-deepseek
           api_base: http://${prometheusOverlayHost}:${toString prometheusLlamaPort}/v1
           api_key: ${prometheusLlamaApiKey}
         order: 1
       - model_name: prometheus-qwen-2.5-72b-instruct
         litellm_params:
-          model: openai/prometheus-qwen-2.5-72b-instruct
+          model: openai/prometheus-subagent-qwen25
           api_base: http://${prometheusOverlayHost}:${toString prometheusLlamaPort}/v1
           api_key: ${prometheusLlamaApiKey}
         order: 2
       - model_name: prometheus-llama-3.3-70b-instruct
         litellm_params:
-          model: openai/prometheus-llama-3.3-70b-instruct
+          model: openai/prometheus-fast-llama33
           api_base: http://${prometheusOverlayHost}:${toString prometheusLlamaPort}/v1
           api_key: ${prometheusLlamaApiKey}
         order: 3
