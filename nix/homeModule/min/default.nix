@@ -247,7 +247,7 @@ let
   prometheusLlamaCanonicalModels = [
     {
       section = "prometheus-main-deepseek";
-      file = "DeepSeek-R1-Distill-Llama-70B-Q8_0-merged.gguf";
+      file = "DeepSeek-R1-Distill-Llama-70B-Q8_0-00001-of-00002.gguf";
       alias = "prometheus-deepseek-r1-distill-llama-70b";
     }
     {
