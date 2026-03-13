@@ -58,7 +58,7 @@ in
       server = {
         interface = listenIPs;
         do-not-query-localhost = false;
-        tls-cert-bundle = "/etc/ssl/certs/ca-certificates.crt";
+        tls-cert-bundle = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
       };
       forward-zone =
         (lib.optionals isTailnetNode [

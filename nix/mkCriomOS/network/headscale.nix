@@ -13,6 +13,13 @@ let
 
   headscalePort = 8443;
 
+  ouranosNodeIp = node.nodeIp or null;
+
+  headscaleBindAddress =
+    if ouranosNodeIp != null && ouranosNodeIp != ""
+    then ouranosNodeIp
+    else "0.0.0.0";
+
   ouranosFqdn =
     if exNodes ? ouranos && exNodes.ouranos ? criomeDomainName
     then exNodes.ouranos.criomeDomainName
@@ -32,12 +39,17 @@ let
     keyFile=${lib.escapeShellArg tlsKeyPath}
     fqdn=${lib.escapeShellArg ouranosFqdn}
 
+    umask 077
+    mkdir -p "$certDir"
+
+    # Allow headscale (group) to traverse the TLS directory.
+    hsGroup=${lib.escapeShellArg config.services.headscale.group}
+    chown root:"$hsGroup" "$certDir"
+    chmod 0750 "$certDir"
+
     if [ -s "$certFile" ] && [ -s "$keyFile" ]; then
       exit 0
     fi
-
-    umask 077
-    mkdir -p "$certDir"
 
     # Self-signed cert for Phase 1; will be replaced with real PKI later.
     ${lib.getExe pkgs.openssl} req \
@@ -48,7 +60,7 @@ let
       -subj "/CN=$fqdn" \
       -addext "subjectAltName=DNS:$fqdn"
 
-    chown root:${lib.escapeShellArg config.services.headscale.group} "$certFile" "$keyFile"
+    chown root:"$hsGroup" "$certFile" "$keyFile"
     chmod 0644 "$certFile"
     chmod 0640 "$keyFile"
   '';
@@ -58,7 +70,7 @@ in
   config = lib.mkIf isOuranosNode {
     services.headscale = {
       enable = true;
-      address = "0.0.0.0";
+      address = headscaleBindAddress;
       port = headscalePort;
 
       # Direct TLS (no reverse proxy) for Phase 1.
@@ -79,7 +91,6 @@ in
     systemd.services.headscale-selfsigned-cert = {
       description = "Generate headscale self-signed TLS certificate (Phase 1)";
       before = [ "headscale.service" ];
-      wantedBy = [ "headscale.service" ];
 
       serviceConfig = {
         Type = "oneshot";
