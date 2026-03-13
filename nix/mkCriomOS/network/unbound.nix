@@ -8,19 +8,19 @@
 let
   inherit (builtins)
     map
+    concatLists
     concatStringsSep
-    concatMap
     attrNames
     attrValues
     split
     head
     match
     ;
-  inherit (lib) mapAttrsToList concatMapStringsSep lowPrio;
-  inherit (horizon) node cluster exNodes;
-  inherit (horizon.node) typeIs criomeDomainName;
+  inherit (lib) filter mapAttrsToList concatMapStringsSep lowPrio;
+  inherit (horizon) cluster;
 
   tailnetBaseDomain = "tailnet.${cluster.name}.criome";
+  nodeCriomeDomainName = concatStringsSep "." [ cluster.name "criome" ];
   headscaleEnabled = config.services.headscale.enable;
 
   listenIPs = [
@@ -49,17 +49,11 @@ let
 
   mkForwardServerUrls = domain: ipList: map (ip: "${ip}@853#${domain}") ipList;
 
-  forwardServerUrls = concatMap (name: mkForwardServerUrls name TLSDNServers.${name}) (
-    attrNames TLSDNServers
-  );
-
-  horizonNodes = [ node ] ++ attrValues exNodes;
-
-  mkFqdn = name: concatStringsSep "." [ name "" ];
+  forwardServerUrls = concatLists (map (name: mkForwardServerUrls name TLSDNServers.${name}) (attrNames TLSDNServers));
 
   mkRecord = { name, rtype, value }:
     concatStringsSep " " [
-      mkFqdn name
+      name
       "IN"
       rtype
       value
@@ -77,34 +71,19 @@ let
   recordTypeForIp = ip:
     if match ".*:.*" ip != null then "AAAA" else "A";
 
-  mkAddressRecord = { name, ip }:
+  hostEntries = config.networking.hosts or { };
+
+  mkHostRecords = ip: names:
     let
       address = sanitizeIp ip;
+      validNames = lib.filter (name: name != null && name != "") names;
     in
       if address == null then
         []
       else
-        [ mkRecord { name = name; rtype = recordTypeForIp address; value = address; } ];
+        map (name: mkRecord { name = name; rtype = recordTypeForIp address; value = address; }) validNames;
 
-  mkYggRecords = entry:
-    let
-      address = sanitizeIp entry.yggAddress;
-      alias = entry.methods.nixCacheDomain;
-      aliasRecord =
-        if address == null || alias == null || alias == "" then
-          []
-        else
-          [ mkRecord { name = alias; rtype = "AAAA"; value = address; } ];
-    in
-    if address == null then
-      []
-    else
-      [ mkRecord { name = entry.criomeDomainName; rtype = "AAAA"; value = address; } ] ++ aliasRecord;
-
-  mkNodeDnsRecords = entry:
-    mkAddressRecord { name = entry.criomeDomainName; ip = entry.nodeIp; } ++ mkYggRecords entry;
-
-  localDnsRecords = concatMap mkNodeDnsRecords horizonNodes;
+  localDnsRecords = concatLists (map (ip: mkHostRecords ip (hostEntries.${ip})) (attrNames hostEntries));
 
 in
 {

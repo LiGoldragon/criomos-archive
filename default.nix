@@ -58,7 +58,13 @@ let
       };
     };
 
-  inherit (builtins) mapAttrs;
+  inherit (builtins)
+    filter
+    mapAttrs
+    match
+    replaceStrings
+    toJSON
+    ;
 
   crioSphereProposalFromName =
     name:
@@ -71,6 +77,46 @@ let
     subCriomeConfig // { nodes = allNodes; };
 
   uncheckedCrioSphereProposal = lib.genAttrs local.nodeNames crioSphereProposalFromName;
+
+  sanitizeDeployAddress =
+    address:
+    if address == null || address == "" then
+      null
+    else
+      let
+        parts = builtins.split "/" address;
+        cleaned = builtins.head parts;
+      in
+      if cleaned == "" then null else cleaned;
+
+  mkRemoteTargets =
+    node:
+    let
+      yggAddress = sanitizeDeployAddress node.yggAddress;
+    in
+    filter (target: target.target != null && target.target != "") [
+      {
+        kind = "ygg";
+        target = yggAddress;
+      }
+    ];
+
+  mkDeployManifest =
+    clusterName: nodeName: node:
+    builtins.toFile "criomos-deploy-${clusterName}-${nodeName}.json" (
+      toJSON {
+        schema = "criomos-deploy-manifest-v1";
+        cluster = clusterName;
+        nodes = {
+          ${nodeName} = {
+            nodeName = nodeName;
+            buildAttribute = ".#crioZones.${clusterName}.${nodeName}.os";
+            expectedHostname = node.name;
+            remoteTargets = mkRemoteTargets node;
+          };
+        };
+      }
+    );
 
   mkNodeDerivations =
     preNodeName: crioZone:
@@ -145,6 +191,7 @@ let
       fullOs = mkCriomOS ({ _withUsers = true; } // commonArgs);
       hom = mapAttrs mkUserHomes users;
       emacs = mapAttrs mkUserEmacs users;
+      deployManifest = mkDeployManifest horizon.cluster.name horizon.node.name horizon.node;
     };
 
   mkEachCrioZoneDerivations =

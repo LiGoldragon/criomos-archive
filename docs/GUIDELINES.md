@@ -253,8 +253,10 @@ directly instead of hardcoding the behavior inside a module.
 - Exact build commands:
   - `nix build .#crioZones.maisiliym.ouranos.os --no-link --print-out-paths --refresh`
   - `nix build .#crioZones.maisiliym.prometheus.os --no-link --print-out-paths --refresh`
+  - `nix build .#crioZones.maisiliym.ouranos.deployManifest --no-link --print-out-paths --refresh`
+  - `nix build .#crioZones.maisiliym.prometheus.deployManifest --no-link --print-out-paths --refresh`
 - Exact deployment flow:
-  - `ouranos`: deploy the built `ouranos` system to `localhost` while local-host transport remains the temporary stable lane.
-  - `prometheus`: test Yggdrasil transport first and deploy over the Ygg address when it responds. Current Ygg transport target: `202:68bc:1221:1b13:5397:2a56:4aea:d4a9`.
-  - Temporary fallback: use the current LAN IP for `prometheus` only when Ygg transport fails.
-- Exact activation shape: `kriOSPush $(nix build .#crioZones.maisiliym.<node>.os --no-link --print-out-paths --refresh) <transport-target>`. 
+  - `execute deploy-manifest --manifest $(nix build .#crioZones.maisiliym.<node>.deployManifest --no-link --print-out-paths --refresh) --node <node>` is the canonical activation shape.
+  - `prometheus`: the generated manifest prefers Yggdrasil transport first. Current Ygg transport target remains `202:68bc:1221:1b13:5397:2a56:4aea:d4a9` while the Maisiliym node truth stays unchanged.
+  - `ouranos`: use `--allow-localhost` only when remote transport fails. Localhost activation is guarded by a mandatory `hostname` check and must abort when `hostname != nodeName`.
+  - Temporary fallback: use the current LAN IP for `prometheus` only when the generated manifest is extended with that transport or when the operator performs a separate explicitly documented override.

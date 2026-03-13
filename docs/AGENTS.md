@@ -12,8 +12,10 @@
 - For operator work, prefer exact attr builds over broad flake evaluation.
 - `nix build .#crioZones.maisiliym.ouranos.os --no-link --print-out-paths --refresh` builds the current Ouranos system payload.
 - `nix build .#crioZones.maisiliym.prometheus.os --no-link --print-out-paths --refresh` builds the current Prometheus system payload.
-- `kriOSPush $(nix build .#crioZones.maisiliym.<node>.os --no-link --print-out-paths --refresh) <transport-target>` is the temporary activation shape.
-- Temporary transport ladder: use `localhost` for Ouranos while the local-host lane remains stable; test Yggdrasil first for Prometheus and fall back to the current LAN IP only when Ygg transport fails.
+- `nix build .#crioZones.maisiliym.ouranos.deployManifest --no-link --print-out-paths --refresh` builds the Ouranos deployment manifest.
+- `nix build .#crioZones.maisiliym.prometheus.deployManifest --no-link --print-out-paths --refresh` builds the Prometheus deployment manifest.
+- `execute deploy-manifest --manifest $(nix build .#crioZones.maisiliym.<node>.deployManifest --no-link --print-out-paths --refresh) --node <node>` is the canonical activation shape.
+- Temporary transport ladder: the generated manifest prefers Yggdrasil first; `--allow-localhost` is override-only and must succeed through a `hostname == nodeName` guard before any local activation proceeds.
 - `nix develop` remains the entry point when an interactive development shell is needed.
 
 ## Coding Style & Naming Conventions
