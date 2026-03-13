@@ -13,13 +13,6 @@ let
 
   headscalePort = 8443;
 
-  ouranosNodeIp = node.nodeIp or null;
-
-  headscaleBindAddress =
-    if ouranosNodeIp != null && ouranosNodeIp != ""
-    then ouranosNodeIp
-    else "0.0.0.0";
-
   ouranosFqdn =
     if exNodes ? ouranos && exNodes.ouranos ? criomeDomainName
     then exNodes.ouranos.criomeDomainName
@@ -70,7 +63,7 @@ in
   config = lib.mkIf isOuranosNode {
     services.headscale = {
       enable = true;
-      address = headscaleBindAddress;
+      address = "0.0.0.0";
       port = headscalePort;
 
       # Direct TLS (no reverse proxy) for Phase 1.
