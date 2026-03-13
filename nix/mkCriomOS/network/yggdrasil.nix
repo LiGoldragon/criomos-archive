@@ -79,7 +79,7 @@ in
           ${pkgs.jq}/bin/jq --slurp add ${preCriadJson} ${configFile} > ${combinedConfigJson}
         '';
 
-        postStart = optionalString seedYggdrasil extractPreCriomeJson;
+        postStart = optionalString seedYggdrasil "${yggCtlExec} -json getself > ${preCriomeJson}";
 
         serviceConfig = {
           ExecStart = ''

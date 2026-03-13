@@ -262,56 +262,18 @@ let
     }
   ];
 
-  prometheusLlamaGeneratePreset =
-    pkgs.writeShellScript "prometheus-llama-generate-models-ini" (
-      let
-        mkAdd = m: "add_model ${lib.escapeShellArg m.section} ${lib.escapeShellArg m.file} ${lib.escapeShellArg m.alias}";
-        addLines = builtins.concatStringsSep "\n" (builtins.map mkAdd prometheusLlamaCanonicalModels);
-      in
-      ''
-        set -euo pipefail
-
-        preset=${lib.escapeShellArg prometheusLlamaPreset}
-        models_dir=${lib.escapeShellArg prometheusLlamaModelDir}
-        coreutils=${lib.escapeShellArg pkgs.coreutils}/bin
-
-        "$coreutils/mkdir" -p "$("$coreutils/dirname" "$preset")"
-
-        {
-          echo "version = 1"
-          echo ""
-          echo "[*]"
-          echo "models-dir = $models_dir"
-          echo "load-on-startup = false"
-          echo ""
-        } > "$preset"
-
-        wrote_any=0
-
-        add_model() {
-          local section="$1"
-          local filename="$2"
-          local alias="$3"
-          local path="$models_dir/$filename"
-
-          if [[ -f "$path" ]]; then
-            {
-              echo "[$section]"
-              echo "model = $path"
-              echo "alias = $alias"
-              echo ""
-            } >> "$preset"
-            wrote_any=1
-          fi
-        }
-
-        ${addLines}
-
-        if [[ "$wrote_any" -eq 0 ]]; then
-          echo "# No canonical GGUF assets found under $models_dir; add at least one *.gguf." >> "$preset"
-        fi
-      ''
-    );
+  # Use explicit service for model stability instead of router mode.
+  prometheus-deepseek-70b-service = {
+    Unit = {
+      Description = "DeepSeek R1 Distill Llama 70B Service";
+      After = [ "network-online.target" ];
+    };
+    Service = {
+      ExecStart = "${pkgs.llama-cpp-rocm}/bin/llama-server --host 0.0.0.0 --port 11436 --model /home/li/.local/share/prometheus-llama/models/DeepSeek-R1-Distill-Llama-70B-Q8_0-00001-of-00002.gguf --n-gpu-layers 99 --alias prometheus-main-deepseek --api-key sk-no-key-required --no-webui";
+      Restart = "always";
+    };
+    Install = { WantedBy = [ "default.target" ]; };
+  };
 
   litellmRouterYaml = ''
     ---
@@ -356,6 +318,7 @@ let
       enable_pre_call_checks: true
       model_group_alias:
         main-deepseek: prometheus-deepseek-r1-distill-llama-70b
+        deepseek-r1-distill-llama-70b: prometheus-deepseek-r1-distill-llama-70b
         subagent-qwen25: prometheus-qwen-2.5-72b-instruct
         fast-llama33: prometheus-llama-3.3-70b-instruct
       fallbacks:
@@ -849,26 +812,14 @@ mkIf sizedAtLeast.min {
   systemd = {
     user.services =
       (optionalAttrs isPrometheusNode {
-        prometheus-llama-server = {
+        prometheus-deepseek-70b = {
           Unit = {
-            Description = "Local llama.cpp server for Prometheus";
+            Description = "DeepSeek R1 Distill Llama 70B Service";
             Wants = [ "network-online.target" ];
             After = [ "network-online.target" ];
           };
           Service = {
-            ExecStartPre = [ "${prometheusLlamaGeneratePreset}" ];
-            ExecStart = ''
-              ${pkgs.llama-cpp}/bin/llama-server \
-                --models-preset ${prometheusLlamaPreset} \
-                --host 0.0.0.0 \
-                --port ${toString prometheusLlamaPort} \
-                --api-key ${prometheusLlamaApiKey} \
-                --jinja \
-                --reasoning-format deepseek \
-                --sleep-idle-seconds 600 \
-                --models-max 4 \
-                --no-webui
-            '';
+            ExecStart = "${pkgs.llama-cpp-rocm}/bin/llama-server --host 0.0.0.0 --port 11436 --model /home/li/.local/share/prometheus-llama/models/DeepSeek-R1-Distill-Llama-70B-Q8_0-00001-of-00002.gguf --n-gpu-layers 99 --alias prometheus-main-deepseek --api-key sk-no-key-required --no-webui";
             Restart = "on-failure";
             RestartSec = 5;
             PrivateTmp = true;

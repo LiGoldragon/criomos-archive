@@ -51,7 +51,11 @@ let
 in
 {
   boot = {
-    kernelParams = [ "consoleblank=300" ];
+    kernelParams = [ 
+      "consoleblank=300"
+      "amdgpu.ppfeaturemask=0xffffffff"
+      "amdgpu.gttsize=73728" # 72GB in MiB
+    ];
 
     kernelPackages = pkgs.linuxPackages_latest;
 

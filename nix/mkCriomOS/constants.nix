@@ -26,7 +26,7 @@ in
       preCriadJson = stateDirectory + "/preCriad.json";
       combinedConfigJson = stateDirectory + "/combinedConfig.json";
 
-      interfaceName = "yggtun";
+      interfaceName = "yggTun";
     };
   };
 

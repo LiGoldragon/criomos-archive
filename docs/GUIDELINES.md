@@ -238,3 +238,15 @@ When a new toggle requires horizon truth that is absent from the current schema,
 extend the CriomOS/CrioSphere schema (for example `capnp/criosphere.capnp`) so
 the node horizon exposes an optional or defaulted value, and consume that value
 directly instead of hardcoding the behavior inside a module.
+
+## Operator Node/Network Truth Authority
+
+**MUST UPDATE WHEN EDITING REPO:** When node or network behavior is touched, operators update the Maisiliym source (`/home/li/git/maisiliym/datom.nix`) first, then reread this guidance and the mirror in `Components/CriomOS/docs/AGENTS.md` before touching CriomOS artifacts.
+
+### Edit authority
+- Maisiliym owns node/network truth inside `/home/li/git/maisiliym/datom.nix` via `NodeProposal.nodes.*`. Any node name, role, connectivity, or identity change begins by editing the corresponding `NodeProposal` entry so horizon data exports the new truth before any CriomOS consumer is built or deployed.
+- Maintain the Maisiliym trust model (users, hardware assignments, disk layout) in the same `NodeProposal` block and test via the toparranged validation (`nix flake check` or the Maisiliym validation job) before downstream operators consume it.
+
+### Build/deploy authority
+- CriomOS consumes that Maisiliym truth through horizon exports (see `Components/CriomOS/nix/mkCrioZones/mkHorizonModule.nix` for the export wiring) and the network modules (`Components/CriomOS/nix/mkCriomOS/network/default.nix`, `Components/CriomOS/nix/mkCriomOS/network/unbound.nix`). Builders read `node.name`, `node.yggAddress`, and `exNodes` from horizon data rather than adding new literals.
+- Update horizon exports before adjusting CriomOS DNS, host tables, or kube provisioning. After the Maisiliym change lands, rerun the CriomOS build/deploy pipeline so unbound, DHCP, and deployment flows regenerate from the fresh node truth.

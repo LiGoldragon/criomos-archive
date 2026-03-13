@@ -23,6 +23,10 @@
 - Nix evaluation tests live in `nix/tests/`.
 - Prefer adding or updating tests alongside module changes, then validate with `nix flake check`.
 
+## Node/Network Truth Guidance
+- `Components/CriomOS/docs/GUIDELINES.md` is the canonical operator reference for node/network behavior. Read the `Operator Node/Network Truth Authority` section and respect the **MUST UPDATE WHEN EDITING REPO** marker before touching network or horizon code.
+- Maisiliym owns node/network truth in `/home/li/git/maisiliym/datom.nix` (`NodeProposal.nodes.*`). CriomOS consumes/builds/deploys the resulting horizon exports from `Components/CriomOS/nix/mkCrioZones/mkHorizonModule.nix`, with network modules such as `Components/CriomOS/nix/mkCriomOS/network/default.nix` and `Components/CriomOS/nix/mkCriomOS/network/unbound.nix` deriving their host data from that truth.
+
 ## Commit & Pull Request Guidelines
 - Commit messages follow a lowercase verb + scoped parentheses style, often nested (example: `fix(emacs(errors(copilot)))`).
 - PRs should include a short intent summary, affected outputs (e.g., `nix/mkCriomOS`), and the exact test commands run.

@@ -11,13 +11,17 @@ let
     concatStringsSep
     concatMap
     attrNames
+    attrValues
+    split
+    head
+    match
     ;
   inherit (lib) mapAttrsToList concatMapStringsSep lowPrio;
-  inherit (horizon) node cluster;
+  inherit (horizon) node cluster exNodes;
   inherit (horizon.node) typeIs criomeDomainName;
 
   tailnetBaseDomain = "tailnet.${cluster.name}.criome";
-  isTailnetNode = builtins.elem node.name [ "ouranos" "prometheus" ];
+  headscaleEnabled = config.services.headscale.enable;
 
   listenIPs = [
     "::1"
@@ -49,6 +53,59 @@ let
     attrNames TLSDNServers
   );
 
+  horizonNodes = [ node ] ++ attrValues exNodes;
+
+  mkFqdn = name: concatStringsSep "." [ name "" ];
+
+  mkRecord = { name, rtype, value }:
+    concatStringsSep " " [
+      mkFqdn name
+      "IN"
+      rtype
+      value
+    ];
+
+  sanitizeIp = ip:
+    if ip == null || ip == "" then
+      null
+    else
+      let
+        cleaned = head (split "/" ip);
+      in
+        if cleaned == "" then null else cleaned;
+
+  recordTypeForIp = ip:
+    if match ".*:.*" ip != null then "AAAA" else "A";
+
+  mkAddressRecord = { name, ip }:
+    let
+      address = sanitizeIp ip;
+    in
+      if address == null then
+        []
+      else
+        [ mkRecord { name = name; rtype = recordTypeForIp address; value = address; } ];
+
+  mkYggRecords = entry:
+    let
+      address = sanitizeIp entry.yggAddress;
+      alias = entry.methods.nixCacheDomain;
+      aliasRecord =
+        if address == null || alias == null || alias == "" then
+          []
+        else
+          [ mkRecord { name = alias; rtype = "AAAA"; value = address; } ];
+    in
+    if address == null then
+      []
+    else
+      [ mkRecord { name = entry.criomeDomainName; rtype = "AAAA"; value = address; } ] ++ aliasRecord;
+
+  mkNodeDnsRecords = entry:
+    mkAddressRecord { name = entry.criomeDomainName; ip = entry.nodeIp; } ++ mkYggRecords entry;
+
+  localDnsRecords = concatMap mkNodeDnsRecords horizonNodes;
+
 in
 {
   services.unbound = {
@@ -60,8 +117,9 @@ in
         do-not-query-localhost = false;
         tls-cert-bundle = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
       };
+      local-data = localDnsRecords;
       forward-zone =
-        (lib.optionals isTailnetNode [
+        (lib.optionals headscaleEnabled [
           {
             # Split-DNS for our headscale tailnet base domain.
             # This lets us keep `tailscale up --accept-dns=false` later.
