@@ -31,7 +31,7 @@ let
     certFile=${lib.escapeShellArg tlsCertPath}
     keyFile=${lib.escapeShellArg tlsKeyPath}
     fqdn=${lib.escapeShellArg ouranosFqdn}
-    primaryIpv4="$(${lib.getExe pkgs.iproute2} route get 1.1.1.1 | ${lib.getExe pkgs.gawk} '/src/ {for (i = 1; i <= NF; i++) if ($i == "src") { print $(i+1); exit }}')"
+    primaryIpv4="$(${lib.getExe' pkgs.iproute2 "ip"} route get 1.1.1.1 | ${lib.getExe' pkgs.gawk "awk"} '/src/ {for (i = 1; i <= NF; i++) if ($i == "src") { print $(i+1); exit }}')"
 
     umask 077
     mkdir -p "$certDir"
