@@ -17,10 +17,9 @@ let
     match
     ;
   inherit (lib) filter mapAttrsToList concatMapStringsSep lowPrio;
-  inherit (horizon) cluster;
+  inherit (horizon) cluster node exNodes;
 
   tailnetBaseDomain = "tailnet.${cluster.name}.criome";
-  nodeCriomeDomainName = concatStringsSep "." [ cluster.name "criome" ];
   headscaleEnabled = config.services.headscale.enable;
 
   listenIPs = [
@@ -71,19 +70,31 @@ let
   recordTypeForIp = ip:
     if match ".*:.*" ip != null then "AAAA" else "A";
 
-  hostEntries = config.networking.hosts or { };
+  horizonNodes = [ node ] ++ attrValues exNodes;
 
-  mkHostRecords = ip: names:
+  mkPrimaryAddress = entry:
     let
-      address = sanitizeIp ip;
-      validNames = lib.filter (name: name != null && name != "") names;
+      yggAddress = sanitizeIp entry.yggAddress;
+      nodeIp = sanitizeIp entry.nodeIp;
+    in
+      if yggAddress != null then yggAddress else nodeIp;
+
+  mkPrimaryRecords = entry:
+    let
+      address = mkPrimaryAddress entry;
+      alias = entry.methods.nixCacheDomain;
+      aliasRecords =
+        if alias == null || alias == "" || address == null then
+          []
+        else
+          [ mkRecord { name = alias; rtype = recordTypeForIp address; value = address; } ];
     in
       if address == null then
         []
       else
-        map (name: mkRecord { name = name; rtype = recordTypeForIp address; value = address; }) validNames;
+        [ mkRecord { name = entry.criomeDomainName; rtype = recordTypeForIp address; value = address; } ] ++ aliasRecords;
 
-  localDnsRecords = concatLists (map (ip: mkHostRecords ip (hostEntries.${ip})) (attrNames hostEntries));
+  localDnsRecords = concatLists (map mkPrimaryRecords horizonNodes);
 
 in
 {
