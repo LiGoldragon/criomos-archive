@@ -55,6 +55,7 @@ in
         + " --parallel 1"
         + " --ctx-size 8192"
         + " --no-warmup"
+        + " --no-mmap"
         + " --no-webui";
 
       Restart = "on-failure";
