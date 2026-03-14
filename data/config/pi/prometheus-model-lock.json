@@ -10,7 +10,7 @@
     "filename": "llama-3.2-1b-instruct-q4_k_m.gguf"
   },
   "reasoning": false,
-  "contextWindow": 4096,
+  "contextWindow": 8192,
   "maxTokens": 2048,
-  "ctxSize": 4096
+  "ctxSize": 8192
 }

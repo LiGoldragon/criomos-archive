@@ -11,7 +11,7 @@
       "id": "llama-3.2-1b-instruct",
       "descriptor": "Llama 3.2 1B Instruct (Prometheus sanity lane)",
       "alias": "prometheus/main-sanity",
-      "contextWindow": 4096,
+      "contextWindow": 8192,
       "maxTokens": 2048,
       "reasoning": false
     }
