@@ -1,16 +1,42 @@
 {
-  "modelId": "llama-3.2-1b-instruct",
-  "canonicalId": "llama-3.2-1b-instruct",
-  "alias": "prometheus-main-sanity",
-  "primaryAlias": "main-sanity",
-  "descriptor": "Llama 3.2 1B Instruct (Prometheus sanity lane)",
-  "artifact": {
-    "url": "https://huggingface.co/hugging-quants/Llama-3.2-1B-Instruct-Q4_K_M-GGUF/resolve/main/llama-3.2-1b-instruct-q4_k_m.gguf",
-    "sha256": "1qrc2p1749qgbxybr5ja6i44rs834w9gskyg7kvsw4jfxhcr83hx",
-    "filename": "llama-3.2-1b-instruct-q4_k_m.gguf"
-  },
-  "reasoning": false,
-  "contextWindow": 8192,
-  "maxTokens": 2048,
-  "ctxSize": 8192
+  "servedModels": [
+    {
+      "modelId": "llama-3.2-1b-instruct",
+      "canonicalId": "llama-3.2-1b-instruct",
+      "alias": "prometheus-main-sanity",
+      "primaryAlias": "main-sanity",
+      "serviceSuffix": "sanity",
+      "descriptor": "Llama 3.2 1B Instruct (Prometheus sanity lane)",
+      "source": {
+        "kind": "fetchurl",
+        "url": "https://huggingface.co/hugging-quants/Llama-3.2-1B-Instruct-Q4_K_M-GGUF/resolve/main/llama-3.2-1b-instruct-q4_k_m.gguf",
+        "sha256": "1qrc2p1749qgbxybr5ja6i44rs834w9gskyg7kvsw4jfxhcr83hx",
+        "filename": "llama-3.2-1b-instruct-q4_k_m.gguf"
+      },
+      "reasoning": false,
+      "contextWindow": 8192,
+      "maxTokens": 2048,
+      "ctxSize": 8192,
+      "port": 11436
+    },
+    {
+      "modelId": "qwen3.5-35b-a3b",
+      "canonicalId": "qwen3.5-35b-a3b",
+      "alias": "prometheus-main-reasoning",
+      "primaryAlias": "main-reasoning",
+      "serviceSuffix": "reasoning",
+      "descriptor": "Qwen 3.5 35B A3B Q8_0 (Prometheus reasoning lane)",
+      "source": {
+        "kind": "fetchurl",
+        "url": "https://huggingface.co/unsloth/Qwen3.5-35B-A3B-GGUF/resolve/main/Qwen3.5-35B-A3B-Q8_0.gguf",
+        "sha256": "3808866c016ab02b4adb26b873f7008a2cdd2c0704a39704050119ab0631db46",
+        "filename": "Qwen3.5-35B-A3B-Q8_0.gguf"
+      },
+      "reasoning": true,
+      "contextWindow": 32768,
+      "maxTokens": 4096,
+      "ctxSize": 32768,
+      "port": 11437
+    }
+  ]
 }
