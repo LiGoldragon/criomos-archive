@@ -243,10 +243,8 @@ let
         ];
 
         ExecStartPre =
-          # Copy local-file models to state directory if needed
-          if source.kind == "local-file"
-          then "${pkgs.coreutils}/bin/cp -f ${source.path} ${runtimeHome}/models/" + source.filename
-          else "/bin/true";
+          # Create state directory if it doesn't exist
+          "${pkgs.coreutils}/bin/mkdir -p ${runtimeHome}/models";
 
         ExecStart =
           "${llamaCppPackage}/bin/llama-server"
