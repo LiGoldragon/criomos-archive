@@ -277,7 +277,7 @@ let
           api_key: ${prometheusLlamaApiKey}
         order: 3
     router_settings:
-      enable_pre_call_checks: true
+      enable_pre_call_checks: false
       model_group_alias:
         llama-3.2-1b-instruct: llama-3.2-1b-instruct
         qwen3.5-35b-a3b: qwen3.5-35b-a3b
