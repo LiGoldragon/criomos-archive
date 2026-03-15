@@ -24,6 +24,12 @@ an evolved version of NixOS, which is used for the bootstrap version.
   deliberately keeps it out of the Intel media-driver set and enables
   `hardware.amdgpu` only when `model == "GMKtec EVO-X2"` to keep the driver
   stack neutral yet correct.
+
+  - Stability experiment: this repo applies a targeted kernel-parameter tweak
+    for GMKtec EVO-X2 (Strix Halo ROCm/KFD) test images only — `amdgpu.cwsr_enable=0`.
+    This is a local experiment to improve ROCm/KFD stability on the Strix Halo
+    and is intentionally gated on `model == "GMKtec EVO-X2"` so it is NOT a
+    global default.
 - Networking: the live image is Ethernet-first; `nix/mkCriomOS/normalize.nix`
   enables NetworkManager for sized nodes so a plugged-in cable is detected
   during the initial boot before other transports are considered.

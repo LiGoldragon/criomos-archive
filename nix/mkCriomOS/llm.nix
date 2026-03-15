@@ -25,35 +25,12 @@ let
 
   prometheusLitellmPort = 11434;
 
-  # Derive runtime user/home preferring users explicitly present on this node
-  # Use repo-local horizon.node.name and horizon.users.<user>.preCriomes to build
-  # a candidate list of users that have preCriome entries for the current node.
-  # Choose the first node-matching user if any exist; otherwise fall back to the
-  # previous horizon/global heuristics, then to config.users, and finally to
-  # a deterministic "nobody" string to avoid nondeterminism during evaluation.
-  runtimeUser =
-    let
-      nodeName = if (horizon != null) && hasAttr "node" horizon then horizon.node.name else null;
-      nodeLocalUsers =
-        if nodeName != null && (horizon != null) && builtins.isAttrs horizon && hasAttr "users" horizon then
-          lib.filterAttrs (u: v: hasAttr nodeName (v.preCriomes or {})) horizon.users
-        else {};
-      nodeLocalNames = builtins.attrNames nodeLocalUsers;
-    in
-    if (length nodeLocalNames) > 0 then builtins.head nodeLocalNames
-    else if (horizon != null) && builtins.isAttrs horizon && hasAttr "users" horizon then
-      # horizon.users may be an attrset keyed by username
-      builtins.head (builtins.attrNames horizon.users)
-    else if (horizon != null) && (builtins.isList (horizon.users or [])) && (builtins.length (horizon.users or []) > 0) then
-      (elemAt (horizon.users or []) 0).name
-    else if builtins.isAttrs config.users && hasAttr "users" config.users && builtins.isAttrs config.users.users then builtins.head (builtins.attrNames config.users.users)
-    else "nobody";
+  # Use a dedicated static system user for the llama runtime. This avoids
+  # depending on any horizon/config user selection and ensures a canonical
+  # persistent state location under /var/lib/llama.
+  runtimeUser = "llama";
+  runtimeHome = "/var/lib/llama";
 
-  # Prefer authoritative home from config.users.users.<name>.home when present,
-  # otherwise construct a conventional /home/<user> path.
-  runtimeHome = if builtins.isAttrs config.users && hasAttr "users" config.users && builtins.isAttrs config.users.users && hasAttr runtimeUser config.users.users
-                then config.users.users.${runtimeUser}.home
-                else "/home/${runtimeUser}";
 
   prometheusApiKey = "sk-no-key-required";
   litellmRouterConfigPath = "/etc/litellm-router.yaml";
@@ -80,7 +57,7 @@ let
             filename = if hasAttr "filename" prometheusLock.artifact then prometheusLock.artifact.filename else null;
           } else {
             kind = "local";
-            path = "${runtimeHome}/.local/share/prometheus-llama/models/DeepSeek-R1-Distill-Llama-70B-Q8_0-00001-of-00002.gguf";
+            path = "/var/lib/llama/models/DeepSeek-R1-Distill-Llama-70B-Q8_0-00001-of-00002.gguf";
             filename = "DeepSeek-R1-Distill-Llama-70B-Q8_0-00001-of-00002.gguf";
           };
           reasoning = if hasAttr "reasoning" prometheusLock then prometheusLock.reasoning else false;
@@ -213,6 +190,20 @@ let
 
 in
 {
+  # Declare the dedicated system user/group for the llama runtime and grant
+  # it access to typical GPU device groups. Kept here in the module's
+  # resulting attribute set so it is applied when this module is used.
+  users.users.llama = {
+    isSystemUser = true;
+    description = "llama runtime user";
+    home = runtimeHome;
+    createHome = false;
+    group = "llama";
+    extraGroups = [ "video" "render" ];
+    password = "*";
+  };
+  users.groups.llama = {};
+
   environment.etc."litellm-router.yaml" = {
     source = litellmRouterFile;
     mode = "0644";
@@ -220,7 +211,24 @@ in
 
   networking.firewall.allowedTCPPorts = [ prometheusLitellmPort ] ++ builtins.map (model: model.port) runtimeModels;
 
-  systemd.services = llamaServices // {
+  # Ensure the llama runtime state directory and models subdirectory are
+  # created declaratively on boot and owned by the dedicated "llama" user.
+  # We use systemd.StateDirectory for services and systemd.tmpfiles to
+  # guarantee /var/lib/llama/models exists for local-model fallbacks.
+  # Leave a composable list-based tmpfiles declaration (do not force it).
+  systemd.tmpfiles.rules = [
+    # Create /var/lib/llama (StateDirectory will normally manage this too
+    # while the unit is active). Ensure models subdir exists persistently.
+    "d /var/lib/llama 0755 llama llama - -"
+    "d /var/lib/llama/models 0755 llama llama - -"
+  ];
+
+  # Inject StateDirectory = "llama" into generated per-model services so
+  # systemd creates/owns /var/lib/llama at runtime for the llama user.
+  # We add the same for the gateway proxy service.
+  systemd.services = lib.mapAttrs (_: svc: svc // {
+    serviceConfig = svc.serviceConfig // { StateDirectory = "llama"; };
+  }) llamaServices // {
     prometheus-litellm = {
       description = "Prometheus LiteLLM gateway";
       wants = [ "network-online.target" ];
@@ -244,6 +252,7 @@ in
 
         Restart = "on-failure";
         RestartSec = 5;
+        StateDirectory = "llama";
       };
 
       wantedBy = [ "multi-user.target" ];

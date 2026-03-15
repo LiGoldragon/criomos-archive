@@ -258,9 +258,13 @@ directly instead of hardcoding the behavior inside a module.
   - `nix build .#crioZones.maisiliym.ouranos.deployManifest --no-link --print-out-paths --refresh`
   - `nix build .#crioZones.maisiliym.prometheus.deployManifest --no-link --print-out-paths --refresh`
   - If an override is required for the Maisiliym source, use only `--override-input maisiliym github:LiGoldragon/maisiliym`.
-- Exact deployment flow:
-  - `execute deploy-manifest --manifest $(nix build .#crioZones.maisiliym.<node>.deployManifest --no-link --print-out-paths --refresh) --node <node>` is the canonical activation shape.
-  - `prometheus`: the generated manifest prefers Yggdrasil transport first. Current Ygg transport target remains `202:68bc:1221:1b13:5397:2a56:4aea:d4a9` while the Maisiliym node truth stays unchanged.
+- Exact deployment flow (canonical local execute form):
+  - Run the exact execute command from the Components/CriomOS directory. The example below is the tested local form that successfully deploys a generated manifest to a node named `prometheus` (here `prometheus` is the node hostname/crio zone name, not a service identity):
+
+    cd Components/CriomOS && cargo run --quiet --manifest-path ../mentci-execute/Cargo.toml --bin execute -- deploy-manifest --manifest $(nix build .#crioZones.maisiliym.<node>.deployManifest --no-link --print-out-paths --refresh) --node <node>
+
+  - Replace `<node>` with the Maisiliym node name (for Prometheus lane builds use `prometheus` as the node/hostname value). The command must be invoked from Components/CriomOS for relative manifest paths to resolve correctly.
+  - The generated manifest prefers Yggdrasil transport first. Current Ygg transport target remains `202:68bc:1221:1b13:5397:2a56:4aea:d4a9` while the Maisiliym node truth stays unchanged.
   - `ouranos`: use `--allow-localhost` only when remote transport fails. Localhost activation is guarded by a mandatory `hostname` check and must abort when `hostname != nodeName`.
   - Temporary fallback: use the current LAN IP for `prometheus` only when the generated manifest is extended with that transport or when the operator performs a separate explicitly documented override.
   - Prefer the project-local `criomos-deployer` agent when exact attr build + manifest deploy + cross-node verification must happen in one bounded lane.

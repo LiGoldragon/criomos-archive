@@ -15,7 +15,11 @@
 - `nix build .#crioZones.maisiliym.prometheus.os --no-link --print-out-paths --refresh` builds the current Prometheus system payload.
 - `nix build .#crioZones.maisiliym.ouranos.deployManifest --no-link --print-out-paths --refresh` builds the Ouranos deployment manifest.
 - `nix build .#crioZones.maisiliym.prometheus.deployManifest --no-link --print-out-paths --refresh` builds the Prometheus deployment manifest.
-- `execute deploy-manifest --manifest $(nix build .#crioZones.maisiliym.<node>.deployManifest --no-link --print-out-paths --refresh) --node <node>` is the canonical activation shape.
+- Run the canonical activation from the Components/CriomOS directory using the tested local execute form:
+
+  cd Components/CriomOS && cargo run --quiet --manifest-path ../mentci-execute/Cargo.toml --bin execute -- deploy-manifest --manifest $(nix build .#crioZones.maisiliym.<node>.deployManifest --no-link --print-out-paths --refresh) --node <node>
+
+  Note: replace `<node>` with the Maisiliym node name (for Prometheus lane work `prometheus` is the node/hostname). The command must be run from Components/CriomOS so relative paths resolve correctly.
 - If an override is required for Maisiliym truth, use only the GitHub flake source form: `--override-input maisiliym github:LiGoldragon/maisiliym`.
 - Temporary transport ladder: the generated manifest prefers Yggdrasil first; `--allow-localhost` is override-only and must succeed through a `hostname == nodeName` guard before any local activation proceeds.
 - `nix develop` remains the entry point when an interactive development shell is needed.

@@ -8,7 +8,8 @@ The Prometheus runtime deploys one llama.cpp-based server per model using genera
 
 ## Build target
 
-Note: runtime systemd User and HOME are derived from repo-local authority (horizon and config.users) by Components/CriomOS/nix/mkCriomOS/llm.nix. The module prefers users that explicitly target the current node (horizon.users entries whose preCriomes include this node); if none match it falls back to broader horizon/global user definitions and finally to the first user defined in config.users.users. No literal "/home/li" or "li" is hardcoded in the module.
+Note: this module now uses a dedicated static system user and state for the llama runtime. The runtime's canonical identity is the system user "llama" and persistent runtime state lives under /var/lib/llama. The state directory is managed declaratively by systemd StateDirectory and systemd tmpfiles rules from this Nix module and therefore should not be manually created on hosts; it is not expected to preexist. The node hostname for Prometheus lanes is "prometheus" (the crio zone name). Generated unit names such as "prometheus-llama-reasoning" encode the node/zone and the runtime role; they are host-scoped unit names and not an alternative canonical service identity (the canonical identity remains the "llama" user).
+
 The exact Nix build target that produces the generated systemd units referenced in this document is:
 
 .#crioZones.maisiliym.prometheus.os
