@@ -108,8 +108,12 @@ let
         }
       ) shards;
 
+      # Get the filename from the first shard in the list
+      firstShard = builtins.head shards;
+      firstShardFilename = firstShard.filename;
+
       # Merge all shards
-      merged = pkgs.runCommand "merged-model-${builtins.head shards.filename}"
+      merged = pkgs.runCommand "merged-model-${firstShardFilename}"
         {
           nativeBuildInputs = [ pkgs.coreutils ];
           allowSubstitutes = true;
