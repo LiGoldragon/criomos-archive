@@ -117,7 +117,7 @@ let
       firstShardFilename = firstShard.filename;
 
       # Sort filenames and get derivations in sorted order
-      sortedFilenames = builtins.sort (<) (builtins.attrNames shardMap);
+      sortedFilenames = builtins.sort (a: b: a < b) (builtins.attrNames shardMap);
       sortedShards = builtins.map (filename: shardMap.${filename}) sortedFilenames;
 
       # Merge all shards
