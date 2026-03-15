@@ -270,11 +270,18 @@ let
           api_base: http://${prometheusLlamaUpstreamHost}:11437/v1
           api_key: ${prometheusLlamaApiKey}
         order: 2
+      - model_name: deepseek-r1-distill-llama-70b
+        litellm_params:
+          model: openai/prometheus-deepseek-r1-distill-llama-70b
+          api_base: http://${prometheusLlamaUpstreamHost}:11438/v1
+          api_key: ${prometheusLlamaApiKey}
+        order: 3
     router_settings:
       enable_pre_call_checks: true
       model_group_alias:
         llama-3.2-1b-instruct: llama-3.2-1b-instruct
         qwen3.5-35b-a3b: qwen3.5-35b-a3b
+        deepseek-r1-distill-llama-70b: deepseek-r1-distill-llama-70b
     litellm_settings:
       drop_params: true
       modify_params: true
