@@ -2,6 +2,7 @@
   lib,
   pkgs,
   config,
+  horizon,
   ...
 }:
 let
@@ -23,7 +24,37 @@ let
   yamlFormat = pkgs.formats.yaml { };
 
   prometheusLitellmPort = 11434;
-  liHome = "/home/li";
+
+  # Derive runtime user/home preferring users explicitly present on this node
+  # Use repo-local horizon.node.name and horizon.users.<user>.preCriomes to build
+  # a candidate list of users that have preCriome entries for the current node.
+  # Choose the first node-matching user if any exist; otherwise fall back to the
+  # previous horizon/global heuristics, then to config.users, and finally to
+  # a deterministic "nobody" string to avoid nondeterminism during evaluation.
+  runtimeUser =
+    let
+      nodeName = if (horizon != null) && hasAttr "node" horizon then horizon.node.name else null;
+      nodeLocalUsers =
+        if nodeName != null && (horizon != null) && builtins.isAttrs horizon && hasAttr "users" horizon then
+          lib.filterAttrs (u: v: hasAttr nodeName (v.preCriomes or {})) horizon.users
+        else {};
+      nodeLocalNames = builtins.attrNames nodeLocalUsers;
+    in
+    if (length nodeLocalNames) > 0 then builtins.head nodeLocalNames
+    else if (horizon != null) && builtins.isAttrs horizon && hasAttr "users" horizon then
+      # horizon.users may be an attrset keyed by username
+      builtins.head (builtins.attrNames horizon.users)
+    else if (horizon != null) && (builtins.isList (horizon.users or [])) && (builtins.length (horizon.users or []) > 0) then
+      (elemAt (horizon.users or []) 0).name
+    else if builtins.isAttrs config.users && hasAttr "users" config.users && builtins.isAttrs config.users.users then builtins.head (builtins.attrNames config.users.users)
+    else "nobody";
+
+  # Prefer authoritative home from config.users.users.<name>.home when present,
+  # otherwise construct a conventional /home/<user> path.
+  runtimeHome = if builtins.isAttrs config.users && hasAttr "users" config.users && builtins.isAttrs config.users.users && hasAttr runtimeUser config.users.users
+                then config.users.users.${runtimeUser}.home
+                else "/home/${runtimeUser}";
+
   prometheusApiKey = "sk-no-key-required";
   litellmRouterConfigPath = "/etc/litellm-router.yaml";
 
@@ -49,7 +80,7 @@ let
             filename = if hasAttr "filename" prometheusLock.artifact then prometheusLock.artifact.filename else null;
           } else {
             kind = "local";
-            path = "${liHome}/.local/share/prometheus-llama/models/DeepSeek-R1-Distill-Llama-70B-Q8_0-00001-of-00002.gguf";
+            path = "${runtimeHome}/.local/share/prometheus-llama/models/DeepSeek-R1-Distill-Llama-70B-Q8_0-00001-of-00002.gguf";
             filename = "DeepSeek-R1-Distill-Llama-70B-Q8_0-00001-of-00002.gguf";
           };
           reasoning = if hasAttr "reasoning" prometheusLock then prometheusLock.reasoning else false;
@@ -148,10 +179,10 @@ let
 
       serviceConfig = {
         Type = "simple";
-        User = "li";
-        WorkingDirectory = liHome;
+        User = runtimeUser;
+        WorkingDirectory = runtimeHome;
         Environment = [
-          "HOME=${liHome}"
+          "HOME=${runtimeHome}"
           # Runtime ROCm gfx enumeration override for gfx1151 (Strix Halo) on current ROCm stack
           "HSA_OVERRIDE_GFX_VERSION=11.5.1"
         ];
@@ -199,10 +230,10 @@ in
 
       serviceConfig = {
         Type = "simple";
-        User = "li";
-        WorkingDirectory = liHome;
+        User = runtimeUser;
+        WorkingDirectory = runtimeHome;
         Environment = [
-          "HOME=${liHome}"
+          "HOME=${runtimeHome}"
         ];
 
         ExecStart =

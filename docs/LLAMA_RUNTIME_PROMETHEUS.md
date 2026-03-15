@@ -7,6 +7,8 @@ Scope
 The Prometheus runtime deploys one llama.cpp-based server per model using generated systemd units produced by Components/CriomOS/nix/mkCriomOS/llm.nix. The runtime binary package is Components/CriomOS/nix/llama-cpp-prometheus.nix.
 
 ## Build target
+
+Note: runtime systemd User and HOME are derived from repo-local authority (horizon and config.users) by Components/CriomOS/nix/mkCriomOS/llm.nix. The module prefers users that explicitly target the current node (horizon.users entries whose preCriomes include this node); if none match it falls back to broader horizon/global user definitions and finally to the first user defined in config.users.users. No literal "/home/li" or "li" is hardcoded in the module.
 The exact Nix build target that produces the generated systemd units referenced in this document is:
 
 .#crioZones.maisiliym.prometheus.os
