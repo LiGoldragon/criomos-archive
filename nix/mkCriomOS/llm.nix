@@ -152,6 +152,8 @@ let
         WorkingDirectory = liHome;
         Environment = [
           "HOME=${liHome}"
+          # Runtime ROCm gfx enumeration override for gfx1151 (Strix Halo) on current ROCm stack
+          "HSA_OVERRIDE_GFX_VERSION=11.5.1"
         ];
 
         ExecStart =
