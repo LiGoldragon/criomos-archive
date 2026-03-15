@@ -19,32 +19,6 @@ let
     ;
   inherit (lib) foldl';
 
-  # Merge multiple GGUF shards into a single file
-  # Takes a list of shard derivations and produces a merged FOD
-  mergeGgufShards = shards:
-    pkgs.runCommand "merged-gguf"
-      {
-        nativeBuildInputs = [ pkgs.coreutils ];
-        allowSubstitutes = true;
-        preferLocalBuild = true;
-      }
-      (
-        let
-          shardNames = builtins.map (s: s.name) shards;
-          shardPaths = builtins.map (s: s.outPath) shards;
-          # Sort shards by their filename to ensure consistent merge order
-          sortedShards = builtins.sort (a: b: a < b) shardPaths;
-          shardFileNames = builtins.map (p: builtins.baseNameOf p) sortedShards;
-        in
-        builtins.concatStringsSep "\n" (
-          builtins.map (shardPath:
-            ''
-              cat ${shardPath} >> $out/merged.gguf
-            ''
-          ) sortedShards
-        )
-      );
-
   litellmProxy = pkgs.callPackage ../litellm-proxy.nix { };
   llamaCppPackage = pkgs.callPackage ../llama-cpp-prometheus.nix { inherit pkgs; };
   yamlFormat = pkgs.formats.yaml { };
@@ -96,51 +70,6 @@ let
 
   servedModelSpecs = if hasAttr "servedModels" prometheusLock then prometheusLock.servedModels else legacyModel;
 
-  # Create a multi-shard model derivation
-  # Uses fetchurl for each shard, then merges them
-  # Nix will reuse existing store paths if content hashes match
-  mkMultiShardModel = shards:
-    let
-      # Create fetchurl derivations for each shard
-      # These are FODs, so Nix will find existing paths with matching hashes
-      fetchedShards = builtins.map (shard:
-        pkgs.fetchurl {
-          url = shard.url;
-          sha256 = shard.sha256;
-        }
-      );
-
-      # Get the filename from the first shard for output naming
-      firstShard = builtins.head shards;
-      firstShardFilename = firstShard.filename;
-
-      # Sort shards by filename for consistent merge order
-      sortedShardPaths = builtins.sort (a: b: 
-        let
-          aName = builtins.elemAt shards (builtins.elemIdx a fetchedShards).name;
-          bName = builtins.elemAt shards (builtins.elemIdx b fetchedShards).name;
-        in
-        aName.filename < bName.filename
-      ) fetchedShards;
-
-      # Merge all shards into a single model
-      merged = pkgs.runCommand "merged-model-${firstShardFilename}"
-        {
-          nativeBuildInputs = [ pkgs.coreutils ];
-          allowSubstitutes = true;
-          preferLocalBuild = true;
-        }
-        ''
-          ${builtins.concatStringsSep "\n" (
-            builtins.map (shardPath:
-              ''
-                cat ${shardPath} >> $out
-              ''
-            ) sortedShardPaths
-          )}
-        '';
-    in merged;
-
   mkRuntimeModel = index: spec:
     let
       source = if hasAttr "source" spec then spec.source else {
@@ -151,17 +80,20 @@ let
       };
       modelPath =
         if source.kind == "multi-shard"
-        then mkMultiShardModel source.shards
+        then builtins.head (builtins.map (shard: pkgs.fetchurl {
+          url = shard.url;
+          sha256 = shard.sha256;
+        }) source.shards)
         else if source.kind == "fetchurl"
         then pkgs.fetchurl {
           url = source.url;
           sha256 = source.sha256;
         }
         else source.path;
-      # For multi-shard models, the merged file is at $out/merged.gguf
+      # For multi-shard models, just use the first shard (llama-server loads all)
       modelPathStr =
         if source.kind == "multi-shard"
-        then "${modelPath}/merged.gguf"
+        then modelPath
         else modelPath;
       canonicalId = if hasAttr "canonicalId" spec then spec.canonicalId else spec.modelId;
       primaryAlias = if hasAttr "primaryAlias" spec then spec.primaryAlias else canonicalId;
@@ -190,7 +122,6 @@ let
         ;
       order = index + 1;
       serviceName = "prometheus-llama-${serviceSuffix}";
-      source = source;
     };
 
   runtimeModels = genList (index: mkRuntimeModel index (elemAt servedModelSpecs index)) (length servedModelSpecs);
@@ -242,15 +173,11 @@ let
           "HSA_OVERRIDE_GFX_VERSION=11.5.1"
         ];
 
-        ExecStartPre =
-          # Create state directory if it doesn't exist
-          "${pkgs.coreutils}/bin/mkdir -p ${runtimeHome}/models";
-
         ExecStart =
           "${llamaCppPackage}/bin/llama-server"
           + " --host ::"
           + " --port ${toString model.port}"
-          + " --model ${runtimeHome}/models/${source.filename}"
+          + " --model ${model.modelPathStr}"
           + " --n-gpu-layers 99"
           + " --alias ${model.alias}"
           + " --api-key ${prometheusApiKey}"
