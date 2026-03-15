@@ -47,7 +47,7 @@
       "descriptor": "DeepSeek R1 Distill Llama 70B (Prometheus main reasoning)",
       "source": {
         "kind": "local-file",
-        "path": "/var/lib/llama/models/DeepSeek-R1-Distill-Llama-70B-Merged.gguf",
+        "path": "/home/li/.local/share/prometheus-llama/models/DeepSeek-R1-Distill-Llama-70B-Merged.gguf",
         "sha256": "sha256-FmnuILaVRF6uUY/GcU+nwKq9XCPsjVHVSBxrMKIB/yI=",
         "filename": "DeepSeek-R1-Distill-Llama-70B-Merged.gguf"
       },
