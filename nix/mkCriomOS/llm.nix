@@ -97,33 +97,48 @@ let
   servedModelSpecs = if hasAttr "servedModels" prometheusLock then prometheusLock.servedModels else legacyModel;
 
   # Create a multi-shard model derivation
-  # Uses FOD pattern - Nix will reuse existing store paths if content hashes match
+  # Uses fetchurl for each shard, then merges them
+  # Nix will reuse existing store paths if content hashes match
   mkMultiShardModel = shards:
     let
-      # Get the first shard for output naming
+      # Create fetchurl derivations for each shard
+      # These are FODs, so Nix will find existing paths with matching hashes
+      fetchedShards = builtins.map (shard:
+        pkgs.fetchurl {
+          url = shard.url;
+          sha256 = shard.sha256;
+        }
+      );
+
+      # Get the filename from the first shard for output naming
       firstShard = builtins.head shards;
       firstShardFilename = firstShard.filename;
 
-      # Create the merged model using builtins.derivation to create a FOD
-      # The output hash is computed from the concatenation of all shards
-      merged = builtins.derivation {
-        name = "merged-model-${firstShardFilename}";
-        system = "x86_64-linux";
-        builder = "/bin/sh";
-        args = [ "-c" (
-          builtins.concatStringsSep "\n" (
-            builtins.map (shard:
+      # Sort shards by filename for consistent merge order
+      sortedShardPaths = builtins.sort (a: b: 
+        let
+          aName = builtins.elemAt shards (builtins.elemIdx a fetchedShards).name;
+          bName = builtins.elemAt shards (builtins.elemIdx b fetchedShards).name;
+        in
+        aName.filename < bName.filename
+      ) fetchedShards;
+
+      # Merge all shards into a single model
+      merged = pkgs.runCommand "merged-model-${firstShardFilename}"
+        {
+          nativeBuildInputs = [ pkgs.coreutils ];
+          allowSubstitutes = true;
+          preferLocalBuild = true;
+        }
+        ''
+          ${builtins.concatStringsSep "\n" (
+            builtins.map (shardPath:
               ''
-                cat ${pkgs.fetchurl { url = "${shard.url}"; sha256 = "${shard.sha256}"; }} >> $out
+                cat ${shardPath} >> $out
               ''
-            ) shards
-          )
-        )];
-        # Fixed-output derivation attributes
-        outputHash = firstShard.sha256;
-        outputHashAlgo = "sha256";
-        outputHashMode = "flat";
-      };
+            ) sortedShardPaths
+          )}
+        '';
     in merged;
 
   mkRuntimeModel = index: spec:
