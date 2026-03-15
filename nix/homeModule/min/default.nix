@@ -249,7 +249,7 @@ let
 
   prometheusLlamaCanonicalModels = [
     {
-      section = "prometheus-main-sanity";
+      section = "prometheus-llama-3.2-1b-instruct";
       file = "llama-3.2-1b-instruct-q4_k_m.gguf";
       alias = "llama-3.2-1b-instruct";
     }
@@ -260,22 +260,20 @@ let
     model_list:
       - model_name: llama-3.2-1b-instruct
         litellm_params:
-          model: openai/prometheus-main-sanity
+          model: openai/prometheus-llama-3.2-1b-instruct
           api_base: http://${prometheusLlamaUpstreamHost}:${toString prometheusLlamaPort}/v1
           api_key: ${prometheusLlamaApiKey}
         order: 1
       - model_name: qwen3.5-35b-a3b
         litellm_params:
-          model: openai/prometheus-main-reasoning
+          model: openai/prometheus-qwen3.5-35b-a3b
           api_base: http://${prometheusLlamaUpstreamHost}:11437/v1
           api_key: ${prometheusLlamaApiKey}
         order: 2
     router_settings:
       enable_pre_call_checks: true
       model_group_alias:
-        main-sanity: llama-3.2-1b-instruct
         llama-3.2-1b-instruct: llama-3.2-1b-instruct
-        main-reasoning: qwen3.5-35b-a3b
         qwen3.5-35b-a3b: qwen3.5-35b-a3b
     litellm_settings:
       drop_params: true
@@ -394,7 +392,7 @@ let
     defaultModel =
       if builtins.hasAttr "defaultModel" prometheusModelCatalog
       then prometheusModelCatalog.defaultModel
-      else (if builtins.length piAgentModelAliases > 0 then builtins.head piAgentModelAliases else "main-deepseek");
+      else (if builtins.length piAgentModelAliases > 0 then builtins.head piAgentModelAliases else "deepseek-r1-distill-llama-70b");
     enabledModels = piAgentEnabledModels;
     hideThinkingBlock = false;
     defaultThinkingLevel = "medium";

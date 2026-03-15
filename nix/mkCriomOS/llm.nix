@@ -19,6 +19,32 @@ let
     ;
   inherit (lib) foldl';
 
+  # Merge multiple GGUF shards into a single file
+  # Takes a list of shard derivations and produces a merged FOD
+  mergeGgufShards = shards:
+    pkgs.runCommand "merged-gguf"
+      {
+        nativeBuildInputs = [ pkgs.coreutils ];
+        allowSubstitutes = true;
+        preferLocalBuild = true;
+      }
+      (
+        let
+          shardNames = builtins.map (s: s.name) shards;
+          shardPaths = builtins.map (s: s.outPath) shards;
+          # Sort shards by their filename to ensure consistent merge order
+          sortedShards = builtins.sort (a: b: a < b) shardPaths;
+          shardFileNames = builtins.map (p: builtins.baseNameOf p) sortedShards;
+        in
+        builtins.concatStringsSep "\n" (
+          builtins.map (shardPath:
+            ''
+              cat ${shardPath} >> $out/merged.gguf
+            ''
+          ) sortedShards
+        )
+      );
+
   litellmProxy = pkgs.callPackage ../litellm-proxy.nix { };
   llamaCppPackage = pkgs.callPackage ../llama-cpp-prometheus.nix { inherit pkgs; };
   yamlFormat = pkgs.formats.yaml { };
@@ -70,6 +96,40 @@ let
 
   servedModelSpecs = if hasAttr "servedModels" prometheusLock then prometheusLock.servedModels else legacyModel;
 
+  # Create a multi-shard model derivation
+  # Fetches all shards and merges them into a single FOD
+  mkMultiShardModel = shards:
+    let
+      # Fetch each shard as a FOD
+      fetchedShards = builtins.map (shard:
+        pkgs.fetchurl {
+          url = shard.url;
+          sha256 = shard.sha256;
+        }
+      ) shards;
+
+      # Merge all shards
+      merged = pkgs.runCommand "merged-model-${builtins.head shards.filename}"
+        {
+          nativeBuildInputs = [ pkgs.coreutils ];
+          allowSubstitutes = true;
+          preferLocalBuild = true;
+        }
+        (
+          let
+            # Sort shards by filename for consistent merge order
+            sortedShards = builtins.sort (a: b: a < b) fetchedShards;
+          in
+          builtins.concatStringsSep "\n" (
+            builtins.map (shardPath:
+              ''
+                cat ${shardPath} >> $out/merged.gguf
+              ''
+            ) sortedShards
+          )
+        );
+    in merged;
+
   mkRuntimeModel = index: spec:
     let
       source = if hasAttr "source" spec then spec.source else {
@@ -79,12 +139,19 @@ let
         filename = if hasAttr "filename" spec.artifact then spec.artifact.filename else null;
       };
       modelPath =
-        if source.kind == "fetchurl"
+        if source.kind == "multi-shard"
+        then mkMultiShardModel source.shards
+        else if source.kind == "fetchurl"
         then pkgs.fetchurl {
           url = source.url;
           sha256 = source.sha256;
         }
         else source.path;
+      # For multi-shard models, the merged file is at $out/merged.gguf
+      modelPathStr =
+        if source.kind == "multi-shard"
+        then "${modelPath}/merged.gguf"
+        else modelPath;
       canonicalId = if hasAttr "canonicalId" spec then spec.canonicalId else spec.modelId;
       primaryAlias = if hasAttr "primaryAlias" spec then spec.primaryAlias else canonicalId;
       serviceSuffix = if hasAttr "serviceSuffix" spec then spec.serviceSuffix else primaryAlias;
@@ -104,7 +171,7 @@ let
         ctxSize
         descriptor
         maxTokens
-        modelPath
+        modelPathStr
         port
         primaryAlias
         reasoning
@@ -168,7 +235,7 @@ let
           "${llamaCppPackage}/bin/llama-server"
           + " --host ::"
           + " --port ${toString model.port}"
-          + " --model ${model.modelPath}"
+          + " --model ${model.modelPathStr}"
           + " --n-gpu-layers 99"
           + " --alias ${model.alias}"
           + " --api-key ${prometheusApiKey}"

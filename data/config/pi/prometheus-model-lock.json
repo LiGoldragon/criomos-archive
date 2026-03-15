@@ -3,14 +3,14 @@
     {
       "modelId": "llama-3.2-1b-instruct",
       "canonicalId": "llama-3.2-1b-instruct",
-      "alias": "prometheus-main-sanity",
-      "primaryAlias": "main-sanity",
-      "serviceSuffix": "sanity",
+      "alias": "prometheus-llama-3.2-1b-instruct",
+      "primaryAlias": "llama-3.2-1b-instruct",
+      "serviceSuffix": "llama-3.2-1b-instruct",
       "descriptor": "Llama 3.2 1B Instruct (Prometheus sanity lane)",
       "source": {
         "kind": "fetchurl",
         "url": "https://huggingface.co/hugging-quants/Llama-3.2-1B-Instruct-Q4_K_M-GGUF/resolve/main/llama-3.2-1b-instruct-q4_k_m.gguf",
-        "sha256": "1qrc2p1749qgbxybr5ja6i44rs834w9gskyg7kvsw4jfxhcr83hx",
+        "sha256": "sha256-1qrc2p1749qgbxybr5ja6i44rs834w9gskyg7kvsw4jfxhcr83hx",
         "filename": "llama-3.2-1b-instruct-q4_k_m.gguf"
       },
       "reasoning": false,
@@ -22,14 +22,14 @@
     {
       "modelId": "qwen3.5-35b-a3b",
       "canonicalId": "qwen3.5-35b-a3b",
-      "alias": "prometheus-main-reasoning",
-      "primaryAlias": "main-reasoning",
-      "serviceSuffix": "reasoning",
-      "descriptor": "Qwen 3.5 35B A3B Q8_0 (Prometheus reasoning lane)",
+      "alias": "prometheus-qwen3.5-35b-a3b",
+      "primaryAlias": "qwen3.5-35b-a3b",
+      "serviceSuffix": "qwen3.5-35b-a3b",
+      "descriptor": "Qwen 3.5 35B A3B Q8_0 (Prometheus coding lane)",
       "source": {
         "kind": "fetchurl",
         "url": "https://huggingface.co/unsloth/Qwen3.5-35B-A3B-GGUF/resolve/main/Qwen3.5-35B-A3B-Q8_0.gguf",
-        "sha256": "3808866c016ab02b4adb26b873f7008a2cdd2c0704a39704050119ab0631db46",
+        "sha256": "sha256-3808866c016ab02b4adb26b873f7008a2cdd2c0704a39704050119ab0631db46",
         "filename": "Qwen3.5-35B-A3B-Q8_0.gguf"
       },
       "reasoning": true,
@@ -37,6 +37,35 @@
       "maxTokens": 4096,
       "ctxSize": 196608,
       "port": 11437
+    },
+    {
+      "modelId": "deepseek-r1-distill-llama-70b",
+      "canonicalId": "deepseek-r1-distill-llama-70b",
+      "alias": "prometheus-deepseek-r1-distill-llama-70b",
+      "primaryAlias": "deepseek-r1-distill-llama-70b",
+      "serviceSuffix": "deepseek-r1-distill-llama-70b",
+      "descriptor": "DeepSeek R1 Distill Llama 70B (Prometheus main reasoning)",
+      "source": {
+        "kind": "multi-shard",
+        "shards": [
+          {
+            "url": "https://huggingface.co/unsloth/DeepSeek-R1-Distill-Llama-70B-GGUF/resolve/main/DeepSeek-R1-Distill-Llama-70B-Q8_0-00001-of-00002.gguf",
+            "sha256": "sha256-q2mbEa0CzwJznepf5fZrZOtRQMvfwRBS68In/bKlmsk=",
+            "filename": "DeepSeek-R1-Distill-Llama-70B-Q8_0-00001-of-00002.gguf"
+          },
+          {
+            "url": "https://huggingface.co/unsloth/DeepSeek-R1-Distill-Llama-70B-GGUF/resolve/main/DeepSeek-R1-Distill-Llama-70B-Q8_0-00002-of-00002.gguf",
+            "sha256": "sha256-JiG4Nwf0vgf0KSRmxPc7iB7NZYt46VmVpmXkzekqtes=",
+            "filename": "DeepSeek-R1-Distill-Llama-70B-Q8_0-00002-of-00002.gguf"
+          }
+        ],
+        "mergedFilename": "DeepSeek-R1-Distill-Llama-70B-Q8_0.gguf"
+      },
+      "reasoning": true,
+      "contextWindow": 131072,
+      "maxTokens": 16384,
+      "ctxSize": 131072,
+      "port": 11438
     }
   ]
 }

@@ -1,6 +1,6 @@
 {
   "defaultProvider": "prometheus",
-  "defaultModel": "main-reasoning",
+  "defaultModel": "deepseek-r1-distill-llama-70b",
   "provider": "prometheus",
   "serviceEndpoints": {
     "canonical": "http://[202:68bc:1221:1b13:5397:2a56:4aea:d4a9]:11434/v1",
@@ -10,27 +10,37 @@
     {
       "id": "llama-3.2-1b-instruct",
       "descriptor": "Llama 3.2 1B Instruct (Prometheus sanity lane)",
-      "alias": "prometheus/main-sanity",
+      "alias": "prometheus/llama-3.2-1b-instruct",
       "contextWindow": 8192,
       "maxTokens": 2048,
       "reasoning": false
     },
     {
       "id": "qwen3.5-35b-a3b",
-      "descriptor": "Qwen 3.5 35B A3B Q8_0 (Prometheus reasoning lane)",
-      "alias": "prometheus/main-reasoning",
+      "descriptor": "Qwen 3.5 35B A3B Q8_0 (Prometheus coding lane)",
+      "alias": "prometheus/qwen3.5-35b-a3b",
       "contextWindow": 196608,
       "maxTokens": 4096,
+      "reasoning": true
+    },
+    {
+      "id": "deepseek-r1-distill-llama-70b",
+      "descriptor": "DeepSeek R1 Distill Llama 70B (Prometheus main reasoning)",
+      "alias": "prometheus/deepseek-r1-distill-llama-70b",
+      "contextWindow": 131072,
+      "maxTokens": 16384,
       "reasoning": true
     }
   ],
   "aliasTargets": {
-    "main-sanity": "llama-3.2-1b-instruct",
-    "main-reasoning": "qwen3.5-35b-a3b"
+    "llama-3.2-1b-instruct": "llama-3.2-1b-instruct",
+    "qwen3.5-35b-a3b": "qwen3.5-35b-a3b",
+    "deepseek-r1-distill-llama-70b": "deepseek-r1-distill-llama-70b"
   },
   "enabledAliases": [
-    "prometheus/main-sanity",
-    "prometheus/main-reasoning"
+    "prometheus/llama-3.2-1b-instruct",
+    "prometheus/qwen3.5-35b-a3b",
+    "prometheus/deepseek-r1-distill-llama-70b"
   ],
   "declaredModelMenu": [
     {
@@ -40,33 +50,15 @@
       "reasoning": false
     },
     {
-      "id": "mistral-7b-instruct-v0.3",
-      "descriptor": "Mistral 7B Instruct v0.3",
-      "sizeClass": "small",
-      "reasoning": false
-    },
-    {
-      "id": "qwen2.5-7b-instruct",
-      "descriptor": "Qwen 2.5 7B Instruct",
-      "sizeClass": "small-plus",
-      "reasoning": false
-    },
-    {
-      "id": "qwen2.5-coder-14b-instruct",
-      "descriptor": "Qwen 2.5 Coder 14B Instruct",
-      "sizeClass": "medium",
-      "reasoning": true
-    },
-    {
-      "id": "deepseek-r1-distill-qwen-32b",
-      "descriptor": "DeepSeek R1 Distill Qwen 32B",
-      "sizeClass": "large",
-      "reasoning": true
-    },
-    {
       "id": "qwen3.5-35b-a3b",
       "descriptor": "Qwen 3.5 35B A3B",
       "sizeClass": "72gb-vram-class",
+      "reasoning": true
+    },
+    {
+      "id": "deepseek-r1-distill-llama-70b",
+      "descriptor": "DeepSeek R1 Distill Llama 70B",
+      "sizeClass": "128gb-vram-class",
       "reasoning": true
     }
   ]
