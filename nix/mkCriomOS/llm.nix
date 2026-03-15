@@ -157,6 +157,16 @@ let
           url = source.url;
           sha256 = source.sha256;
         }
+        else if source.kind == "local-file"
+        then pkgs.runCommand "copy-model-${source.filename}"
+          {
+            nativeBuildInputs = [ pkgs.coreutils ];
+            allowSubstitutes = true;
+            preferLocalBuild = true;
+          }
+          ''
+            cp ${source.path} $out
+          ''
         else source.path;
       # For multi-shard models, the merged file is at $out/merged.gguf
       modelPathStr =
