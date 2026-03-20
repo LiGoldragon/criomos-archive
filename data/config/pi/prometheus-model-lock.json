@@ -37,62 +37,6 @@
       "maxTokens": 4096,
       "ctxSize": 196608,
       "port": 11437
-    },
-    {
-      "modelId": "bartowski/deepseek-r1-distill-llama-70b",
-      "canonicalId": "bartowski/deepseek-r1-distill-llama-70b",
-      "alias": "prometheus-bartowski-deepseek-r1-distill-llama-70b",
-      "primaryAlias": "bartowski-deepseek-r1-distill-llama-70b",
-      "serviceSuffix": "bartowski-deepseek-r1-distill-llama-70b",
-      "descriptor": "DeepSeek R1 Distill Llama 70B bartowski Q8_0 (Prometheus main reasoning - bartowski)",
-      "source": {
-        "kind": "multi-shard",
-        "shards": [
-          {
-            "url": "https://huggingface.co/bartowski/DeepSeek-R1-Distill-Llama-70B-GGUF/resolve/main/DeepSeek-R1-Distill-Llama-70B-Q8_0/DeepSeek-R1-Distill-Llama-70B-Q8_0-00001-of-00002.gguf",
-            "sha256": "sha256-fwz8w7lw3l3f1r6m56x9zkiazr8dng4v",
-            "filename": "DeepSeek-R1-Distill-Llama-70B-Q8_0-00001-of-00002.gguf"
-          },
-          {
-            "url": "https://huggingface.co/bartowski/DeepSeek-R1-Distill-Llama-70B-GGUF/resolve/main/DeepSeek-R1-Distill-Llama-70B-Q8_0/DeepSeek-R1-Distill-Llama-70B-Q8_0-00002-of-00002.gguf",
-            "sha256": "sha256-nyrylajzalmb5paqgpfdpzsap29k7nka",
-            "filename": "DeepSeek-R1-Distill-Llama-70B-Q8_0-00002-of-00002.gguf"
-          }
-        ]
-      },
-      "reasoning": true,
-      "contextWindow": 131072,
-      "maxTokens": 16384,
-      "ctxSize": 131072,
-      "port": 11438
-    },
-    {
-      "modelId": "unsloth/deepseek-r1-distill-llama-70b",
-      "canonicalId": "unsloth/deepseek-r1-distill-llama-70b",
-      "alias": "prometheus-unsloth-deepseek-r1-distill-llama-70b",
-      "primaryAlias": "unsloth-deepseek-r1-distill-llama-70b",
-      "serviceSuffix": "unsloth-deepseek-r1-distill-llama-70b",
-      "descriptor": "DeepSeek R1 Distill Llama 70B unsloth Q8_0 (Prometheus main reasoning - unsloth)",
-      "source": {
-        "kind": "multi-shard",
-        "shards": [
-          {
-            "url": "https://huggingface.co/unsloth/DeepSeek-R1-Distill-Llama-70B-GGUF/resolve/main/DeepSeek-R1-Distill-Llama-70B-Q8_0/DeepSeek-R1-Distill-Llama-70B-Q8_0-00001-of-00002.gguf",
-            "sha256": "sha256-ab699b11ad02cf02739dea5fe5f66b64eb5140cbdfc11052ebc227fdb2a59ac9",
-            "filename": "DeepSeek-R1-Distill-Llama-70B-Q8_0-00001-of-00002.gguf"
-          },
-          {
-            "url": "https://huggingface.co/unsloth/DeepSeek-R1-Distill-Llama-70B-GGUF/resolve/main/DeepSeek-R1-Distill-Llama-70B-Q8_0/DeepSeek-R1-Distill-Llama-70B-Q8_0-00002-of-00002.gguf",
-            "sha256": "sha256-2621b83707f4be07f4292466c4f73b881ecd658b78e95995a665e4cde92ab5eb",
-            "filename": "DeepSeek-R1-Distill-Llama-70B-Q8_0-00002-of-00002.gguf"
-          }
-        ]
-      },
-      "reasoning": true,
-      "contextWindow": 131072,
-      "maxTokens": 16384,
-      "ctxSize": 131072,
-      "port": 11439
     }
   ]
 }
