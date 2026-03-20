@@ -101,6 +101,7 @@ struct NodeProposal {
   linkLocalIps @7 :List(LinkLocalIp);
   nodeIp @8 :OptionalText;
   wireguardPreCriome @9 :OptionalText;
+  nordvpn @10 :Bool;
 }
 
 struct NodePreCriomes {
@@ -215,6 +216,7 @@ struct HorizonNode {
   nbOfBuildCores @16 :UInt16;
   typeIs @17 :NodeTypeFlags;
   methods @18 :HorizonNodeMethods;
+  nordvpn @19 :Bool;
 }
 
 struct NodeTypeFlags {
@@ -238,23 +240,24 @@ struct HorizonNodeMethods {
   hasYggPrecriad @6 :Bool;
   hasSshPrecriad @7 :Bool;
   hasWireguardPrecriad @8 :Bool;
-  hasBasePrecriads @9 :Bool;
-  sshPrecriome @10 :OptionalText;
-  nixPreCriome @11 :OptionalText;
-  nixCacheDomain @12 :OptionalText;
-  nixUrl @13 :OptionalText;
-  behavesAs @14 :BehavesAs;
+  hasNordvpnPrecriad @9 :Bool;
+  hasBasePrecriads @10 :Bool;
+  sshPrecriome @11 :OptionalText;
+  nixPreCriome @12 :OptionalText;
+  nixCacheDomain @13 :OptionalText;
+  nixUrl @14 :OptionalText;
+  behavesAs @15 :BehavesAs;
 
-  builderConfigs @15 :List(BuilderConfig);
-  cacheURLs @16 :List(OptionalText);
-  exNodesSshPreCriomes @17 :List(OptionalText);
-  dispatchersSshPreCriomes @18 :List(OptionalText);
-  adminSshPreCriomes @19 :List(OptionalText);
-  chipIsIntel @20 :Bool;
-  modelIsThinkpad @21 :Bool;
-  useColemak @22 :Bool;
-  computerIs @23 :List(ModelFlag);
-  wireguardUntrustedProxies @24 :List(WireguardProxy);
+  builderConfigs @16 :List(BuilderConfig);
+  cacheURLs @17 :List(OptionalText);
+  exNodesSshPreCriomes @18 :List(OptionalText);
+  dispatchersSshPreCriomes @19 :List(OptionalText);
+  adminSshPreCriomes @20 :List(OptionalText);
+  chipIsIntel @21 :Bool;
+  modelIsThinkpad @22 :Bool;
+  useColemak @23 :Bool;
+  computerIs @24 :List(ModelFlag);
+  wireguardUntrustedProxies @25 :List(WireguardProxy);
 }
 
 struct SizedAtLeast {

@@ -108,6 +108,11 @@ let
         default = null;
       };
 
+      nordvpn = mkOption {
+        type = lib.types.bool;
+        default = false;
+      };
+
     };
   };
 

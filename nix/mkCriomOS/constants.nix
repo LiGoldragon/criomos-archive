@@ -28,6 +28,9 @@ in
 
       interfaceName = "yggTun";
     };
+    nordvpn = {
+      privateKeyFile = "/etc/nordvpn/privateKey";
+    };
   };
 
   network = {
