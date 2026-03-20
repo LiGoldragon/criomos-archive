@@ -37,6 +37,7 @@ in
     ./yggdrasil.nix
     ./tailscale.nix
     ./headscale.nix
+    ./nordvpn.nix
   ];
 
   networking = {
