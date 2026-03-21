@@ -127,7 +127,7 @@ lib.mkIf sizedAtLeast.med {
 
           c.scrolling.smooth = True
           c.scrolling.bar = "never"
-          c.colors.webpage.darkmode.enabled = True
+          c.colors.webpage.darkmode.enabled = ${if config.stylix.polarity == "dark" then "True" else "False"}
           c.fonts.web.size.default = 18
 
           config.set('content.javascript.enabled', False)

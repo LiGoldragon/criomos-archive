@@ -537,7 +537,7 @@ mkIf sizedAtLeast.min {
       settings = {
         shared = { };
         client = {
-          dark_mode = true;
+          dark_mode = config.stylix.polarity == "dark";
         };
         daemon = {
           default_parallel_tasks = 1;
@@ -629,7 +629,7 @@ mkIf sizedAtLeast.min {
       settings = {
         core = {
           modal = true;
-          color-theme = "Lapce Dark";
+          color-theme = if config.stylix.polarity == "dark" then "Lapce Dark" else "Lapce Light";
         };
         editor = {
           font-family = "FiraCode Nerd Font";
