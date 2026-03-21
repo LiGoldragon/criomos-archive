@@ -506,14 +506,19 @@ mkIf sizedAtLeast.min {
       };
     };
 
-    gammastep = {
+    hyprsunset = {
       enable = true;
-      provider = "manual";
-      latitude = 36.7;
-      longitude = -4.4;
-      temperature = {
-        day = 6500;
-        night = 3500;
+      settings = {
+        profile = [
+          {
+            time = "7:00";
+            temperature = 6500;
+          }
+          {
+            time = "20:00";
+            temperature = 3500;
+          }
+        ];
       };
     };
 

@@ -8,9 +8,6 @@ let
   darkScheme = "${pkgs.base16-schemes}/share/themes/gruvbox-dark-hard.yaml";
   lightScheme = "${pkgs.base16-schemes}/share/themes/gruvbox-material-light-hard.yaml";
 
-  /*
-    Parse base16 YAML into a Nix attrset at build time.
-  */
   parseScheme = scheme:
     (lib.importJSON (pkgs.runCommand "base16-to-json" {
       nativeBuildInputs = [ pkgs.yq-go ];
@@ -22,12 +19,61 @@ let
   light = parseScheme lightScheme;
 
   /*
-    Generate OSC escape sequences to live-update all terminal colors.
-    base16 → ANSI 16-color mapping (standard base16-shell order):
-      0=base00  1=base08  2=base0B  3=base0A  4=base0D  5=base0E  6=base0C  7=base05
-      8=base03  9=base08 10=base0B 11=base0A 12=base0D 13=base0E 14=base0C 15=base07
-    OSC 4;N;color sets palette slot N.
-    OSC 10/11/12 set foreground, background, cursor.
+    Generate waybar CSS with base16 @define-color variables.
+    This is written as a real file by darkman, not managed by HM.
+  */
+  mkWaybarCss = c: pkgs.writeText "waybar-style.css" ''
+    @define-color base00 ${c.base00}; @define-color base01 ${c.base01};
+    @define-color base02 ${c.base02}; @define-color base03 ${c.base03};
+    @define-color base04 ${c.base04}; @define-color base05 ${c.base05};
+    @define-color base06 ${c.base06}; @define-color base07 ${c.base07};
+
+    @define-color base08 ${c.base08}; @define-color base09 ${c.base09};
+    @define-color base0A ${c.base0A}; @define-color base0B ${c.base0B};
+    @define-color base0C ${c.base0C}; @define-color base0D ${c.base0D};
+    @define-color base0E ${c.base0E}; @define-color base0F ${c.base0F};
+
+    window#waybar, tooltip {
+        background: alpha(@base00, 0.95);
+        color: @base05;
+    }
+
+    * {
+        font-family: "FiraMono Nerd Font";
+        font-size: 14px;
+    }
+
+    tooltip { border-color: @base0D; }
+    tooltip label { color: @base05; }
+
+    #wireplumber, #pulseaudio, #sndio,
+    #upower, #battery,
+    #network, #user, #clock, #backlight,
+    #cpu, #disk, #idle_inhibitor, #temperature,
+    #mpd, #language, #keyboard-state, #memory,
+    #window, #bluetooth { padding: 0 5px; }
+
+    .modules-left #workspaces button,
+    .modules-center #workspaces button,
+    .modules-right #workspaces button {
+        border-bottom: 3px solid transparent;
+    }
+    .modules-left #workspaces button.focused,
+    .modules-left #workspaces button.active,
+    .modules-center #workspaces button.focused,
+    .modules-center #workspaces button.active,
+    .modules-right #workspaces button.focused,
+    .modules-right #workspaces button.active {
+        border-bottom: 3px solid @base05;
+    }
+  '';
+
+  darkWaybarCss = mkWaybarCss dark;
+  lightWaybarCss = mkWaybarCss light;
+
+  /*
+    OSC escape sequences for terminal color switching.
+    base16 → ANSI mapping (base16-shell order).
   */
   mkOscSequence = c:
     let osc = n: color: ''\033]4;${toString n};${color}\007'';
@@ -41,20 +87,10 @@ let
   strip = color: builtins.substring 1 6 color;
 
   /*
-    The switch script does everything darkman needs for a full theme transition:
-    1. dconf — GTK/Qt apps react immediately
-    2. XDG portal — Firefox, Electron, Flatpak apps react
-    3. OSC sequences — all running terminals change colors
-    4. hyprctl — Hyprland border colors update
-    5. waybar — restart picks up GTK theme change
-    6. emacs — load new theme in running daemon
-    New terminal windows also get correct colors via the zsh hook below.
+    mkApplyScript: darkman calls this on sunrise/sunset.
+    Writes real config files and reloads all running apps.
   */
-  /*
-    mkApplyScript: called by darkman scripts (no darkman set — avoids loop).
-    Applies theme to all running apps that don't follow the XDG portal.
-  */
-  mkApplyScript = { mode, scheme }:
+  mkApplyScript = { mode, scheme, waybarCss }:
     let
       c = parseScheme scheme;
       oscSeq = mkOscSequence c;
@@ -62,10 +98,18 @@ let
       emacsTheme = if mode == "dark" then "modus-vivendi" else "modus-operandi";
     in
     pkgs.writeShellScript "apply-${mode}" ''
-      # GTK via dconf
+      # GTK via dconf (portal-aware apps: Firefox, Electron, ghostty)
       ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'${dconfMode}'"
 
-      # Terminals (OSC escape sequences to all PTYs)
+      # Waybar: write real CSS file, restart
+      mkdir -p "$HOME/.config/waybar"
+      cp -f ${waybarCss} "$HOME/.config/waybar/style.css"
+      chmod 644 "$HOME/.config/waybar/style.css"
+      ${pkgs.procps}/bin/pkill -9 waybar 2>/dev/null || true
+      sleep 0.3
+      ${pkgs.procps}/bin/pgrep -x waybar >/dev/null || { waybar & disown; }
+
+      # Terminals: OSC escape sequences to all PTYs
       SEQ="${oscSeq}"
       for pty in /dev/pts/[0-9]*; do
         printf "$SEQ" > "$pty" 2>/dev/null || true
@@ -75,28 +119,20 @@ let
       ${pkgs.hyprland}/bin/hyprctl keyword general:col.active_border "rgb(${strip c.base0E}) rgb(${strip c.base0D}) 45deg" 2>/dev/null || true
       ${pkgs.hyprland}/bin/hyprctl keyword general:col.inactive_border "rgb(${strip c.base01})" 2>/dev/null || true
 
-      # Waybar
-      ${pkgs.procps}/bin/pkill -9 waybar 2>/dev/null || true
-      sleep 0.5
-      ${pkgs.procps}/bin/pgrep -x waybar >/dev/null || { waybar & disown; }
-
       # Emacs
       ${pkgs.emacs-pgtk}/bin/emacsclient --eval "(load-theme '${emacsTheme} t)" 2>/dev/null || true
 
-      # Persist mode for new shell sessions
+      # Persist mode for new terminals
       mkdir -p "''${XDG_STATE_HOME:-$HOME/.local/state}/darkman"
       echo "${mode}" > "''${XDG_STATE_HOME:-$HOME/.local/state}/darkman/current-mode"
     '';
 
-  applyDark = mkApplyScript { mode = "dark"; scheme = darkScheme; };
-  applyLight = mkApplyScript { mode = "light"; scheme = lightScheme; };
+  applyDark = mkApplyScript { mode = "dark"; scheme = darkScheme; waybarCss = darkWaybarCss; };
+  applyLight = mkApplyScript { mode = "light"; scheme = lightScheme; waybarCss = lightWaybarCss; };
 
   /*
-    Shell hook: new terminals query the current darkman mode and apply
-    the right colors via OSC sequences. This ensures new foot windows
-    match the current theme even though foot.ini is always dark.
+    Shell hook: new terminals get correct colors via OSC on startup.
   */
-  darkOsc = mkOscSequence dark;
   lightOsc = mkOscSequence light;
   terminalInitHook = ''
     __darkman_init_theme() {
@@ -142,7 +178,10 @@ in
       autoEnable = true;
       polarity = "dark";
       base16Scheme = darkScheme;
-      targets.ghostty.enable = false;
+      targets = {
+        ghostty.enable = false;
+        waybar.enable = false;
+      };
       image = pkgs.runCommand "wallpaper.png" {
         nativeBuildInputs = [ pkgs.imagemagick ];
       } ''
