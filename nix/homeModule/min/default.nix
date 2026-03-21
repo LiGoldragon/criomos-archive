@@ -575,7 +575,6 @@ mkIf sizedAtLeast.min {
     ghostty = {
       enable = true;
       settings = {
-        theme = "light:Gruvbox Material Light,dark:Gruvbox";
         font-family = "FiraMono Nerd Font";
         font-size = 14;
         window-decoration = false;

@@ -108,7 +108,7 @@ let
     Writes real config files and reloads every app that doesn't
     follow the XDG portal natively.
   */
-  mkApplyScript = { mode, scheme, waybarCss, gtkSettings }:
+  mkApplyScript = { mode, scheme, waybarCss, gtkSettings, ghosttyTheme }:
     let
       c = parseScheme scheme;
       oscSeq = mkOscSequence c;
@@ -117,7 +117,7 @@ let
       fzfColors = mkFzfColors c;
     in
     pkgs.writeShellScript "apply-${mode}" ''
-      # --- Portal + dconf (Firefox, Electron, ghostty, Qt) ---
+      # --- Portal + dconf (Firefox, Electron, Qt) ---
       ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'${dconfMode}'"
 
       # --- GTK settings files (file manager, launcher, legacy GTK apps) ---
@@ -125,6 +125,14 @@ let
       cp -f ${gtkSettings} "$HOME/.config/gtk-3.0/settings.ini"
       cp -f ${gtkSettings} "$HOME/.config/gtk-4.0/settings.ini"
       chmod 644 "$HOME/.config/gtk-3.0/settings.ini" "$HOME/.config/gtk-4.0/settings.ini"
+
+      # --- Ghostty: replace symlink with real file, set theme ---
+      GHOSTTY_CONF="$HOME/.config/ghostty/config"
+      if [ -e "$GHOSTTY_CONF" ]; then
+        CONTENT=$(cat "$GHOSTTY_CONF" | ${pkgs.gnugrep}/bin/grep -v '^theme = ')
+        rm -f "$GHOSTTY_CONF"
+        printf '%s\ntheme = ${ghosttyTheme}\n' "$CONTENT" > "$GHOSTTY_CONF"
+      fi
 
       # --- Waybar: write CSS, restart ---
       mkdir -p "$HOME/.config/waybar"
@@ -159,10 +167,12 @@ let
   applyDark = mkApplyScript {
     mode = "dark"; scheme = darkScheme;
     waybarCss = darkWaybarCss; gtkSettings = darkGtkSettings;
+    ghosttyTheme = "Gruvbox";
   };
   applyLight = mkApplyScript {
     mode = "light"; scheme = lightScheme;
     waybarCss = lightWaybarCss; gtkSettings = lightGtkSettings;
+    ghosttyTheme = "Gruvbox Material Light";
   };
 
   /*
