@@ -72,10 +72,9 @@ let
       ${pkgs.hyprland}/bin/hyprctl keyword general:col.inactive_border "rgb(${strip c.base01})" 2>/dev/null || true
 
       # Waybar (GTK app — restart to pick up new dconf theme)
-      ${pkgs.procps}/bin/pkill -x waybar 2>/dev/null || true
-      sleep 0.3
-      waybar &
-      disown
+      ${pkgs.procps}/bin/pkill -9 waybar 2>/dev/null || true
+      sleep 0.5
+      ${pkgs.procps}/bin/pgrep -x waybar >/dev/null || { waybar & disown; }
 
       # Emacs
       ${pkgs.emacs-pgtk}/bin/emacsclient --eval "(load-theme '${emacsTheme} t)" 2>/dev/null || true
