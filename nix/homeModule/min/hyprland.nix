@@ -1,6 +1,6 @@
 { pkgs, config, ... }:
 let
-  terminal = "foot";
+  terminal = "ghostty";
   keyboardLauncher = "wofi --show drun";
   lockScreen = "swaylock";
   turnOffScreens = "hyrctl dispatch dpms off";

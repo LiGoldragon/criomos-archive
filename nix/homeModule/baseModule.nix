@@ -139,6 +139,7 @@ in
       autoEnable = true;
       polarity = "dark";
       base16Scheme = darkScheme;
+      targets.ghostty.enable = false;
       image = pkgs.runCommand "wallpaper.png" {
         nativeBuildInputs = [ pkgs.imagemagick ];
       } ''

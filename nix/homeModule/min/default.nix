@@ -563,8 +563,17 @@ mkIf sizedAtLeast.min {
       nix-direnv.enable = isCodeDev;
     };
 
-    foot = {
+    foot.enable = true;
+
+    ghostty = {
       enable = true;
+      settings = {
+        theme = "light:GruvboxLight,dark:Gruvbox";
+        font-family = "FiraMono Nerd Font";
+        font-size = 14;
+        window-decoration = false;
+        gtk-titlebar = false;
+      };
     };
 
     fzf = {
