@@ -1,8 +1,8 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 let
   terminal = "foot";
   keyboardLauncher = "wofi --show drun";
-  lockScreen = "swaylock --color 000000";
+  lockScreen = "swaylock";
   turnOffScreens = "hyrctl dispatch dpms off";
   turnOnScreens = "hyrctl dispatch dpms on";
 
@@ -24,8 +24,9 @@ in
 {
   home.packages = with pkgs; [ hyprnome ];
 
-  # (Todo theme)
-  xdg.configFile."hypr/hyprland.conf".text = with keys; ''
+  xdg.configFile."hypr/hyprland.conf".text = with keys; let
+    colors = config.lib.stylix.colors.withHashtag;
+  in ''
     exec-once=waybar
 
     monitor=,preferred,auto,1
@@ -57,8 +58,8 @@ in
       gaps_in = 3
       gaps_out = 3
       border_size = 3
-      col.active_border = rgb(fa00fa) rgb(ff00ff) 45deg
-      col.inactive_border = rgba(28282899)
+      col.active_border = rgb(${builtins.substring 1 6 colors.base0E}) rgb(${builtins.substring 1 6 colors.base0D}) 45deg
+      col.inactive_border = rgb(${builtins.substring 1 6 colors.base01})
       layout = master
     }
 

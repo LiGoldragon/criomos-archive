@@ -174,11 +174,7 @@ in
 
 { user }:
 let
-  emacsTheme = "'modus-vivendi";
-
-  loadTheme = ''
-    (load-theme ${emacsTheme} t)
-  '';
+  loadTheme = "";
 
   commonPackagesEl = readFile ./packages.el;
   launcherCommonEl = readFile ./selector-common.el;

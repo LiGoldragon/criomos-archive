@@ -102,9 +102,6 @@ let
 
   themeKod =
     ''
-      vim.g.syntax_cmd = 'skip'
-      local base16 = require 'base16'
-      base16(base16.themes['bright'], true)
       command('hi def link NeogitDiffAddHighlight SignColumn')
       command('hi def link NeogitDiffDeleteHighlight SignColumn')
       command('hi def link NeogitDiffContextHighlight SignColumn')

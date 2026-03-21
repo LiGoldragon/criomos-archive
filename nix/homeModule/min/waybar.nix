@@ -1,17 +1,19 @@
 {
   horizon,
+  config,
   ...
 }:
 let
   inherit (horizon.node.methods) behavesAs;
+  colors = config.lib.stylix.colors.withHashtag;
 
-  red = "#CC241D";
-  green = "#98971A";
-  yellow = "#FABD2F";
-  blue = "#458588";
-  magenta = "#B16286";
-  cyan = "#689D6A";
-  orange = "#D65D0E";
+  red = colors.base08;
+  green = colors.base0B;
+  yellow = colors.base0A;
+  blue = colors.base0D;
+  magenta = colors.base0E;
+  cyan = colors.base0C;
+  orange = colors.base09;
 
   # TODO - module for packages
   sysMonitor = "btm";
@@ -51,7 +53,7 @@ in
       clock = {
         calendar = {
           format = {
-            today = "<span color='#98971A'><b>{}</b></span>";
+            today = "<span color='${green}'><b>{}</b></span>";
           };
         };
         format = "  {:%H:%M}";
@@ -144,7 +146,7 @@ in
         tooltip-format = "{time}";
       };
       "hyprland/language" = {
-        format = "<span foreground='#FABD2F'> </span> {}";
+        format = "<span foreground='${yellow}'> </span> {}";
         format-fr = "FR";
         format-en = "US";
       };

@@ -77,18 +77,6 @@ let
 
   fzfBindsString = optionalString (fzfBinds != [ ]) (mkFzfBinds fzfBinds);
 
-  fzfTheme = import ./fzfDark.nix;
-  fzfBase16Map = import ./fzfBase16map.nix;
-
-  mkFzfColor =
-    n: v:
-    let
-      color = fzfTheme.${v};
-    in
-    color;
-
-  fzfColors = builtins.mapAttrs mkFzfColor fzfBase16Map;
-
   waylandQtpass = pkgs.qtpass.override { pass = waylandPass; };
   waylandPass = pkgs.pass.override {
     x11Support = false;
@@ -113,15 +101,6 @@ let
       <cachedir>${mkFcCache}</cachedir>
     </fontconfig>
   '';
-
-  mkFootSrcTheme =
-    themeName:
-    let
-      themeString = readFile (pkgs.foot.src + "/themes/${themeName}");
-    in
-    writeText "foot-theme-${themeName}" themeString;
-
-  footThemeFile = mkFootSrcTheme "derp";
 
   bleedingEdgeGraphicalPackages = [ ];
 
@@ -515,18 +494,13 @@ mkIf sizedAtLeast.min {
   services = {
     dunst = {
       enable = !sizedAtLeast.min;
-      # (TODO theme)
       settings = {
         global = {
           geometry = "300x5-30+50";
           transparency = 10;
-          frame_color = "#eceff1";
-          font = "Fira Code 10";
         };
 
         urgency_normal = {
-          background = "#37474f";
-          foreground = "#eceff1";
           timeout = 10;
         };
       };
@@ -737,11 +711,6 @@ mkIf sizedAtLeast.min {
         systemctl --user daemon-reload 2>/dev/null || true
         rm -f ${homeDir}/.config/litellm-router.yaml
       '';
-    };
-
-    pointerCursor = {
-      package = pkgs.vanilla-dmz;
-      name = "Vanilla-DMZ";
     };
 
     file =
