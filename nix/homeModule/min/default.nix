@@ -570,6 +570,11 @@ mkIf sizedAtLeast.min {
       nix-direnv.enable = isCodeDev;
     };
 
+    ghostty = {
+      enable = true;
+      installVimSyntax = true;
+    };
+
     wezterm = {
       enable = true;
       extraConfig = ''
@@ -728,15 +733,7 @@ mkIf sizedAtLeast.min {
       nordvpnSeed
     ];
 
-    activation = optionalAttrs isOuranosNode {
-      removeLegacyLitellmGateway = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-        export XDG_RUNTIME_DIR="/run/user/$(id -u)"
-        systemctl --user stop litellm-gateway.service 2>/dev/null || true
-        systemctl --user disable litellm-gateway.service 2>/dev/null || true
-        systemctl --user daemon-reload 2>/dev/null || true
-        rm -f ${homeDir}/.config/litellm-router.yaml
-      '';
-    };
+    activation = { };
 
     file =
       {

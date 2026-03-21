@@ -108,7 +108,7 @@ let
     Writes real config files and reloads every app that doesn't
     follow the XDG portal natively.
   */
-  mkApplyScript = { mode, scheme, waybarCss, gtkSettings }:
+  mkApplyScript = { mode, scheme, waybarCss, gtkSettings, ghosttyTheme }:
     let
       c = parseScheme scheme;
       oscSeq = mkOscSequence c;
@@ -125,6 +125,18 @@ let
       cp -f ${gtkSettings} "$HOME/.config/gtk-3.0/settings.ini"
       cp -f ${gtkSettings} "$HOME/.config/gtk-4.0/settings.ini"
       chmod 644 "$HOME/.config/gtk-3.0/settings.ini" "$HOME/.config/gtk-4.0/settings.ini"
+
+      # --- Ghostty config (darkman owns this file) ---
+      mkdir -p "$HOME/.config/ghostty"
+      cat > "$HOME/.config/ghostty/config" << 'GHOSTTY'
+font-family = FiraMono Nerd Font
+font-size = 14
+window-decoration = false
+gtk-titlebar = false
+theme = ${ghosttyTheme}
+background = ${c.base00}
+foreground = ${c.base05}
+GHOSTTY
 
       # --- Waybar: write CSS, restart ---
       mkdir -p "$HOME/.config/waybar"
@@ -159,10 +171,12 @@ let
   applyDark = mkApplyScript {
     mode = "dark"; scheme = darkScheme;
     waybarCss = darkWaybarCss; gtkSettings = darkGtkSettings;
+    ghosttyTheme = "Gruvbox";
   };
   applyLight = mkApplyScript {
     mode = "light"; scheme = lightScheme;
     waybarCss = lightWaybarCss; gtkSettings = lightGtkSettings;
+    ghosttyTheme = "Gruvbox Material Light";
   };
 
   /*
@@ -217,6 +231,7 @@ in
       base16Scheme = darkScheme;
       targets = {
         # Darkman manages these at runtime
+        ghostty.enable = false;
         wezterm.enable = false;
         waybar.enable = false;
         fzf.enable = false;
