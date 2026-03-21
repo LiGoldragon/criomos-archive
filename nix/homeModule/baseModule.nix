@@ -126,12 +126,12 @@ let
       cp -f ${gtkSettings} "$HOME/.config/gtk-4.0/settings.ini"
       chmod 644 "$HOME/.config/gtk-3.0/settings.ini" "$HOME/.config/gtk-4.0/settings.ini"
 
-      # --- Ghostty: replace symlink with real file, set theme ---
+      # --- Ghostty: replace symlink with real file, set theme + bg ---
       GHOSTTY_CONF="$HOME/.config/ghostty/config"
       if [ -e "$GHOSTTY_CONF" ]; then
-        CONTENT=$(cat "$GHOSTTY_CONF" | ${pkgs.gnugrep}/bin/grep -v '^theme = ')
+        CONTENT=$(cat "$GHOSTTY_CONF" | ${pkgs.gnugrep}/bin/grep -vE '^(theme|background|foreground) = ')
         rm -f "$GHOSTTY_CONF"
-        printf '%s\ntheme = ${ghosttyTheme}\n' "$CONTENT" > "$GHOSTTY_CONF"
+        printf '%s\ntheme = ${ghosttyTheme}\nbackground = ${c.base00}\nforeground = ${c.base05}\n' "$CONTENT" > "$GHOSTTY_CONF"
       fi
 
       # --- Waybar: write CSS, restart ---
