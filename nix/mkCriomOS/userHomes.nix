@@ -9,13 +9,9 @@ let
   inherit (builtins) mapAttrs;
   inherit (world) pkdjz;
 
-  profile = {
-    dark = false;
-  };
-
   mkUserConfig = name: user: {
     _module.args = {
-      inherit user profile;
+      inherit user;
     };
   };
 

@@ -4,7 +4,6 @@
   pkgs,
   user,
   config,
-  profile,
   horizon,
   ...
 }:
@@ -21,7 +20,6 @@ let
     isMultimediaDev
     ;
   inherit (user) size;
-  inherit (profile) dark;
   inherit (pkgs) writeText;
   inherit (horizon.node.machine) model;
 

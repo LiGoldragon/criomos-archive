@@ -26,9 +26,8 @@
   ```
 - Build a home profile:
   ```
-  nix build .#crioZones.maisiliym.<node>.hom.<user>.<profile> --no-link --print-out-paths
+  nix build .#crioZones.maisiliym.<node>.home.<user> --no-link --print-out-paths
   ```
-  Profiles: `light`, `dark`.
 - Test with a local Maisiliym override (not for production):
   ```
   nix build .#crioZones.maisiliym.<node>.os --override-input maisiliym path:/home/li/git/maisiliym --no-link --print-out-paths

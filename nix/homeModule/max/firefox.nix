@@ -1,4 +1,4 @@
-{ pkgs, darkOrLight, ... }:
+{ pkgs, ... }:
 let
 
 in

@@ -128,50 +128,32 @@ let
       horizon = crioZone;
       litellmProxy = pkgs.callPackage ./nix/litellm-proxy.nix { };
 
-      userProfiles = {
-        light = {
-          dark = false;
-        };
-        dark = {
-          dark = true;
-        };
-      };
-
-      mkUserHomes =
+      mkUserHome =
         userName: user:
         let
           inherit (world) pkdjz;
-
-          mkProfileHome =
-            profileName: profile:
-            let
-              modules = homeModules;
-              extraSpecialArgs = {
-                inherit
-                  criomos-lib
-                  pkdjz
-                  world
-                  horizon
-                  user
-                  profile
-                  litellmProxy
-                  ;
-              };
-              evalHomeManager = inputs.home-manager.lib.homeManagerConfiguration;
-              evaluation = evalHomeManager { inherit modules extraSpecialArgs pkgs; };
-            in
-            evaluation.config.home.activationPackage;
-
+          modules = homeModules;
+          extraSpecialArgs = {
+            inherit
+              criomos-lib
+              pkdjz
+              world
+              horizon
+              user
+              litellmProxy
+              ;
+          };
+          evalHomeManager = inputs.home-manager.lib.homeManagerConfiguration;
+          evaluation = evalHomeManager { inherit modules extraSpecialArgs pkgs; };
         in
-        mapAttrs mkProfileHome userProfiles;
+        evaluation.config.home.activationPackage;
 
       mkUserEmacs =
         userName: user:
         let
           inherit (world.pkdjz) mkEmacs;
-          mkProfileEmacs = profileName: profile: mkEmacs { inherit user profile; };
         in
-        mapAttrs mkProfileEmacs userProfiles;
+        mkEmacs { inherit user; };
 
       commonArgs = {
         inherit
@@ -189,7 +171,7 @@ let
     {
       os = mkCriomOS ({ _withUsers = false; } // commonArgs);
       fullOs = mkCriomOS ({ _withUsers = true; } // commonArgs);
-      hom = mapAttrs mkUserHomes users;
+      home = mapAttrs mkUserHome users;
       emacs = mapAttrs mkUserEmacs users;
       deployManifest = mkDeployManifest horizon.cluster.name horizon.node.name horizon.node;
     };

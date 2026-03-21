@@ -172,9 +172,9 @@ let
 
 in
 
-{ user, profile }:
+{ user }:
 let
-  emacsTheme = if profile.dark then "'modus-vivendi" else "'modus-operandi";
+  emacsTheme = "'modus-vivendi";
 
   loadTheme = ''
     (load-theme ${emacsTheme} t)

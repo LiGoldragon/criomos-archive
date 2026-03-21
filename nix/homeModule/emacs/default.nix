@@ -3,12 +3,11 @@
   pkdjz,
   user,
   crioZone,
-  profile,
   ...
 }:
 let
   inherit (pkdjz) mkEmacs;
-  package = mkEmacs { inherit user profile; };
+  package = mkEmacs { inherit user; };
 
   baseDependencies = with pkgs; [
     nil

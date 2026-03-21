@@ -2,7 +2,6 @@
   lib,
   pkgs,
   user,
-  profile,
   config,
   ...
 }:
@@ -10,7 +9,6 @@ let
   inherit (builtins) readFile toString;
   inherit (lib) mkIf optionalString;
   inherit (user.methods) useColemak sizedAtLeast;
-  inherit (profile) dark;
 
   badDomains = [
     "www.reddit.com"
@@ -129,7 +127,7 @@ lib.mkIf sizedAtLeast.med {
 
           c.scrolling.smooth = True
           c.scrolling.bar = "never"
-          c.colors.webpage.darkmode.enabled = ${if dark then "True" else "False"}
+          c.colors.webpage.darkmode.enabled = True
           c.fonts.web.size.default = 18
 
           config.set('content.javascript.enabled', False)

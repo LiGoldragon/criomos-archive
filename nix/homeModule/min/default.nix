@@ -6,7 +6,6 @@
   user,
   horizon,
   config,
-  profile,
   world,
   litellmProxy,
   # Todo(data)
@@ -33,7 +32,6 @@ let
     isMultimediaDev
     ;
   inherit (user) githubId name methods;
-  inherit (profile) dark;
   inherit (pkgs) writeText;
 
   homeDir = config.home.homeDirectory;
@@ -79,7 +77,7 @@ let
 
   fzfBindsString = optionalString (fzfBinds != [ ]) (mkFzfBinds fzfBinds);
 
-  fzfTheme = if dark then import ./fzfDark.nix else import ./fzfLight.nix;
+  fzfTheme = import ./fzfDark.nix;
   fzfBase16Map = import ./fzfBase16map.nix;
 
   mkFzfColor =
@@ -123,12 +121,7 @@ let
     in
     writeText "foot-theme-${themeName}" themeString;
 
-  footThemeFile =
-    let
-      darkTheme = mkFootSrcTheme "derp";
-      lightTheme = mkFootSrcTheme "selenized-white";
-    in
-    if dark then darkTheme else lightTheme;
+  footThemeFile = mkFootSrcTheme "derp";
 
   bleedingEdgeGraphicalPackages = [ ];
 
@@ -570,7 +563,7 @@ mkIf sizedAtLeast.min {
       settings = {
         shared = { };
         client = {
-          dark_mode = dark;
+          dark_mode = true;
         };
         daemon = {
           default_parallel_tasks = 1;
@@ -587,7 +580,6 @@ mkIf sizedAtLeast.min {
     bat = {
       enable = true;
       config = {
-        theme = "gruvbox-${if dark then "dark" else "light"}";
         pager = "less -FR";
       };
     };
@@ -599,17 +591,10 @@ mkIf sizedAtLeast.min {
 
     foot = {
       enable = true;
-      settings = {
-        main = {
-          include = toString footThemeFile;
-          font = "${terminalFontFamily}:size=14";
-        };
-      };
     };
 
     fzf = {
       enable = true;
-      colors = fzfColors;
       defaultCommand = "fd --type f";
       defaultOptions = [ fzfBindsString ];
     };
@@ -670,7 +655,7 @@ mkIf sizedAtLeast.min {
       settings = {
         core = {
           modal = true;
-          color-theme = if dark then "Lapce Dark" else "Lapce Light";
+          color-theme = "Lapce Dark";
         };
         editor = {
           font-family = "FiraCode Nerd Font";
@@ -691,13 +676,7 @@ mkIf sizedAtLeast.min {
       package = pkgs.zed-editor;
       extraPackages = with pkgs; [ ];
       userKeymaps = optionalAttrs useColemak colemakZedKeys;
-      userSettings =
-        let
-          darkTheme = "base16-bright";
-          lightTheme = "base16-selenized-white";
-        in
-        {
-          theme = if dark then darkTheme else lightTheme;
+      userSettings = {
           vim_mode = true;
         };
       extensions = [ ];
@@ -767,11 +746,6 @@ mkIf sizedAtLeast.min {
 
     file =
       {
-        ".config/gtk-3.0/settings.ini".text = ''
-          [Settings]
-          gtk-application-prefer-dark-theme=${if dark then "1" else "0"}
-        '';
-
         ".config/IJHack/QtPass.conf".text = ''
           [General]
           autoclearSeconds=20

@@ -4,7 +4,6 @@
   pkdjz,
   user,
   config,
-  profile,
   horizon,
   ...
 }:
@@ -23,7 +22,6 @@ let
     ;
   inherit (user.methods) isCodeDev sizedAtLeast useColemak;
   inherit (horizon) node;
-  inherit (profile) dark;
   inherit (pkgs) parinfer-rust writeText;
   inherit (pkdjz) vimPloginz;
 
@@ -103,15 +101,10 @@ let
   ];
 
   themeKod =
-    let
-      lightTheme = "google-light";
-      darkTheme = "bright";
-      theme = if dark then darkTheme else lightTheme;
-    in
     ''
       vim.g.syntax_cmd = 'skip'
       local base16 = require 'base16'
-      base16(base16.themes['${theme}'], true)
+      base16(base16.themes['bright'], true)
       command('hi def link NeogitDiffAddHighlight SignColumn')
       command('hi def link NeogitDiffDeleteHighlight SignColumn')
       command('hi def link NeogitDiffContextHighlight SignColumn')
