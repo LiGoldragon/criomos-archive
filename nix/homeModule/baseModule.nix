@@ -20,7 +20,7 @@ let
 
   /*
     Generate waybar CSS with base16 @define-color variables.
-    This is written as a real file by darkman, not managed by HM.
+    Written as a real file by darkman — not managed by home-manager.
   */
   mkWaybarCss = c: pkgs.writeText "waybar-style.css" ''
     @define-color base00 ${c.base00}; @define-color base01 ${c.base01};
@@ -37,12 +37,10 @@ let
         background: alpha(@base00, 0.95);
         color: @base05;
     }
-
     * {
         font-family: "FiraMono Nerd Font";
         font-size: 14px;
     }
-
     tooltip { border-color: @base0D; }
     tooltip label { color: @base05; }
 
@@ -72,8 +70,27 @@ let
   lightWaybarCss = mkWaybarCss light;
 
   /*
+    Generate GTK settings.ini for dark/light.
+    Written to ~/.config/gtk-3.0/ and gtk-4.0/ by darkman.
+  */
+  mkGtkSettings = { isDark }: pkgs.writeText "gtk-settings.ini" ''
+    [Settings]
+    gtk-application-prefer-dark-theme=${if isDark then "1" else "0"}
+  '';
+
+  darkGtkSettings = mkGtkSettings { isDark = true; };
+  lightGtkSettings = mkGtkSettings { isDark = false; };
+
+  /*
+    Generate fzf color string from base16 palette.
+  */
+  mkFzfColors = c:
+    "--color=bg:${c.base00},bg+:${c.base01},fg:${c.base04},fg+:${c.base06}" +
+    ",hl:${c.base0D},hl+:${c.base0D},info:${c.base0A},marker:${c.base0C}" +
+    ",prompt:${c.base0A},spinner:${c.base0C},pointer:${c.base0C},header:${c.base0D}";
+
+  /*
     OSC escape sequences for terminal color switching.
-    base16 → ANSI mapping (base16-shell order).
   */
   mkOscSequence = c:
     let osc = n: color: ''\033]4;${toString n};${color}\007'';
@@ -88,20 +105,28 @@ let
 
   /*
     mkApplyScript: darkman calls this on sunrise/sunset.
-    Writes real config files and reloads all running apps.
+    Writes real config files and reloads every app that doesn't
+    follow the XDG portal natively.
   */
-  mkApplyScript = { mode, scheme, waybarCss }:
+  mkApplyScript = { mode, scheme, waybarCss, gtkSettings }:
     let
       c = parseScheme scheme;
       oscSeq = mkOscSequence c;
       dconfMode = if mode == "dark" then "prefer-dark" else "prefer-light";
       emacsTheme = if mode == "dark" then "modus-vivendi" else "modus-operandi";
+      fzfColors = mkFzfColors c;
     in
     pkgs.writeShellScript "apply-${mode}" ''
-      # GTK via dconf (portal-aware apps: Firefox, Electron, ghostty)
+      # --- Portal + dconf (Firefox, Electron, ghostty, Qt) ---
       ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'${dconfMode}'"
 
-      # Waybar: write real CSS file, restart
+      # --- GTK settings files (file manager, launcher, legacy GTK apps) ---
+      mkdir -p "$HOME/.config/gtk-3.0" "$HOME/.config/gtk-4.0"
+      cp -f ${gtkSettings} "$HOME/.config/gtk-3.0/settings.ini"
+      cp -f ${gtkSettings} "$HOME/.config/gtk-4.0/settings.ini"
+      chmod 644 "$HOME/.config/gtk-3.0/settings.ini" "$HOME/.config/gtk-4.0/settings.ini"
+
+      # --- Waybar: write CSS, restart ---
       mkdir -p "$HOME/.config/waybar"
       cp -f ${waybarCss} "$HOME/.config/waybar/style.css"
       chmod 644 "$HOME/.config/waybar/style.css"
@@ -109,38 +134,50 @@ let
       sleep 0.3
       ${pkgs.procps}/bin/pgrep -x waybar >/dev/null || { waybar & disown; }
 
-      # Terminals: OSC escape sequences to all PTYs
+      # --- Terminals: OSC sequences to all PTYs ---
       SEQ="${oscSeq}"
       for pty in /dev/pts/[0-9]*; do
         printf "$SEQ" > "$pty" 2>/dev/null || true
       done
 
-      # Hyprland borders
+      # --- Hyprland borders ---
       ${pkgs.hyprland}/bin/hyprctl keyword general:col.active_border "rgb(${strip c.base0E}) rgb(${strip c.base0D}) 45deg" 2>/dev/null || true
       ${pkgs.hyprland}/bin/hyprctl keyword general:col.inactive_border "rgb(${strip c.base01})" 2>/dev/null || true
 
-      # Emacs
+      # --- Emacs ---
       ${pkgs.emacs-pgtk}/bin/emacsclient --eval "(load-theme '${emacsTheme} t)" 2>/dev/null || true
 
-      # Persist mode for new terminals
+      # --- fzf colors (sourced by new shells) ---
       mkdir -p "''${XDG_STATE_HOME:-$HOME/.local/state}/darkman"
+      echo "export FZF_DEFAULT_OPTS=\"\$FZF_DEFAULT_OPTS ${fzfColors}\"" \
+        > "''${XDG_STATE_HOME:-$HOME/.local/state}/darkman/fzf-theme.sh"
+
+      # --- Persist mode ---
       echo "${mode}" > "''${XDG_STATE_HOME:-$HOME/.local/state}/darkman/current-mode"
     '';
 
-  applyDark = mkApplyScript { mode = "dark"; scheme = darkScheme; waybarCss = darkWaybarCss; };
-  applyLight = mkApplyScript { mode = "light"; scheme = lightScheme; waybarCss = lightWaybarCss; };
+  applyDark = mkApplyScript {
+    mode = "dark"; scheme = darkScheme;
+    waybarCss = darkWaybarCss; gtkSettings = darkGtkSettings;
+  };
+  applyLight = mkApplyScript {
+    mode = "light"; scheme = lightScheme;
+    waybarCss = lightWaybarCss; gtkSettings = lightGtkSettings;
+  };
 
   /*
-    Shell hook: new terminals get correct colors via OSC on startup.
+    Shell hook: new terminals get correct colors + fzf theme.
   */
   lightOsc = mkOscSequence light;
   terminalInitHook = ''
     __darkman_init_theme() {
+      local state="''${XDG_STATE_HOME:-$HOME/.local/state}/darkman"
       local mode
-      mode=$(cat "''${XDG_STATE_HOME:-$HOME/.local/state}/darkman/current-mode" 2>/dev/null) || return
+      mode=$(cat "$state/current-mode" 2>/dev/null) || return
       if [ "$mode" = "light" ]; then
         printf "${lightOsc}"
       fi
+      [ -f "$state/fzf-theme.sh" ] && source "$state/fzf-theme.sh"
     }
     __darkman_init_theme
   '';
@@ -179,8 +216,11 @@ in
       polarity = "dark";
       base16Scheme = darkScheme;
       targets = {
+        # Darkman manages these at runtime
         ghostty.enable = false;
         waybar.enable = false;
+        fzf.enable = false;
+        gtk.enable = false;
       };
       image = pkgs.runCommand "wallpaper.png" {
         nativeBuildInputs = [ pkgs.imagemagick ];
