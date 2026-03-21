@@ -6,7 +6,7 @@
 }:
 let
   darkScheme = "${pkgs.base16-schemes}/share/themes/gruvbox-dark-hard.yaml";
-  lightScheme = "${pkgs.base16-schemes}/share/themes/gruvbox-light-hard.yaml";
+  lightScheme = "${pkgs.base16-schemes}/share/themes/gruvbox-material-light-hard.yaml";
 
   /*
     Parse base16 YAML into a Nix attrset at build time.
