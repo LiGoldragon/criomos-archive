@@ -2,3 +2,4 @@
 .aider*
 asklepios.qcow2
 *.qcow2
+target/

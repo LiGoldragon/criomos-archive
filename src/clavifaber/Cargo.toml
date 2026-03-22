@@ -1,0 +1,19 @@
+[package]
+name = "clavifaber"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+der = { version = "0.7", features = ["alloc", "derive", "oid", "pem"] }
+x509-cert = { version = "0.2", features = ["pem"] }
+spki = { version = "0.7", features = ["alloc", "pem"] }
+p256 = { version = "0.13", features = ["ecdsa", "pem"] }
+ed25519-dalek = { version = "2", features = ["rand_core"] }
+ssh-key = { version = "0.6", features = ["ed25519"] }
+pem-rfc7468 = { version = "0.7", features = ["alloc"] }
+base64ct = { version = "1", features = ["alloc"] }
+rand = "0.8"
+sha2 = "0.10"
+hex = "0.4"
+const-oid = "0.9"
