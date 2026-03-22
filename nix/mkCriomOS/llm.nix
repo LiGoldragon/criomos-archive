@@ -7,11 +7,14 @@
 }:
 let
   inherit (builtins)
+    concatStringsSep
     elemAt
     genList
     hasAttr
+    head
     length
     listToAttrs
+    map
     pathExists
     readFile
     toString
@@ -78,12 +81,21 @@ let
         sha256 = spec.artifact.sha256;
         filename = if hasAttr "filename" spec.artifact then spec.artifact.filename else null;
       };
+      # Multi-shard: symlink all shards into one directory so llama-server
+      # can locate sibling shards by naming convention.
       modelPath =
         if source.kind == "multi-shard"
-        then builtins.head (builtins.map (shard: pkgs.fetchurl {
-          url = shard.url;
-          sha256 = shard.sha256;
-        }) source.shards)
+        then
+          let
+            fetched = map (shard: {
+              drv = pkgs.fetchurl { url = shard.url; sha256 = shard.sha256; };
+              inherit (shard) filename;
+            }) source.shards;
+            modelDir = pkgs.runCommand "model-shards-${spec.modelId}" {} (
+              "mkdir -p $out\n"
+              + concatStringsSep "\n" (map (s: "ln -s ${s.drv} $out/${s.filename}") fetched)
+            );
+          in "${modelDir}/${(head source.shards).filename}"
         else if source.kind == "fetchurl"
         then pkgs.fetchurl {
           url = source.url;
@@ -100,11 +112,7 @@ let
             cp ${source.path} $out
           ''
         else source.path;
-      # For multi-shard models, just use the first shard (llama-server loads all)
-      modelPathStr =
-        if source.kind == "multi-shard"
-        then modelPath
-        else modelPath;
+      modelPathStr = modelPath;
       canonicalId = if hasAttr "canonicalId" spec then spec.canonicalId else spec.modelId;
       primaryAlias = if hasAttr "primaryAlias" spec then spec.primaryAlias else canonicalId;
       serviceSuffix = if hasAttr "serviceSuffix" spec then spec.serviceSuffix else primaryAlias;

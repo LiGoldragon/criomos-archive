@@ -236,9 +236,9 @@ let
           api_base: http://${prometheusLlamaUpstreamHost}:${toString prometheusLlamaPort}/v1
           api_key: ${prometheusLlamaApiKey}
         order: 1
-      - model_name: qwen3.5-35b-a3b
+      - model_name: nemotron-3-super-120b-a12b
         litellm_params:
-          model: openai/prometheus-qwen3.5-35b-a3b
+          model: openai/prometheus-nemotron-3-super-120b-a12b
           api_base: http://${prometheusLlamaUpstreamHost}:11437/v1
           api_key: ${prometheusLlamaApiKey}
         order: 2
@@ -246,7 +246,7 @@ let
       enable_pre_call_checks: false
       model_group_alias:
         llama-3.2-1b-instruct: llama-3.2-1b-instruct
-        qwen3.5-35b-a3b: qwen3.5-35b-a3b
+        nemotron-3-super-120b-a12b: nemotron-3-super-120b-a12b
     litellm_settings:
       drop_params: true
       modify_params: true

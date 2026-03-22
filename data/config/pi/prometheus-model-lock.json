@@ -20,22 +20,36 @@
       "port": 11436
     },
     {
-      "modelId": "qwen3.5-35b-a3b",
-      "canonicalId": "qwen3.5-35b-a3b",
-      "alias": "prometheus-qwen3.5-35b-a3b",
-      "primaryAlias": "qwen3.5-35b-a3b",
-      "serviceSuffix": "qwen3.5-35b-a3b",
-      "descriptor": "Qwen 3.5 35B A3B Q8_0 (Prometheus coding lane)",
+      "modelId": "nemotron-3-super-120b-a12b",
+      "canonicalId": "nemotron-3-super-120b-a12b",
+      "alias": "prometheus-nemotron-3-super-120b-a12b",
+      "primaryAlias": "nemotron-3-super-120b-a12b",
+      "serviceSuffix": "nemotron-3-super-120b-a12b",
+      "descriptor": "NVIDIA Nemotron 3 Super 120B-A12B UD-Q4_K_M (Prometheus reasoning lane)",
       "source": {
-        "kind": "fetchurl",
-        "url": "https://huggingface.co/unsloth/Qwen3.5-35B-A3B-GGUF/resolve/main/Qwen3.5-35B-A3B-Q8_0.gguf",
-        "sha256": "sha256-OAiGbAFqsCtK2ya4c/cAiizdLAcEo5cEBQEZqwYx20Y=",
-        "filename": "Qwen3.5-35B-A3B-Q8_0.gguf"
+        "kind": "multi-shard",
+        "shards": [
+          {
+            "url": "https://huggingface.co/unsloth/NVIDIA-Nemotron-3-Super-120B-A12B-GGUF/resolve/main/UD-Q4_K_M/NVIDIA-Nemotron-3-Super-120B-A12B-UD-Q4_K_M-00001-of-00003.gguf",
+            "sha256": "sha256-8iCD62sVrLUpBTCKsIPosMw4iXAFzEXoiBq9FkWAqsI=",
+            "filename": "NVIDIA-Nemotron-3-Super-120B-A12B-UD-Q4_K_M-00001-of-00003.gguf"
+          },
+          {
+            "url": "https://huggingface.co/unsloth/NVIDIA-Nemotron-3-Super-120B-A12B-GGUF/resolve/main/UD-Q4_K_M/NVIDIA-Nemotron-3-Super-120B-A12B-UD-Q4_K_M-00002-of-00003.gguf",
+            "sha256": "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA0=",
+            "filename": "NVIDIA-Nemotron-3-Super-120B-A12B-UD-Q4_K_M-00002-of-00003.gguf"
+          },
+          {
+            "url": "https://huggingface.co/unsloth/NVIDIA-Nemotron-3-Super-120B-A12B-GGUF/resolve/main/UD-Q4_K_M/NVIDIA-Nemotron-3-Super-120B-A12B-UD-Q4_K_M-00003-of-00003.gguf",
+            "sha256": "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA0=",
+            "filename": "NVIDIA-Nemotron-3-Super-120B-A12B-UD-Q4_K_M-00003-of-00003.gguf"
+          }
+        ]
       },
       "reasoning": true,
-      "contextWindow": 196608,
+      "contextWindow": 131072,
       "maxTokens": 4096,
-      "ctxSize": 196608,
+      "ctxSize": 8192,
       "port": 11437
     }
   ]

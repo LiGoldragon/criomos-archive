@@ -1,10 +1,10 @@
 {
   "defaultProvider": "prometheus",
-  "defaultModel": "qwen3.5-35b-a3b",
+  "defaultModel": "nemotron-3-super-120b-a12b",
   "provider": "prometheus",
   "serviceEndpoints": {
-    "canonical": "http://[202:68bc:1221:1b13:5397:2a56:4aea:d4a9]:11434/v1",
-    "backup": "http://[202:68bc:1221:1b13:5397:2a56:4aea:d4a9]:11437/v1"
+    "canonical": "http://[200:ca41:6b12:fba:d7bc:cfc6:4aaa:165f]:11434/v1",
+    "backup": "http://[200:ca41:6b12:fba:d7bc:cfc6:4aaa:165f]:11437/v1"
   },
   "models": [
     {
@@ -16,10 +16,10 @@
       "reasoning": false
     },
     {
-      "id": "qwen3.5-35b-a3b",
-      "descriptor": "Qwen 3.5 35B A3B Q8_0 (Prometheus coding lane)",
-      "alias": "prometheus/qwen3.5-35b-a3b",
-      "contextWindow": 196608,
+      "id": "nemotron-3-super-120b-a12b",
+      "descriptor": "NVIDIA Nemotron 3 Super 120B-A12B UD-Q4_K_M (Prometheus reasoning lane)",
+      "alias": "prometheus/nemotron-3-super-120b-a12b",
+      "contextWindow": 131072,
       "maxTokens": 4096,
       "reasoning": true
     }
@@ -27,7 +27,7 @@
   "aliasTargets": { },
   "enabledAliases": [
     "prometheus/llama-3.2-1b-instruct",
-    "prometheus/qwen3.5-35b-a3b"
+    "prometheus/nemotron-3-super-120b-a12b"
   ],
   "declaredModelMenu": [
     {
@@ -37,9 +37,9 @@
       "reasoning": false
     },
     {
-      "id": "qwen3.5-35b-a3b",
-      "descriptor": "Qwen 3.5 35B A3B",
-      "sizeClass": "72gb-vram-class",
+      "id": "nemotron-3-super-120b-a12b",
+      "descriptor": "NVIDIA Nemotron 3 Super 120B-A12B",
+      "sizeClass": "128gb-unified-class",
       "reasoning": true
     }
   ]
