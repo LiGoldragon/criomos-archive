@@ -10,10 +10,8 @@
     import ./default.nix nonSelfInputs;
 
   inputs = {
-    # Nixpkgs & lib
+    # Nixpkgs
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    lib.url = "github:criome/lib";
-    lib.inputs.nixpkgs.follows = "nixpkgs";
 
     # Nixpkgs overlays
     rust-overlay.url = "github:oxalica/rust-overlay";

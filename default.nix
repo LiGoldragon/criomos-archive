@@ -6,12 +6,13 @@ in
 
 {
   nixpkgs ? fallbackInputs.nixpkgs,
-  lib ? fallbackInputs.lib,
   criomos-lib ? (import ./criomos-lib.nix),
   ...
 }@inputs:
 
 let
+  lib = nixpkgs.lib // criomos-lib;
+
   mkCriomOS = import ./nix/mkCriomOS;
 
   local = mapAttrs (_: import) {
