@@ -24,7 +24,7 @@ let
     computerIs
     ;
 
-  centerIgnoresSuspend = typeIs.center || typeIs.largeAI;
+  centerIgnoresSuspend = typeIs.center || typeIs.largeAI || typeIs."largeAI-router";
 
   enableWaydroid = sizedAtLeast.max && behavesAs.edge;
 
@@ -231,7 +231,7 @@ in
       ++ optionals chipIsIntel intelUtils
       ++ optionals sizedAtLeast.max [ v4l-utils ]
       ++ optionals enableWaydroid waydroidPackages
-      ++ optionals typeIs.largeAI [
+      ++ optionals (typeIs.largeAI || typeIs."largeAI-router") [
         curl
         jq
         htop

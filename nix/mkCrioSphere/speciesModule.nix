@@ -37,6 +37,7 @@ let
   nodeSpecies = [
     "center"
     "largeAI"
+    "largeAI-router"
     "hybrid"
     "edge"
     "edgeTesting"

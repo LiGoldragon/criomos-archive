@@ -5,29 +5,43 @@
   ...
 }:
 let
-  l = lib // builtins;
   inherit (horizon.node) typeIs;
+  inherit (horizon.node.machine) model;
 
-  # TODO - massive hack
-  wanInterface = "enp0s25";
-  lanInterfaceOne = "enp0s20u1";
-  wlanDevice = "wlp3s0";
-  # lanInterfaceTwo = "enp0s20u1";
+  # Per-model interface mapping
+  interfaceMap = {
+    # asklepios (old router)
+    "all-x86-64" = {
+      wan = "enp0s25";
+      wlan = "wlp3s0";
+      wlanBand = "2g";
+      wlanChannel = 1;
+      wlanStandard = "wifi4";
+    };
+    # Prometheus (GMKtec EVO-X2, WiFi 7)
+    "GMKtec EVO-X2" = {
+      wan = "eno1";
+      wlan = "wlp195s0";
+      wlanBand = "6g";
+      wlanChannel = 0;
+      wlanStandard = "wifi7";
+    };
+  };
+
+  hw = interfaceMap.${model} or (throw "router: no interface map for model ${model}");
 
   lanBridgeInterface = "br-lan";
   lanSubnetPrefix = "10.18.0";
   lanAddress = "${lanSubnetPrefix}.1";
-  lanFullAdress = "${lanAddress}/24";
+  lanFullAddress = "${lanAddress}/24";
 
   useNftables = typeIs.routerTesting;
 
 in
 {
-  boot.kernel = {
-    sysctl = {
-      "net.ipv4.conf.all.forwarding" = true;
-      "net.ipv6.conf.all.forwarding" = true;
-    };
+  boot.kernel.sysctl = {
+    "net.ipv4.conf.all.forwarding" = true;
+    "net.ipv6.conf.all.forwarding" = true;
   };
 
   networking = {
@@ -48,25 +62,25 @@ in
 
             tcp dport ssh accept
 
-            iifname { ${lanBridgeInterface}, ${wlanDevice}, yggTun } accept comment "Allow local network to access the router"
-            iifname "${wanInterface}" ct state { established, related } accept comment "Allow established traffic"
-            iifname "${wanInterface}" icmp type { echo-request, destination-unreachable, time-exceeded } counter accept comment "Allow select ICMP"
-            iifname "${wanInterface}" counter drop comment "Drop all other unsolicited traffic from ${wanInterface}"
+            iifname { ${lanBridgeInterface}, ${hw.wlan}, yggTun } accept comment "Allow local network to access the router"
+            iifname "${hw.wan}" ct state { established, related } accept comment "Allow established traffic"
+            iifname "${hw.wan}" icmp type { echo-request, destination-unreachable, time-exceeded } counter accept comment "Allow select ICMP"
+            iifname "${hw.wan}" counter drop comment "Drop all other unsolicited traffic from ${hw.wan}"
             iifname "lo" accept comment "Accept everything from loopback interface"
           }
-          
+
           chain forward {
             type filter hook forward priority filter; policy drop;
 
-            iifname { ${lanBridgeInterface} } oifname { "${wanInterface}" } accept comment "Allow trusted LAN to WAN"
-            iifname { "${wanInterface}" } oifname { ${lanBridgeInterface} } ct state { established, related } accept comment "Allow established back to LANs"
+            iifname { ${lanBridgeInterface} } oifname { "${hw.wan}" } accept comment "Allow trusted LAN to WAN"
+            iifname { "${hw.wan}" } oifname { ${lanBridgeInterface} } ct state { established, related } accept comment "Allow established back to LANs"
           }
         }
 
         table ip nat {
           chain postrouting {
             type nat hook postrouting priority 100; policy accept;
-            oifname "${wanInterface}" masquerade
+            oifname "${hw.wan}" masquerade
           }
         }
       '';
@@ -77,13 +91,15 @@ in
     hostapd = {
       enable = true;
       radios = {
-        "${wlanDevice}" = {
-          band = "2g";
-          channel = 1;
+        "${hw.wlan}" = {
+          band = hw.wlanBand;
+          channel = hw.wlanChannel;
           countryCode = "PL";
-          wifi4.enable = true;
+          wifi4.enable = hw.wlanStandard == "wifi4";
+          wifi6.enable = hw.wlanStandard == "wifi6" || hw.wlanStandard == "wifi7";
+          wifi7.enable = hw.wlanStandard == "wifi7";
           networks = {
-            "${wlanDevice}" = {
+            "${hw.wlan}" = {
               ssid = "wifi-name";
               authentication = {
                 mode = "wpa3-sae";
@@ -116,7 +132,7 @@ in
           subnet4 = [
             {
               id = 1;
-              subnet = lanFullAdress;
+              subnet = lanFullAddress;
               pools = [ { pool = "${lanSubnetPrefix}.100 - ${lanSubnetPrefix}.240"; } ];
               option-data = [
                 {
@@ -132,6 +148,7 @@ in
   };
 
   systemd.network = {
+    enable = true;
     wait-online.anyInterface = true;
 
     netdevs = {
@@ -144,41 +161,34 @@ in
     };
 
     networks = {
-      "30-lan0" = {
-        matchConfig.Name = lanInterfaceOne;
+      "10-wan" = {
+        matchConfig.Name = hw.wan;
+        networkConfig = {
+          DHCP = "ipv4";
+        };
+        linkConfig.RequiredForOnline = "routable";
+      };
+
+      # Any USB ethernet dongle auto-bridges to the LAN
+      "30-usb-eth" = {
+        matchConfig = {
+          Type = "ether";
+          Driver = "cdc_ether r8152 ax88179_178a asix";
+        };
         networkConfig = {
           Bridge = lanBridgeInterface;
           ConfigureWithoutCarrier = true;
         };
-        linkConfig.RequiredForOnline = "enslaved";
+        linkConfig.RequiredForOnline = "no";
       };
-
-      # "30-lan3" = {
-      #   matchConfig.Name = lanInterfaceTwo;
-      #   networkConfig = {
-      #     Bridge = lanBridgeInterface;
-      #     ConfigureWithoutCarrier = true;
-      #   };
-      #   linkConfig.RequiredForOnline = "enslaved";
-      # };
 
       "40-br-lan" = {
         matchConfig.Name = lanBridgeInterface;
         bridgeConfig = { };
-        address = [ lanFullAdress ];
+        address = [ lanFullAddress ];
         networkConfig = {
           ConfigureWithoutCarrier = true;
         };
-      };
-
-      "10-wan" = {
-        matchConfig.Name = "${wanInterface}";
-        networkConfig = {
-          # start a DHCP Client for IPv4 Addressing/Routing
-          DHCP = "ipv4";
-        };
-        # make routing on this interface a dependency for network-online.target
-        linkConfig.RequiredForOnline = "routable";
       };
     };
   };

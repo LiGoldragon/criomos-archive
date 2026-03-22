@@ -187,7 +187,7 @@ let
 
         in
         rec {
-          centerLike = typeIs.center || typeIs.largeAI;
+          centerLike = typeIs.center || typeIs.largeAI || typeIs."largeAI-router";
           isFullyTrusted = trust == 3;
           sizedAtLeast = mkSizeAtLeast size;
           isBuilder =
@@ -215,7 +215,7 @@ let
           nixUrl = if isNixCache then ("http://" + nixCacheDomain) else null;
 
           behavesAs = rec {
-            router = typeIs.hybrid || typeIs.router;
+            router = typeIs.hybrid || typeIs.router || typeIs."largeAI-router";
             edge = typeIs.edge || typeIs.hybrid || typeIs.edgeTesting;
             nextGen = typeIs.edgeTesting || typeIs.hybrid;
             lowPower = typeIs.edge || typeIs.edgeTesting;
