@@ -103,6 +103,89 @@
   "Cozo-TS"
   (setq-local comment-start "# ")
   (setq-local comment-end "")
+  (setq-local treesit-font-lock-feature-list
+              '((comment string)
+                (keyword type)
+                (builtin number constant operator)
+                (variable function punctuation)))
+  (setq-local treesit-font-lock-settings
+              (treesit-font-lock-rules
+               :language 'cozo
+               :feature 'comment
+               '((comment) @font-lock-comment-face)
+
+               :language 'cozo
+               :feature 'string
+               '((string) @font-lock-string-face
+                 (escape_sequence) @font-lock-escape-face)
+
+               :language 'cozo
+               :feature 'keyword
+               '((command_name) @font-lock-keyword-face
+                 (option_name) @font-lock-keyword-face
+                 (inline_rule ":=" @font-lock-keyword-face)
+                 (constant_rule "<-" @font-lock-keyword-face)
+                 (fixed_rule "<~" @font-lock-keyword-face)
+                 (negation "not" @font-lock-keyword-face)
+                 (disjunction "or" @font-lock-keyword-face)
+                 (multi_unification "in" @font-lock-keyword-face)
+                 (conditional_expression "if" @font-lock-keyword-face)
+                 (if_block) @font-lock-keyword-face
+                 (if_not_block) @font-lock-keyword-face
+                 (loop_block) @font-lock-keyword-face
+                 (break_statement) @font-lock-keyword-face
+                 (continue_statement) @font-lock-keyword-face
+                 (return_statement) @font-lock-keyword-face
+                 (debug_statement) @font-lock-keyword-face
+                 (swap_statement) @font-lock-keyword-face)
+
+               :language 'cozo
+               :feature 'type
+               '((stored_relation name: (identifier) @font-lock-type-face)
+                 (search_apply name: (identifier) @font-lock-type-face)
+                 (simple_type) @font-lock-type-face
+                 (fixed_rule algorithm: (identifier) @font-lock-type-face))
+
+               :language 'cozo
+               :feature 'builtin
+               '((system_command (command_name) @font-lock-builtin-face))
+
+               :language 'cozo
+               :feature 'number
+               '((number) @font-lock-number-face)
+
+               :language 'cozo
+               :feature 'constant
+               '((boolean) @font-lock-constant-face
+                 (null) @font-lock-constant-face)
+
+               :language 'cozo
+               :feature 'operator
+               '((operator) @font-lock-operator-face
+                 (unification "=" @font-lock-operator-face)
+                 "*" @font-lock-operator-face
+                 "~" @font-lock-operator-face
+                 "?" @font-lock-operator-face)
+
+               :language 'cozo
+               :feature 'function
+               '((rule_head name: (identifier) @font-lock-function-name-face)
+                 (function_call name: (identifier) @font-lock-function-call-face)
+                 (aggregation function: (identifier) @font-lock-function-call-face))
+
+               :language 'cozo
+               :feature 'variable
+               '((parameter) @font-lock-variable-use-face
+                 (named_binding key: (identifier) @font-lock-property-use-face)
+                 (fixed_option key: (identifier) @font-lock-property-use-face)
+                 (column_definition name: (identifier) @font-lock-property-use-face)
+                 (object_pair key: (identifier) @font-lock-property-use-face))
+
+               :language 'cozo
+               :feature 'punctuation
+               :override t
+               '(["(" ")" "[" "]" "{" "}"] @font-lock-bracket-face
+                 ["," ";" "=>"] @font-lock-delimiter-face)))
   (treesit-parser-create 'cozo)
   (treesit-major-mode-setup))
 
