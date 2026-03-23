@@ -79,7 +79,6 @@ let
        `(font-lock-function-call-face ((,class (:foreground "${c.base0D}"))))
        `(font-lock-number-face ((,class (:foreground "${c.base09}"))))
        `(font-lock-operator-face ((,class (:foreground "${c.base0F}"))))
-       `(font-lock-property-name-face ((,class (:foreground "${c.base08}"))))
        `(font-lock-property-use-face ((,class (:foreground "${c.base08}"))))
        `(font-lock-punctuation-face ((,class (:foreground "${c.base04}"))))
        `(font-lock-bracket-face ((,class (:foreground "${c.base04}"))))
@@ -122,7 +121,7 @@ let
         color: @base05;
     }
     * {
-        font-family: "FiraMono Nerd Font";
+        font-family: "IosevkaTerm Nerd Font";
         font-size: 14px;
     }
     tooltip { border-color: @base0D; }
@@ -213,7 +212,7 @@ let
       # --- Ghostty config (darkman owns this file) ---
       mkdir -p "$HOME/.config/ghostty"
       cat > "$HOME/.config/ghostty/config" << 'GHOSTTY'
-font-family = FiraMono Nerd Font
+font-family = IosevkaTerm Nerd Font
 font-size = 14
 window-decoration = false
 gtk-titlebar = false
@@ -333,8 +332,8 @@ in
       };
       fonts = {
         monospace = {
-          package = pkgs.nerd-fonts.fira-mono;
-          name = "FiraMono Nerd Font";
+          package = pkgs.nerd-fonts.iosevka-term;
+          name = "IosevkaTerm Nerd Font";
         };
         sansSerif = {
           package = pkgs.dejavu_fonts;

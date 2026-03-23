@@ -64,7 +64,7 @@ let
   # Prometheus runs the llama.cpp server locally; other nodes should route to the Prometheus overlay.
   prometheusLlamaUpstreamHost = if isPrometheusNode then "127.0.0.1" else prometheusOverlayHost;
 
-  terminalFontFamily = if sizedAtLeast.med then "FiraMono Nerd Font" else "DejaVu Sans Mono";
+  terminalFontFamily = if sizedAtLeast.med then "IosevkaTerm Nerd Font" else "DejaVu Sans Mono";
 
   # Todo(Those data files should be in a top arg called data)
   colemakZedKeys = criomos-lib.importJSON ./../../../data/ZedKeymaps/goldragon-colemak.json;
@@ -85,8 +85,8 @@ let
 
   fontPackages = with pkgs; [
     dejavu_fonts
-    nerd-fonts.fira-mono
-    nerd-fonts.fira-code
+    nerd-fonts.iosevka-term
+    nerd-fonts.iosevka
   ];
 
   mkFcCache = pkgs.makeFontsCache { fontDirectories = fontPackages; };
@@ -596,7 +596,7 @@ mkIf sizedAtLeast.min {
         end)
 
         return {
-          font = wezterm.font("FiraMono Nerd Font"),
+          font = wezterm.font("IosevkaTerm Nerd Font"),
           font_size = 14.0,
           color_scheme = scheme_for_appearance(wezterm.gui.get_appearance()),
           window_decorations = "NONE",
@@ -694,7 +694,7 @@ mkIf sizedAtLeast.min {
           color-theme = if config.stylix.polarity == "dark" then "Lapce Dark" else "Lapce Light";
         };
         editor = {
-          font-family = "FiraCode Nerd Font";
+          font-family = "Iosevka Nerd Font";
           font-size = 16;
           bracket-pair-colorization = true;
           highlight-matching-brackets = true;

@@ -355,7 +355,7 @@ in
         pkgs,
       }:
 
-      src.packages.${pkgs.system}.default;
+      src.packages.${pkgs.stdenv.hostPlatform.system}.default;
   };
 
   videomass.lambda =
