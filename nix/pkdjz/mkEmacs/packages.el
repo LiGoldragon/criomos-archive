@@ -95,7 +95,18 @@
   prog-mode
   "Proto-TS"
   (treesit-parser-create 'proto)
-  (treesit-major-mode-setup)))
+  (treesit-major-mode-setup))
+
+ (define-derived-mode
+  cozo-ts-mode
+  prog-mode
+  "Cozo-TS"
+  (setq-local comment-start "# ")
+  (setq-local comment-end "")
+  (treesit-parser-create 'cozo)
+  (treesit-major-mode-setup))
+
+ (add-to-list 'auto-mode-alist '("\\.cozo\\'" . cozo-ts-mode)))
 
 (use-package
  rust-mode
