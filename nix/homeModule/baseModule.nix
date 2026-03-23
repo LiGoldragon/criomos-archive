@@ -78,7 +78,7 @@ let
        ;; Emacs 29+ tree-sitter faces
        `(font-lock-function-call-face ((,class (:foreground "${c.base0D}"))))
        `(font-lock-number-face ((,class (:foreground "${c.base09}"))))
-       `(font-lock-operator-face ((,class (:foreground "${c.base05}"))))
+       `(font-lock-operator-face ((,class (:foreground "${c.base0F}"))))
        `(font-lock-property-name-face ((,class (:foreground "${c.base08}"))))
        `(font-lock-property-use-face ((,class (:foreground "${c.base08}"))))
        `(font-lock-punctuation-face ((,class (:foreground "${c.base04}"))))

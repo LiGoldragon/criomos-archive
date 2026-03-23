@@ -130,14 +130,23 @@
                  (disjunction "or" @font-lock-keyword-face)
                  (multi_unification "in" @font-lock-keyword-face)
                  (conditional_expression "if" @font-lock-keyword-face)
-                 (if_block) @font-lock-keyword-face
-                 (if_not_block) @font-lock-keyword-face
-                 (loop_block) @font-lock-keyword-face
-                 (break_statement) @font-lock-keyword-face
-                 (continue_statement) @font-lock-keyword-face
-                 (return_statement) @font-lock-keyword-face
-                 (debug_statement) @font-lock-keyword-face
-                 (swap_statement) @font-lock-keyword-face)
+                 (if_block "%if" @font-lock-keyword-face)
+                 (if_block "%then" @font-lock-keyword-face)
+                 (if_block "%else" @font-lock-keyword-face)
+                 (if_block "%end" @font-lock-keyword-face)
+                 (if_not_block "%if_not" @font-lock-keyword-face)
+                 (if_not_block "%then" @font-lock-keyword-face)
+                 (if_not_block "%else" @font-lock-keyword-face)
+                 (if_not_block "%end" @font-lock-keyword-face)
+                 (loop_block "%loop" @font-lock-keyword-face)
+                 (loop_block "%end" @font-lock-keyword-face)
+                 (loop_block "%mark" @font-lock-keyword-face)
+                 (break_statement "%break" @font-lock-keyword-face)
+                 (continue_statement "%continue" @font-lock-keyword-face)
+                 (return_statement "%return" @font-lock-keyword-face)
+                 (debug_statement "%debug" @font-lock-keyword-face)
+                 (ignore_error_statement "%ignore_error" @font-lock-keyword-face)
+                 (swap_statement "%swap" @font-lock-keyword-face))
 
                :language 'cozo
                :feature 'type
@@ -180,6 +189,7 @@
                  (named_binding key: (identifier) @font-lock-property-use-face)
                  (fixed_option key: (identifier) @font-lock-property-use-face)
                  (column_definition name: (identifier) @font-lock-property-use-face)
+                 (data_field key: (identifier) @font-lock-property-use-face)
                  (object_pair key: (identifier) @font-lock-property-use-face))
 
                :language 'cozo
@@ -193,14 +203,38 @@
  (add-to-list 'auto-mode-alist '("\\.cozo\\'" . cozo-ts-mode))
 
  ;; Positional column faces for constant data rules
- (defface cozo-column-0 '((t :foreground "#e040a0")) "Column 0 — pink")
- (defface cozo-column-1 '((t :foreground "#00cc44")) "Column 1 — green")
- (defface cozo-column-2 '((t :foreground "#f5c000")) "Column 2 — yellow")
- (defface cozo-column-3 '((t :foreground "#ff8800")) "Column 3 — orange")
- (defface cozo-column-4 '((t :foreground "#cc44ff")) "Column 4 — purple")
- (defface cozo-column-5 '((t :foreground "#ff0066")) "Column 5 — red")
- (defface cozo-column-6 '((t :foreground "#bb44ee")) "Column 6 — violet")
- (defface cozo-column-7 '((t :foreground "#ff5577")) "Column 7 — salmon")
+ (defface cozo-column-0
+   '((((background dark))  :foreground "#e040a0")
+     (((background light)) :foreground "#b03080"))
+   "Column 0 — pink")
+ (defface cozo-column-1
+   '((((background dark))  :foreground "#00cc44")
+     (((background light)) :foreground "#1a8a30"))
+   "Column 1 — green")
+ (defface cozo-column-2
+   '((((background dark))  :foreground "#f5c000")
+     (((background light)) :foreground "#b89000"))
+   "Column 2 — yellow")
+ (defface cozo-column-3
+   '((((background dark))  :foreground "#ff8800")
+     (((background light)) :foreground "#d06600"))
+   "Column 3 — orange")
+ (defface cozo-column-4
+   '((((background dark))  :foreground "#cc44ff")
+     (((background light)) :foreground "#9930cc"))
+   "Column 4 — purple")
+ (defface cozo-column-5
+   '((((background dark))  :foreground "#ff0066")
+     (((background light)) :foreground "#cc0044"))
+   "Column 5 — red")
+ (defface cozo-column-6
+   '((((background dark))  :foreground "#bb44ee")
+     (((background light)) :foreground "#8822bb"))
+   "Column 6 — violet")
+ (defface cozo-column-7
+   '((((background dark))  :foreground "#ff5577")
+     (((background light)) :foreground "#cc3355"))
+   "Column 7 — salmon")
 
  (defvar cozo-column-faces
    [cozo-column-0 cozo-column-1 cozo-column-2 cozo-column-3
