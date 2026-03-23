@@ -207,31 +207,37 @@
     cozo-column-4 cozo-column-5 cozo-column-6 cozo-column-7]
    "Cycling faces for positional column highlighting.")
 
+ (defun cozo--color-children-by-position (node)
+   "Apply column faces to named children of NODE by position."
+   (let ((col 0))
+     (dotimes (i (treesit-node-child-count node t))
+       (let ((child (treesit-node-child node i t)))
+         (unless (member (treesit-node-type child) '("," "[" "]" "(" ")" "?" "<-"))
+           (when (< col (length cozo-column-faces))
+             (put-text-property
+              (treesit-node-start child)
+              (treesit-node-end child)
+              'face (aref cozo-column-faces col)))
+           (setq col (1+ col)))))))
+
  (defun cozo--fontify-columns (start end)
-   "Apply positional column colors to constant rule data rows."
+   "Apply positional column colors to constant rule heads and data rows."
    (when (treesit-parser-list)
      (let ((root (treesit-buffer-root-node)))
-       (dolist (rule-def (treesit-query-capture root
-                           '((constant_rule) @rule) start end))
-         (when (eq (car rule-def) 'rule)
-           (let* ((node (cdr rule-def))
+       (dolist (cap (treesit-query-capture root
+                      '((constant_rule) @rule) start end))
+         (when (eq (car cap) 'rule)
+           (let* ((node (cdr cap))
+                  (head (treesit-node-child-by-field-name node "head"))
                   (body (treesit-node-child-by-field-name node "body")))
+             ;; Color rule head variables positionally
+             (when head (cozo--color-children-by-position head))
+             ;; Color each data row positionally
              (when (and body (string= (treesit-node-type body) "list"))
-               ;; Each child list is a data row
                (dotimes (i (treesit-node-child-count body t))
                  (let ((row (treesit-node-child body i t)))
                    (when (string= (treesit-node-type row) "list")
-                     ;; Apply column face to each element
-                     (let ((col 0))
-                       (dotimes (j (treesit-node-child-count row t))
-                         (let ((elem (treesit-node-child row j t)))
-                           (when (not (member (treesit-node-type elem) '("," "[" "]")))
-                             (when (< col (length cozo-column-faces))
-                               (put-text-property
-                                (treesit-node-start elem)
-                                (treesit-node-end elem)
-                                'face (aref cozo-column-faces col)))
-                             (setq col (1+ col))))))))))))))))
+                     (cozo--color-children-by-position row)))))))))))
 
  (add-hook 'cozo-ts-mode-hook
            (lambda () (jit-lock-register #'cozo--fontify-columns))))
