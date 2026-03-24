@@ -20,29 +20,24 @@
       "port": 11436
     },
     {
-      "modelId": "nemotron-3-super-120b-a12b",
-      "canonicalId": "nemotron-3-super-120b-a12b",
-      "alias": "prometheus-nemotron-3-super-120b-a12b",
-      "primaryAlias": "nemotron-3-super-120b-a12b",
-      "serviceSuffix": "nemotron-3-super-120b-a12b",
-      "descriptor": "NVIDIA Nemotron 3 Super 120B-A12B UD-Q4_K_M (Prometheus reasoning lane)",
+      "modelId": "gpt-oss-120b",
+      "canonicalId": "gpt-oss-120b",
+      "alias": "prometheus-gpt-oss-120b",
+      "primaryAlias": "gpt-oss-120b",
+      "serviceSuffix": "gpt-oss-120b",
+      "descriptor": "OpenAI GPT-OSS 120B Q4_K_M (Prometheus reasoning lane)",
       "source": {
         "kind": "multi-shard",
         "shards": [
           {
-            "url": "https://huggingface.co/unsloth/NVIDIA-Nemotron-3-Super-120B-A12B-GGUF/resolve/main/UD-Q4_K_M/NVIDIA-Nemotron-3-Super-120B-A12B-UD-Q4_K_M-00001-of-00003.gguf",
-            "sha256": "sha256-8iCD62sVrLUpBTCKsIPosMw4iXAFzEXoiBq9FkWAqsI=",
-            "filename": "NVIDIA-Nemotron-3-Super-120B-A12B-UD-Q4_K_M-00001-of-00003.gguf"
+            "url": "https://huggingface.co/unsloth/gpt-oss-120b-GGUF/resolve/main/Q4_K_M/gpt-oss-120b-Q4_K_M-00001-of-00002.gguf",
+            "sha256": "sha256-sddHTKqScXuKf3XjwdEAbrQPO9NZFSLlorCV82sSdX0=",
+            "filename": "gpt-oss-120b-Q4_K_M-00001-of-00002.gguf"
           },
           {
-            "url": "https://huggingface.co/unsloth/NVIDIA-Nemotron-3-Super-120B-A12B-GGUF/resolve/main/UD-Q4_K_M/NVIDIA-Nemotron-3-Super-120B-A12B-UD-Q4_K_M-00002-of-00003.gguf",
-            "sha256": "sha256-bWWt2oh1nxvOpxTk2gnauOzEImWle4f5v3/jy39TuIk=",
-            "filename": "NVIDIA-Nemotron-3-Super-120B-A12B-UD-Q4_K_M-00002-of-00003.gguf"
-          },
-          {
-            "url": "https://huggingface.co/unsloth/NVIDIA-Nemotron-3-Super-120B-A12B-GGUF/resolve/main/UD-Q4_K_M/NVIDIA-Nemotron-3-Super-120B-A12B-UD-Q4_K_M-00003-of-00003.gguf",
-            "sha256": "sha256-KxJsUTlt0x+7EnP7KyjQyFArq141eoUvZ696S29bp5w=",
-            "filename": "NVIDIA-Nemotron-3-Super-120B-A12B-UD-Q4_K_M-00003-of-00003.gguf"
+            "url": "https://huggingface.co/unsloth/gpt-oss-120b-GGUF/resolve/main/Q4_K_M/gpt-oss-120b-Q4_K_M-00002-of-00002.gguf",
+            "sha256": "sha256-t8xPfdjf0lKQDXmrRiq8CtS/BuS88OWeSRtmJb/uNuY=",
+            "filename": "gpt-oss-120b-Q4_K_M-00002-of-00002.gguf"
           }
         ]
       },

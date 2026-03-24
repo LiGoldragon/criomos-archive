@@ -1,6 +1,6 @@
 {
   "defaultProvider": "prometheus",
-  "defaultModel": "nemotron-3-super-120b-a12b",
+  "defaultModel": "gpt-oss-120b",
   "provider": "prometheus",
   "serviceEndpoints": {
     "canonical": "http://[200:ca41:6b12:fba:d7bc:cfc6:4aaa:165f]:11434/v1",
@@ -16,9 +16,9 @@
       "reasoning": false
     },
     {
-      "id": "nemotron-3-super-120b-a12b",
-      "descriptor": "NVIDIA Nemotron 3 Super 120B-A12B UD-Q4_K_M (Prometheus reasoning lane)",
-      "alias": "prometheus/nemotron-3-super-120b-a12b",
+      "id": "gpt-oss-120b",
+      "descriptor": "OpenAI GPT-OSS 120B Q4_K_M (Prometheus reasoning lane)",
+      "alias": "prometheus/gpt-oss-120b",
       "contextWindow": 131072,
       "maxTokens": 4096,
       "reasoning": true
@@ -27,7 +27,7 @@
   "aliasTargets": { },
   "enabledAliases": [
     "prometheus/llama-3.2-1b-instruct",
-    "prometheus/nemotron-3-super-120b-a12b"
+    "prometheus/gpt-oss-120b"
   ],
   "declaredModelMenu": [
     {
@@ -37,8 +37,8 @@
       "reasoning": false
     },
     {
-      "id": "nemotron-3-super-120b-a12b",
-      "descriptor": "NVIDIA Nemotron 3 Super 120B-A12B",
+      "id": "gpt-oss-120b",
+      "descriptor": "OpenAI GPT-OSS 120B",
       "sizeClass": "128gb-unified-class",
       "reasoning": true
     }
