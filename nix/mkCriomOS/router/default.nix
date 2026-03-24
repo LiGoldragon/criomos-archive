@@ -1,6 +1,5 @@
 {
   lib,
-  pkgs,
   horizon,
   config,
   constants,
@@ -9,7 +8,8 @@
 let
   inherit (horizon.node) typeIs;
   inherit (horizon.node.machine) model;
-  inherit (constants.fileSystem.wifiPki) caCertFile serverCertFile serverKeyFile;
+  # WiFi PKI paths — uncomment when EAP-TLS is deployed
+  # inherit (constants.fileSystem.wifiPki) caCertFile serverCertFile serverKeyFile;
 
   # Per-model interface mapping
   interfaceMap = {
@@ -41,11 +41,6 @@ let
   lanFullAddress = "${lanAddress}/24";
 
   useNftables = true;
-
-  # EAP-TLS user file: accept any valid TLS client certificate
-  eapUsersFile = pkgs.writeText "eap_users" ''
-    * TLS
-  '';
 
 in
 {
@@ -113,27 +108,9 @@ in
           wifi6.enable = hw.wlanStandard == "wifi6" || hw.wlanStandard == "wifi7";
           wifi7.enable = hw.wlanStandard == "wifi7";
           networks = {
-            # WPA3-Enterprise EAP-TLS — NixOS nodes with GPG-derived X.509 certs
+            # WPA3-SAE — primary SSID (EAP-TLS will replace this once PKI is deployed)
             "${hw.wlan}" = {
               ssid = "criome";
-              authentication.mode = "none";
-              settings = {
-                wpa = 2;
-                wpa_key_mgmt = "WPA-EAP";
-                ieee8021x = 1;
-                eap_server = 1;
-                ca_cert = caCertFile;
-                server_cert = serverCertFile;
-                private_key = serverKeyFile;
-                eap_user_file = "${eapUsersFile}";
-                ieee80211w = 2;
-                rsn_pairwise = "CCMP";
-                bridge = lanBridgeInterface;
-              };
-            };
-            # WPA3-SAE — fallback for mobile devices
-            "${hw.wlan}_sae" = {
-              ssid = "criome-mobile";
               authentication = {
                 mode = "wpa3-sae";
                 saePasswords = [ { password = "leavesarealsoalive"; } ];
