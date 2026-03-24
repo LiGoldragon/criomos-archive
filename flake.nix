@@ -48,7 +48,10 @@
     };
 
     # AI coding agents (daily auto-updates)
-    llm-agents.url = "github:numtide/llm-agents.nix";
+    llm-agents = {
+      url = "github:numtide/llm-agents.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # Desktop agents
     claude-for-linux.url = "github:Criome/claude-for-linux/update-v1.1.7714";
