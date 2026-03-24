@@ -366,7 +366,7 @@ let
   ];
 
 in
-assert builtins.length prometheusModels > 0;
+assert builtins.length largeAIModels > 0;
 mkIf sizedAtLeast.min {
   fonts.fontconfig = {
     enable = true;
