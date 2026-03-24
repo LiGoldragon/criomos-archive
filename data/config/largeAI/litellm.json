@@ -58,6 +58,36 @@
       "maxTokens": 4096,
       "ctxSize": 32768,
       "port": 11437
+    },
+    {
+      "modelId": "nemotron-3-nano-30b-a3b",
+      "descriptor": "NVIDIA Nemotron 3 Nano 30B-A3B Q8_0 (fast coding lane)",
+      "source": {
+        "kind": "fetchurl",
+        "url": "https://huggingface.co/unsloth/Nemotron-3-Nano-30B-A3B-GGUF/resolve/main/Nemotron-3-Nano-30B-A3B-Q8_0.gguf",
+        "sha256": "sha256-QzqcDTnGw0NCBHl7MJkcTRR8DyUyhpDWCGLsOeKpIYg=",
+        "filename": "Nemotron-3-Nano-30B-A3B-Q8_0.gguf"
+      },
+      "reasoning": true,
+      "contextWindow": 131072,
+      "maxTokens": 4096,
+      "ctxSize": 32768,
+      "port": 11438
+    },
+    {
+      "modelId": "qwen3-8b",
+      "descriptor": "Qwen3 8B Q8_0 (instant lane)",
+      "source": {
+        "kind": "fetchurl",
+        "url": "https://huggingface.co/unsloth/Qwen3-8B-GGUF/resolve/main/Qwen3-8B-Q8_0.gguf",
+        "sha256": "sha256-DPv3RXYPB6dt3rNY3QJaJ/LhHRypyaQWmjc9UpkP6G4=",
+        "filename": "Qwen3-8B-Q8_0.gguf"
+      },
+      "reasoning": true,
+      "contextWindow": 32768,
+      "maxTokens": 4096,
+      "ctxSize": 32768,
+      "port": 11439
     }
   ]
 }
