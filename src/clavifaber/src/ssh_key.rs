@@ -1,58 +1,47 @@
-use ssh_key::public::KeyData;
-use spki::SubjectPublicKeyInfoOwned;
+use crate::error::Error;
 use der::asn1::{BitString, ObjectIdentifier};
+use spki::SubjectPublicKeyInfoOwned;
+use ssh_key::public::KeyData;
 
-/// OID for Ed25519: 1.3.101.112
 const ED25519_OID: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.3.101.112");
 
 /// Parse an OpenSSH public key string and convert to SubjectPublicKeyInfo.
-/// Accepts either the full "ssh-ed25519 AAAA..." format or just the base64 part.
-pub fn ssh_pubkey_to_spki(ssh_pubkey_str: &str) -> Result<SubjectPublicKeyInfoOwned, String> {
-    let pubkey = ssh_key::PublicKey::from_openssh(ssh_pubkey_str)
-        .or_else(|_| {
-            // Try parsing as just the key type + base64
-            let full = if ssh_pubkey_str.contains(' ') {
-                ssh_pubkey_str.to_string()
-            } else {
-                format!("ssh-ed25519 {ssh_pubkey_str}")
-            };
-            ssh_key::PublicKey::from_openssh(&full)
-        })
-        .map_err(|e| format!("invalid SSH public key: {e}"))?;
-
+pub fn ssh_pubkey_to_spki(ssh_pubkey_str: &str) -> Result<SubjectPublicKeyInfoOwned, Error> {
+    let pubkey = parse_ssh_pubkey(ssh_pubkey_str)?;
     match pubkey.key_data() {
         KeyData::Ed25519(ed_key) => {
-            let raw_bytes = ed_key.as_ref();
             let spki = SubjectPublicKeyInfoOwned {
                 algorithm: spki::AlgorithmIdentifierOwned {
                     oid: ED25519_OID,
                     parameters: None,
                 },
-                subject_public_key: BitString::from_bytes(raw_bytes)
-                    .map_err(|e| format!("BitString encoding failed: {e}"))?,
+                subject_public_key: BitString::from_bytes(ed_key.as_ref())
+                    .map_err(|e| Error::Parse(format!("BitString: {e}")))?,
             };
             Ok(spki)
         }
-        _ => Err("only Ed25519 SSH keys are supported".into()),
+        _ => Err(Error::Parse("only Ed25519 SSH keys are supported".into())),
     }
 }
 
 /// Get the raw Ed25519 public key bytes from an SSH public key string.
-pub fn ssh_pubkey_raw_bytes(ssh_pubkey_str: &str) -> Result<Vec<u8>, String> {
-    let pubkey = ssh_key::PublicKey::from_openssh(ssh_pubkey_str)
-        .or_else(|_| {
-            let full = if ssh_pubkey_str.contains(' ') {
-                ssh_pubkey_str.to_string()
-            } else {
-                format!("ssh-ed25519 {ssh_pubkey_str}")
-            };
-            ssh_key::PublicKey::from_openssh(&full)
-        })
-        .map_err(|e| format!("invalid SSH public key: {e}"))?;
-
+pub fn ssh_pubkey_raw_bytes(ssh_pubkey_str: &str) -> Result<Vec<u8>, Error> {
+    let pubkey = parse_ssh_pubkey(ssh_pubkey_str)?;
     match pubkey.key_data() {
         KeyData::Ed25519(ed_key) => Ok(ed_key.as_ref().to_vec()),
-        _ => Err("only Ed25519 SSH keys are supported".into()),
+        _ => Err(Error::Parse("only Ed25519 SSH keys are supported".into())),
     }
 }
 
+fn parse_ssh_pubkey(s: &str) -> Result<ssh_key::PublicKey, Error> {
+    ssh_key::PublicKey::from_openssh(s)
+        .or_else(|_| {
+            let full = if s.contains(' ') {
+                s.to_string()
+            } else {
+                format!("ssh-ed25519 {s}")
+            };
+            ssh_key::PublicKey::from_openssh(&full)
+        })
+        .map_err(|e| Error::Parse(format!("invalid SSH public key: {e}")))
+}

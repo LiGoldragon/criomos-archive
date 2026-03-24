@@ -9,7 +9,7 @@ der = { version = "0.7", features = ["alloc", "derive", "oid", "pem"] }
 x509-cert = { version = "0.2", features = ["pem"] }
 spki = { version = "0.7", features = ["alloc", "pem"] }
 p256 = { version = "0.13", features = ["ecdsa", "pem"] }
-ed25519-dalek = { version = "2", features = ["rand_core"] }
+ed25519-dalek = { version = "2", features = ["rand_core", "pkcs8"] }
 ssh-key = { version = "0.6", features = ["ed25519"] }
 pem-rfc7468 = { version = "0.7", features = ["alloc"] }
 base64ct = { version = "1", features = ["alloc"] }

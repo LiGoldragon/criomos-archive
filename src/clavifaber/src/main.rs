@@ -1,9 +1,12 @@
 mod complex;
+mod error;
 mod gpg_agent;
 mod ssh_key;
+mod util;
 mod x509;
 
 use clap::{Parser, Subcommand};
+use error::Error;
 use std::fs;
 use std::path::PathBuf;
 
@@ -18,86 +21,58 @@ struct Cli {
 enum Commands {
     /// Create a self-signed CA certificate from a GPG Ed25519 key
     CaInit {
-        /// GPG keygrip of the CA key (40 hex chars)
         #[arg(long)]
         keygrip: String,
-
-        /// Common Name for the CA certificate
         #[arg(long)]
         cn: String,
-
-        /// Output PEM file path
         #[arg(long)]
         out: PathBuf,
     },
 
     /// Generate a P-256 server keypair + certificate signed by the CA
     ServerCert {
-        /// GPG keygrip of the CA key
         #[arg(long)]
         ca_keygrip: String,
-
-        /// Path to the CA certificate PEM
         #[arg(long)]
         ca_cert: PathBuf,
-
-        /// Common Name for the server certificate
         #[arg(long)]
         cn: String,
-
-        /// Output path for the server certificate PEM
         #[arg(long)]
         out_cert: PathBuf,
-
-        /// Output path for the server private key PEM
         #[arg(long)]
         out_key: PathBuf,
     },
 
     /// Create an X.509 client certificate for a node's Ed25519 SSH pubkey
     NodeCert {
-        /// GPG keygrip of the CA key
         #[arg(long)]
         ca_keygrip: String,
-
-        /// Path to the CA certificate PEM
         #[arg(long)]
         ca_cert: PathBuf,
-
-        /// SSH public key (openssh format: "ssh-ed25519 AAAA...")
         #[arg(long)]
         ssh_pubkey: String,
-
-        /// Common Name for the node certificate (e.g. "li@ouranos")
         #[arg(long)]
         cn: String,
-
-        /// Output PEM file path
         #[arg(long)]
         out: PathBuf,
     },
 
     /// Generate node identity complex (Ed25519 keypair) at first install
     ComplexInit {
-        /// Directory to store the complex (e.g. /etc/criomOS/complex)
         #[arg(long)]
         dir: PathBuf,
     },
 
     /// Re-derive ssh.pub from the private key (run on every boot)
     DerivePubkey {
-        /// Directory containing the complex
         #[arg(long)]
         dir: PathBuf,
     },
 
     /// Verify a certificate chains to the CA
     Verify {
-        /// Path to the CA certificate PEM
         #[arg(long)]
         ca_cert: PathBuf,
-
-        /// Path to the certificate to verify
         #[arg(long)]
         cert: PathBuf,
     },
@@ -133,10 +108,9 @@ fn main() {
     }
 }
 
-fn cmd_ca_init(keygrip: &str, cn: &str, out: &PathBuf) -> Result<(), String> {
+fn cmd_ca_init(keygrip: &str, cn: &str, out: &PathBuf) -> Result<(), Error> {
     eprintln!("Creating CA certificate: CN={cn}");
 
-    // Get the Ed25519 public key from gpg-agent via keygrip
     let pubkey_bytes = export_ed25519_pubkey_from_keygrip(keygrip)?;
 
     let spki = spki::SubjectPublicKeyInfoOwned {
@@ -145,13 +119,16 @@ fn cmd_ca_init(keygrip: &str, cn: &str, out: &PathBuf) -> Result<(), String> {
             parameters: None,
         },
         subject_public_key: der::asn1::BitString::from_bytes(&pubkey_bytes)
-            .map_err(|e| format!("BitString: {e}"))?,
+            .map_err(|e| Error::Certificate(format!("BitString: {e}")))?,
     };
 
     let cert_der = x509::create_ca_cert(keygrip, cn, spki)?;
     let pem = x509::cert_to_pem(&cert_der)?;
 
-    fs::write(out, &pem).map_err(|e| format!("write {}: {e}", out.display()))?;
+    fs::write(out, &pem).map_err(|e| Error::Io {
+        path: out.clone(),
+        source: e,
+    })?;
     eprintln!("CA certificate written to {}", out.display());
     Ok(())
 }
@@ -162,20 +139,26 @@ fn cmd_server_cert(
     cn: &str,
     out_cert: &PathBuf,
     out_key: &PathBuf,
-) -> Result<(), String> {
+) -> Result<(), Error> {
     eprintln!("Creating server certificate: CN={cn}");
 
-    let ca_pem = fs::read_to_string(ca_cert_path)
-        .map_err(|e| format!("read CA cert: {e}"))?;
+    let ca_pem = fs::read_to_string(ca_cert_path).map_err(|e| Error::Io {
+        path: ca_cert_path.clone(),
+        source: e,
+    })?;
     let ca_der = x509::pem_to_cert_der(&ca_pem)?;
 
     let (cert_der, key_pem) = x509::create_server_cert(ca_keygrip, &ca_der, cn)?;
     let cert_pem = x509::cert_to_pem(&cert_der)?;
 
-    fs::write(out_cert, &cert_pem)
-        .map_err(|e| format!("write cert: {e}"))?;
-    fs::write(out_key, &key_pem)
-        .map_err(|e| format!("write key: {e}"))?;
+    fs::write(out_cert, &cert_pem).map_err(|e| Error::Io {
+        path: out_cert.clone(),
+        source: e,
+    })?;
+    fs::write(out_key, &key_pem).map_err(|e| Error::Io {
+        path: out_key.clone(),
+        source: e,
+    })?;
 
     eprintln!("Server certificate: {}", out_cert.display());
     eprintln!("Server private key: {}", out_key.display());
@@ -188,24 +171,28 @@ fn cmd_node_cert(
     ssh_pubkey_str: &str,
     cn: &str,
     out: &PathBuf,
-) -> Result<(), String> {
+) -> Result<(), Error> {
     eprintln!("Creating node certificate: CN={cn}");
 
-    let ca_pem = fs::read_to_string(ca_cert_path)
-        .map_err(|e| format!("read CA cert: {e}"))?;
+    let ca_pem = fs::read_to_string(ca_cert_path).map_err(|e| Error::Io {
+        path: ca_cert_path.clone(),
+        source: e,
+    })?;
     let ca_der = x509::pem_to_cert_der(&ca_pem)?;
 
     let spki = ssh_key::ssh_pubkey_to_spki(ssh_pubkey_str)?;
-
     let cert_der = x509::create_node_cert(ca_keygrip, &ca_der, spki, cn)?;
     let pem = x509::cert_to_pem(&cert_der)?;
 
-    fs::write(out, &pem).map_err(|e| format!("write {}: {e}", out.display()))?;
+    fs::write(out, &pem).map_err(|e| Error::Io {
+        path: out.clone(),
+        source: e,
+    })?;
     eprintln!("Node certificate written to {}", out.display());
     Ok(())
 }
 
-fn cmd_complex_init(dir: &PathBuf) -> Result<(), String> {
+fn cmd_complex_init(dir: &PathBuf) -> Result<(), Error> {
     match complex::Complex::validate(dir)? {
         Some(existing) => {
             let ssh_pub = existing.ssh_pubkey_string();
@@ -224,20 +211,24 @@ fn cmd_complex_init(dir: &PathBuf) -> Result<(), String> {
     Ok(())
 }
 
-fn cmd_derive_pubkey(dir: &PathBuf) -> Result<(), String> {
+fn cmd_derive_pubkey(dir: &PathBuf) -> Result<(), Error> {
     let cx = complex::Complex::load(dir)?;
     let ssh_pub = cx.ssh_pubkey_string();
     let ssh_path = dir.join("ssh.pub");
-    complex::atomic_write(&ssh_path, ssh_pub.as_bytes(), 0o644)?;
+    util::atomic_write(&ssh_path, ssh_pub.as_bytes(), 0o644)?;
     println!("{ssh_pub}");
     Ok(())
 }
 
-fn cmd_verify(ca_cert_path: &PathBuf, cert_path: &PathBuf) -> Result<(), String> {
-    let ca_pem = fs::read_to_string(ca_cert_path)
-        .map_err(|e| format!("read CA cert: {e}"))?;
-    let cert_pem = fs::read_to_string(cert_path)
-        .map_err(|e| format!("read cert: {e}"))?;
+fn cmd_verify(ca_cert_path: &PathBuf, cert_path: &PathBuf) -> Result<(), Error> {
+    let ca_pem = fs::read_to_string(ca_cert_path).map_err(|e| Error::Io {
+        path: ca_cert_path.clone(),
+        source: e,
+    })?;
+    let cert_pem = fs::read_to_string(cert_path).map_err(|e| Error::Io {
+        path: cert_path.clone(),
+        source: e,
+    })?;
 
     let ca_der = x509::pem_to_cert_der(&ca_pem)?;
     let cert_der = x509::pem_to_cert_der(&cert_pem)?;
@@ -247,137 +238,21 @@ fn cmd_verify(ca_cert_path: &PathBuf, cert_path: &PathBuf) -> Result<(), String>
     Ok(())
 }
 
-/// Extract Ed25519 public key bytes from gpg-agent using READKEY.
-fn export_ed25519_pubkey_from_keygrip(keygrip: &str) -> Result<Vec<u8>, String> {
-    // Try gpg --export-ssh-key first, fall back to READKEY via agent
+/// Extract Ed25519 public key bytes from GPG via keygrip.
+/// Tries `gpg --export-ssh-key` first, falls back to READKEY via agent.
+fn export_ed25519_pubkey_from_keygrip(keygrip: &str) -> Result<Vec<u8>, Error> {
     let output = std::process::Command::new("gpg")
         .args(["--batch", "--export-ssh-key", &format!("{keygrip}!")])
         .output()
-        .map_err(|e| format!("gpg --export-ssh-key: {e}"))?;
+        .map_err(|e| Error::Gpg(format!("gpg --export-ssh-key: {e}")))?;
 
-    if !output.status.success() {
-        // Fallback: the keygrip might need to be looked up differently
-        // Try using READKEY via agent
-        return read_key_from_agent(keygrip);
-    }
-
-    let ssh_line = String::from_utf8_lossy(&output.stdout).trim().to_string();
-    if ssh_line.is_empty() {
-        return read_key_from_agent(keygrip);
-    }
-
-    ssh_key::ssh_pubkey_raw_bytes(&ssh_line)
-}
-
-/// Read the public key from gpg-agent using the READKEY Assuan command.
-fn read_key_from_agent(keygrip: &str) -> Result<Vec<u8>, String> {
-    use std::io::{BufRead, BufReader, Write};
-    use std::os::unix::net::UnixStream;
-
-    let output = std::process::Command::new("gpgconf")
-        .args(["--list-dirs", "agent-socket"])
-        .output()
-        .map_err(|e| format!("gpgconf: {e}"))?;
-
-    let socket_path = String::from_utf8_lossy(&output.stdout).trim().to_string();
-    let raw = UnixStream::connect(&socket_path)
-        .map_err(|e| format!("connect: {e}"))?;
-    let mut stream = BufReader::new(raw);
-
-    // Read greeting (always ASCII)
-    let mut line = String::new();
-    stream.read_line(&mut line).map_err(|e| format!("read greeting: {e}"))?;
-
-    let cmd = format!("READKEY {keygrip}\n");
-    stream.get_mut().write_all(cmd.as_bytes())
-        .map_err(|e| format!("write READKEY: {e}"))?;
-    stream.get_mut().flush().map_err(|e| format!("flush: {e}"))?;
-
-    // Read response lines as raw bytes (D-lines may contain non-UTF-8)
-    let mut data = Vec::new();
-    loop {
-        let mut line_buf = Vec::new();
-        stream.read_until(b'\n', &mut line_buf)
-            .map_err(|e| format!("read: {e}"))?;
-        // Trim trailing newline/CR
-        while line_buf.last() == Some(&b'\n') || line_buf.last() == Some(&b'\r') {
-            line_buf.pop();
-        }
-
-        if line_buf.starts_with(b"D ") {
-            let raw = &line_buf[2..];
-            data.extend(decode_assuan_bytes(raw));
-        } else if line_buf.starts_with(b"OK") {
-            break;
-        } else if line_buf.starts_with(b"ERR") {
-            let msg = String::from_utf8_lossy(&line_buf);
-            return Err(format!("READKEY failed: {msg}"));
+    if output.status.success() {
+        let ssh_line = String::from_utf8_lossy(&output.stdout).trim().to_string();
+        if !ssh_line.is_empty() {
+            return ssh_key::ssh_pubkey_raw_bytes(&ssh_line);
         }
     }
 
-    // Parse the S-expression to extract Ed25519 public key
-    // Format: (10:public-key(3:ecc(5:curve7:Ed25519)(5:flags5:eddsa)(1:q32:<32 bytes>)))
-    extract_sexp_q_value(&data)
-        .ok_or_else(|| "could not extract public key from READKEY S-expression".to_string())
-}
-
-fn extract_sexp_q_value(data: &[u8]) -> Option<Vec<u8>> {
-    // Look for (1:q followed by length:data
-    let needle = b"(1:q";
-    let pos = data.windows(needle.len()).position(|w| w == needle)?;
-    let after = pos + needle.len();
-
-    // Parse the length
-    let mut i = after;
-    let mut len_str = String::new();
-    while i < data.len() && data[i].is_ascii_digit() {
-        len_str.push(data[i] as char);
-        i += 1;
-    }
-    if i >= data.len() || data[i] != b':' {
-        return None;
-    }
-    i += 1;
-
-    let len: usize = len_str.parse().ok()?;
-    if i + len > data.len() {
-        return None;
-    }
-
-    let mut key_data = data[i..i + len].to_vec();
-
-    // Ed25519 public key is 32 bytes, but gpg may prefix with 0x40
-    if key_data.len() == 33 && key_data[0] == 0x40 {
-        key_data.remove(0);
-    }
-
-    Some(key_data)
-}
-
-fn decode_assuan_bytes(bytes: &[u8]) -> Vec<u8> {
-    let mut result = Vec::with_capacity(bytes.len());
-    let mut i = 0;
-    while i < bytes.len() {
-        if bytes[i] == b'%' && i + 2 < bytes.len() {
-            let hi = bytes[i + 1];
-            let lo = bytes[i + 2];
-            if let (Some(h), Some(l)) = (hex_digit(hi), hex_digit(lo)) {
-                result.push(h << 4 | l);
-                i += 3;
-                continue;
-            }
-        }
-        result.push(bytes[i]);
-        i += 1;
-    }
-    result
-}
-
-fn hex_digit(b: u8) -> Option<u8> {
-    match b {
-        b'0'..=b'9' => Some(b - b'0'),
-        b'a'..=b'f' => Some(b - b'a' + 10),
-        b'A'..=b'F' => Some(b - b'A' + 10),
-        _ => None,
-    }
+    let mut agent = gpg_agent::GpgAgent::connect()?;
+    agent.readkey(keygrip)
 }
