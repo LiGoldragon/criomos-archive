@@ -21,21 +21,6 @@
 
   "models": [
     {
-      "modelId": "llama-3.2-1b-instruct",
-      "descriptor": "Llama 3.2 1B Instruct (sanity lane)",
-      "source": {
-        "kind": "fetchurl",
-        "url": "https://huggingface.co/hugging-quants/Llama-3.2-1B-Instruct-Q4_K_M-GGUF/resolve/main/llama-3.2-1b-instruct-q4_k_m.gguf",
-        "sha256": "sha256-HQ6UGexOEq73PM9P/RInA+lMSDRKlrx8Xw8ncsIVLOM=",
-        "filename": "llama-3.2-1b-instruct-q4_k_m.gguf"
-      },
-      "reasoning": false,
-      "contextWindow": 8192,
-      "maxTokens": 2048,
-      "ctxSize": 8192,
-      "port": 11436
-    },
-    {
       "modelId": "gpt-oss-120b",
       "descriptor": "OpenAI GPT-OSS 120B Q4_K_M (reasoning lane)",
       "source": {
@@ -60,34 +45,54 @@
       "port": 11437
     },
     {
-      "modelId": "nemotron-3-nano-30b-a3b",
-      "descriptor": "NVIDIA Nemotron 3 Nano 30B-A3B Q8_0 (fast coding lane)",
+      "modelId": "glm-4.7-flash",
+      "descriptor": "GLM-4.7-Flash Q8_0 (fast coding lane)",
       "source": {
         "kind": "fetchurl",
-        "url": "https://huggingface.co/unsloth/Nemotron-3-Nano-30B-A3B-GGUF/resolve/main/Nemotron-3-Nano-30B-A3B-Q8_0.gguf",
-        "sha256": "sha256-QzqcDTnGw0NCBHl7MJkcTRR8DyUyhpDWCGLsOeKpIYg=",
-        "filename": "Nemotron-3-Nano-30B-A3B-Q8_0.gguf"
+        "url": "https://huggingface.co/unsloth/GLM-4.7-Flash-GGUF/resolve/main/GLM-4.7-Flash-Q8_0.gguf",
+        "sha256": "sha256-jAkisDMmkypAMVzpK77gHMg2rRhmQmgBkUPImL3X3Qs=",
+        "filename": "GLM-4.7-Flash-Q8_0.gguf"
       },
       "reasoning": true,
       "contextWindow": 131072,
       "maxTokens": 4096,
       "ctxSize": 32768,
       "port": 11438
+    }
+  ],
+
+  "shardCache": {
+    "_comment": "Pre-fetched model shards kept for future use — not served",
+    "llama-3.2-1b-instruct": {
+      "source": {
+        "kind": "fetchurl",
+        "url": "https://huggingface.co/hugging-quants/Llama-3.2-1B-Instruct-Q4_K_M-GGUF/resolve/main/llama-3.2-1b-instruct-q4_k_m.gguf",
+        "sha256": "sha256-HQ6UGexOEq73PM9P/RInA+lMSDRKlrx8Xw8ncsIVLOM="
+      }
     },
-    {
-      "modelId": "qwen3-8b",
-      "descriptor": "Qwen3 8B Q8_0 (instant lane)",
+    "nemotron-3-nano-30b-a3b": {
+      "source": {
+        "kind": "fetchurl",
+        "url": "https://huggingface.co/unsloth/Nemotron-3-Nano-30B-A3B-GGUF/resolve/main/Nemotron-3-Nano-30B-A3B-Q8_0.gguf",
+        "sha256": "sha256-QzqcDTnGw0NCBHl7MJkcTRR8DyUyhpDWCGLsOeKpIYg="
+      }
+    },
+    "qwen3-8b": {
       "source": {
         "kind": "fetchurl",
         "url": "https://huggingface.co/unsloth/Qwen3-8B-GGUF/resolve/main/Qwen3-8B-Q8_0.gguf",
-        "sha256": "sha256-DPv3RXYPB6dt3rNY3QJaJ/LhHRypyaQWmjc9UpkP6G4=",
-        "filename": "Qwen3-8B-Q8_0.gguf"
-      },
-      "reasoning": true,
-      "contextWindow": 32768,
-      "maxTokens": 4096,
-      "ctxSize": 32768,
-      "port": 11439
+        "sha256": "sha256-DPv3RXYPB6dt3rNY3QJaJ/LhHRypyaQWmjc9UpkP6G4="
+      }
+    },
+    "nemotron-3-super-120b-a12b": {
+      "source": {
+        "kind": "multi-shard",
+        "shards": [
+          { "sha256": "sha256-8iCD62sVrLUpBTCKsIPosMw4iXAFzEXoiBq9FkWAqsI=", "filename": "NVIDIA-Nemotron-3-Super-120B-A12B-UD-Q4_K_M-00001-of-00003.gguf" },
+          { "sha256": "sha256-bWWt2oh1nxvOpxTk2gnauOzEImWle4f5v3/jy39TuIk=", "filename": "NVIDIA-Nemotron-3-Super-120B-A12B-UD-Q4_K_M-00002-of-00003.gguf" },
+          { "sha256": "sha256-KxJsUTlt0x+7EnP7KyjQyFArq141eoUvZ696S29bp5w=", "filename": "NVIDIA-Nemotron-3-Super-120B-A12B-UD-Q4_K_M-00003-of-00003.gguf" }
+        ]
+      }
     }
-  ]
+  }
 }
