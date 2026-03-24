@@ -2,4 +2,5 @@
   "maisiliym"
   "goldragon"
   "seahawk"
+  "aedifico"
 ]

@@ -61,12 +61,25 @@ impl GpgAgent {
         stream.flush().map_err(|e| format!("flush failed: {e}"))
     }
 
+    /// Read a line as UTF-8 (for ASCII-only responses like OK, ERR, greeting).
     fn read_line(&mut self) -> Result<String, String> {
         let mut line = String::new();
         self.stream
             .read_line(&mut line)
             .map_err(|e| format!("read failed: {e}"))?;
         Ok(line.trim_end().to_string())
+    }
+
+    /// Read a raw line as bytes (for D-lines that may contain binary data).
+    fn read_raw_line(&mut self) -> Result<Vec<u8>, String> {
+        let mut buf = Vec::new();
+        self.stream
+            .read_until(b'\n', &mut buf)
+            .map_err(|e| format!("read failed: {e}"))?;
+        while buf.last() == Some(&b'\n') || buf.last() == Some(&b'\r') {
+            buf.pop();
+        }
+        Ok(buf)
     }
 
     fn expect_ok(&mut self) -> Result<(), String> {
@@ -81,20 +94,19 @@ impl GpgAgent {
     }
 
     /// Read a D-line data response followed by OK.
-    /// Handles percent-encoding used by the Assuan protocol.
+    /// Uses byte-level reading since D-lines may contain non-UTF-8 data.
     fn read_data_response(&mut self) -> Result<Vec<u8>, String> {
         let mut data = Vec::new();
         loop {
-            let line = self.read_line()?;
-            if line.starts_with("D ") {
-                let raw = &line[2..];
-                data.extend(decode_assuan_data(raw));
-            } else if line.starts_with("OK") {
+            let line = self.read_raw_line()?;
+            if line.starts_with(b"D ") {
+                data.extend(decode_assuan_bytes(&line[2..]));
+            } else if line.starts_with(b"OK") {
                 break;
-            } else if line.starts_with("ERR") {
-                return Err(format!("gpg-agent error: {line}"));
-            } else if line.starts_with("INQUIRE") {
-                // Some operations may ask for confirmation; send END
+            } else if line.starts_with(b"ERR") {
+                let msg = String::from_utf8_lossy(&line);
+                return Err(format!("gpg-agent error: {msg}"));
+            } else if line.starts_with(b"INQUIRE") {
                 self.send_command("END")?;
             }
         }
@@ -102,19 +114,16 @@ impl GpgAgent {
     }
 }
 
-/// Decode Assuan percent-encoded data.
-/// %XX sequences are decoded; all other bytes pass through.
-fn decode_assuan_data(input: &str) -> Vec<u8> {
-    let bytes = input.as_bytes();
+/// Decode Assuan percent-encoded data from raw bytes.
+fn decode_assuan_bytes(bytes: &[u8]) -> Vec<u8> {
     let mut result = Vec::with_capacity(bytes.len());
     let mut i = 0;
     while i < bytes.len() {
         if bytes[i] == b'%' && i + 2 < bytes.len() {
-            if let Ok(byte) = u8::from_str_radix(
-                &String::from_utf8_lossy(&bytes[i + 1..i + 3]),
-                16,
-            ) {
-                result.push(byte);
+            let hi = bytes[i + 1];
+            let lo = bytes[i + 2];
+            if let (Some(h), Some(l)) = (hex_val(hi), hex_val(lo)) {
+                result.push(h << 4 | l);
                 i += 3;
                 continue;
             }
@@ -123,6 +132,15 @@ fn decode_assuan_data(input: &str) -> Vec<u8> {
         i += 1;
     }
     result
+}
+
+fn hex_val(b: u8) -> Option<u8> {
+    match b {
+        b'0'..=b'9' => Some(b - b'0'),
+        b'a'..=b'f' => Some(b - b'a' + 10),
+        b'A'..=b'F' => Some(b - b'A' + 10),
+        _ => None,
+    }
 }
 
 /// Extract the raw signature value from gpg-agent's S-expression response.

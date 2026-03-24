@@ -32,6 +32,21 @@
         "type": "github"
       }
     },
+    "aedifico": {
+      "locked": {
+        "lastModified": 1774354856,
+        "narHash": "sha256-3sIGSoBWk7BlhSeTJHbYT62Ol8mTtRNatXfxKXOCtIk=",
+        "owner": "Criome",
+        "repo": "aedifico",
+        "rev": "7c9547f3a8d19895a3624005d2275f5d222e061f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Criome",
+        "repo": "aedifico",
+        "type": "github"
+      }
+    },
     "attic": {
       "inputs": {
         "crane": "crane",
@@ -842,6 +857,7 @@
     },
     "root": {
       "inputs": {
+        "aedifico": "aedifico",
         "attic": "attic",
         "base16-styles": "base16-styles",
         "base16-theme": "base16-theme",

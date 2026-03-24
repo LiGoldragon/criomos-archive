@@ -31,6 +31,7 @@
     maisiliym.url = "github:LiGoldragon/maisiliym/dev";
     goldragon.url = "github:LiGoldragon/goldragon";
     seahawk.url = "github:criome/seahawk";
+    aedifico.url = "github:Criome/aedifico";
 
     # Todo - binary cache
     attic.url = "github:zhaofengli/attic";

@@ -284,6 +284,7 @@ fn read_key_from_agent(keygrip: &str) -> Result<Vec<u8>, String> {
         .map_err(|e| format!("connect: {e}"))?;
     let mut stream = BufReader::new(raw);
 
+    // Read greeting (always ASCII)
     let mut line = String::new();
     stream.read_line(&mut line).map_err(|e| format!("read greeting: {e}"))?;
 
@@ -292,19 +293,25 @@ fn read_key_from_agent(keygrip: &str) -> Result<Vec<u8>, String> {
         .map_err(|e| format!("write READKEY: {e}"))?;
     stream.get_mut().flush().map_err(|e| format!("flush: {e}"))?;
 
+    // Read response lines as raw bytes (D-lines may contain non-UTF-8)
     let mut data = Vec::new();
     loop {
-        let mut resp = String::new();
-        stream.read_line(&mut resp).map_err(|e| format!("read: {e}"))?;
-        let resp = resp.trim_end();
+        let mut line_buf = Vec::new();
+        stream.read_until(b'\n', &mut line_buf)
+            .map_err(|e| format!("read: {e}"))?;
+        // Trim trailing newline/CR
+        while line_buf.last() == Some(&b'\n') || line_buf.last() == Some(&b'\r') {
+            line_buf.pop();
+        }
 
-        if resp.starts_with("D ") {
-            let raw = &resp[2..];
-            data.extend(decode_assuan(raw));
-        } else if resp.starts_with("OK") {
+        if line_buf.starts_with(b"D ") {
+            let raw = &line_buf[2..];
+            data.extend(decode_assuan_bytes(raw));
+        } else if line_buf.starts_with(b"OK") {
             break;
-        } else if resp.starts_with("ERR") {
-            return Err(format!("READKEY failed: {resp}"));
+        } else if line_buf.starts_with(b"ERR") {
+            let msg = String::from_utf8_lossy(&line_buf);
+            return Err(format!("READKEY failed: {msg}"));
         }
     }
 
@@ -347,17 +354,15 @@ fn extract_sexp_q_value(data: &[u8]) -> Option<Vec<u8>> {
     Some(key_data)
 }
 
-fn decode_assuan(input: &str) -> Vec<u8> {
-    let bytes = input.as_bytes();
+fn decode_assuan_bytes(bytes: &[u8]) -> Vec<u8> {
     let mut result = Vec::with_capacity(bytes.len());
     let mut i = 0;
     while i < bytes.len() {
         if bytes[i] == b'%' && i + 2 < bytes.len() {
-            if let Ok(byte) = u8::from_str_radix(
-                &String::from_utf8_lossy(&bytes[i + 1..i + 3]),
-                16,
-            ) {
-                result.push(byte);
+            let hi = bytes[i + 1];
+            let lo = bytes[i + 2];
+            if let (Some(h), Some(l)) = (hex_digit(hi), hex_digit(lo)) {
+                result.push(h << 4 | l);
                 i += 3;
                 continue;
             }
@@ -366,4 +371,13 @@ fn decode_assuan(input: &str) -> Vec<u8> {
         i += 1;
     }
     result
+}
+
+fn hex_digit(b: u8) -> Option<u8> {
+    match b {
+        b'0'..=b'9' => Some(b - b'0'),
+        b'a'..=b'f' => Some(b - b'a' + 10),
+        b'A'..=b'F' => Some(b - b'A' + 10),
+        _ => None,
+    }
 }
