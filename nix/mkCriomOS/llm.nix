@@ -132,7 +132,8 @@ let
           + " --ctx-size ${toString model.ctxSize}"
           + " --no-warmup"
           + " --no-mmap"
-          + " --no-webui";
+          + " --no-webui"
+          + " -fit off";
 
         Restart = "on-failure";
         RestartSec = 5;
