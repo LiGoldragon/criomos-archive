@@ -16,7 +16,11 @@
   },
 
   "routerSettings": {
-    "enable_pre_call_checks": false
+    "enable_pre_call_checks": false,
+    "cooldown_time": 5,
+    "allowed_fails": 10,
+    "num_retries": 3,
+    "retry_after": 2
   },
 
   "models": [
@@ -41,7 +45,7 @@
       "reasoning": true,
       "contextWindow": 131072,
       "maxTokens": 4096,
-      "ctxSize": 32768,
+      "ctxSize": 8192,
       "port": 11437
     },
     {
