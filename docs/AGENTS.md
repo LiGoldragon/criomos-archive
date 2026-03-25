@@ -6,7 +6,8 @@
 - Home Manager modules are in `nix/homeModule/` (with `min/`, `med/`, `max/` profiles).
 - Package and tooling overlays are in `nix/pkdjz/` and `nix/mkPkgs/`.
 - Schema concept definitions are in `capnp/` (not consumed by builds — Nix is the production schema).
-- Lock files for external service data live in `data/config/` (e.g., `data/config/nordvpn/servers-lock.json`, `data/config/pi/prometheus-model-lock.json`).
+- LLM model config (single source of truth): `data/config/largeAI/litellm.json` — serves `llm.nix`, litellm proxy, and pi agent settings.
+- Lock files for external service data live in `data/config/` (e.g., `data/config/nordvpn/servers-lock.json`).
 - Inputs are pinned in `npins/` and `flake.lock`.
 - Rust crates live in `src/` (e.g., `src/brightness-ctl/`).
 - Nix package wrappers for local crates live in `nix/` (e.g., `nix/brightness-ctl.nix`).
@@ -109,11 +110,22 @@ When a node is unresponsive, boot the asklepios USB, then:
 
 5. **Never run `activate` or `switch-to-configuration switch` inside a chroot** — it will break the live USB environment. Only use `nixos-install` or `switch-to-configuration boot`.
 
+### Persistent boot — updating the system profile
+`switch-to-configuration boot` only writes a bootloader entry. It does NOT update the system profile.
+To make a build persist across reboots, **always set the profile first**:
+```
+nix-env -p /nix/var/nix/profiles/system --set <store-path>
+<store-path>/bin/switch-to-configuration switch
+```
+Without `nix-env --set`, the bootloader may boot an old generation.
+
 ### Dangerous operations — DO NOT DO
 - **Never** run a system's `activate` script inside a chroot of a mounted install — it overwrites `/etc` on the live system.
 - **Never** deploy a major nixpkgs upgrade to a headless machine without testing on a machine with a screen first.
 - **Never** deploy to a headless node without the asklepios USB available for recovery.
 - **Never** reboot a machine with a live USB still inserted unless you intend to boot from it.
+- **Never** deploy a model that exceeds the GPU memory budget without testing interactively first (see LLM section).
+- **Never** edit config files in a panic to "fix" a deployment — verify what's actually deployed first, then make one deliberate change.
 
 ### Known node addresses (Yggdrasil)
 - ouranos: `201:6de1:5500:7cac:2db9:759e:42d2:fb1d`
@@ -167,7 +179,7 @@ Major nixpkgs upgrades (>1 month gap) require:
 - Use **systemd-networkd** — static, reliable, no GUI
 - `networking.useNetworkd = true` via `nix/mkCriomOS/network/networkd.nix`
 - Gated by `centerLike` (= `typeIs.center || typeIs.largeAI`)
-- USB ethernet dongles auto-configure as NAT routers (DHCP server on `10.47.0.0/24`)
+- USB ethernet dongles auto-bridge to `br-lan` (matched by driver: `cdc_ether r8152 ax88179_178a asix`)
 
 ### SSH access
 - **Keys only** — no password auth, ever. Keys come from the criosphere (`datom.nix` preCriomes).
@@ -190,11 +202,11 @@ When adding node-level configuration (like NordVPN):
 - Home profile packages: `nix/homeModule/min/default.nix` — add to `nixpkgsPackages`, `worldPackages`, or as a standalone `writeScriptBin`.
 - Tokenized scripts (gopass-wrapped): follow the pattern in `nix/homeModule/med/default.nix` — use full nix store paths for dependencies (`${pkgs.gopass}/bin/gopass`).
 
-## Lock File Pattern
-External service data (NordVPN servers, LLM models) uses JSON lock files in `data/config/`:
-- Lock file contains authoritative data with hashes/keys.
-- Nix modules read the lock file at build time via `fromJSON (readFile <path>)`.
-- Update scripts live alongside the lock file (e.g., `data/config/nordvpn/update-servers`).
+## Lock File / Config Pattern
+External service data uses JSON config files in `data/config/`:
+- `data/config/largeAI/litellm.json` — LLM models (single source of truth for services, proxy, and pi agent).
+- `data/config/nordvpn/servers-lock.json` — NordVPN server list with hashes.
+- Nix modules read these at build time via `fromJSON (readFile <path>)`.
 - After updating, review the diff with `jj diff`, then push.
 
 ### NordVPN server lock
@@ -219,6 +231,164 @@ nmcli connection show | grep nordvpn       # list available
 
 Split tunnel: IPv4 user traffic goes through the VPN. Yggdrasil (IPv6) and Tailscale (100.64.0.0/10) are exempt.
 
+## LLM Runtime (largeAI nodes)
+
+### Architecture
+- Single config file: `data/config/largeAI/litellm.json` — defines models, ports, pi agent settings, litellm router config.
+- `nix/mkCriomOS/llm.nix` reads the config and generates systemd services + `/etc/litellm-router.yaml`.
+- `nix/homeModule/min/default.nix` reads the same config and generates `.pi/agent/models.json` + settings for the pi coding agent.
+- The LLM module loads on any node with `typeIs.largeAI` or `typeIs."largeAI-router"`.
+- Client nodes discover the largeAI node via `horizon.exNodes` — no hardcoded addresses.
+- Provider name, gateway URL, and enabled models are all derived at eval time from the config + horizon topology.
+
+### Strix Halo GPU memory
+- Vulkan on Strix Halo defaults to ~64GB visible device memory despite 128GB unified RAM.
+- **TTM kernel params are required** to expose more:
+  ```
+  ttm.page_pool_size=27787264  # 5/6 of 128GB in pages
+  ttm.pages_limit=27787264
+  ```
+  These are set in `nix/mkCriomOS/metal/default.nix` for `centerIgnoresSuspend` nodes.
+- `hardware.graphics.enable = true` is required for Vulkan ICD — without it, llama-server falls back to CPU.
+- `-fit off` flag bypasses llama.cpp's conservative memory check that rejects models on unified memory APUs.
+- **GPU memory budget with TTM**: ~106GB usable. Without TTM: ~64GB. Calculate model weights + KV cache before deploying.
+
+### Model prefetch workflow (FOD pattern)
+Large GGUF models must be prefetched directly on the target node to avoid transferring over the network:
+```
+# On prometheus:
+ssh root@prometheus.maisiliym.criome \
+  'nix-prefetch-url <huggingface-url> --type sha256'
+
+# Convert to SRI:
+nix hash to-sri --type sha256 <hash>
+
+# Add to litellm.json with the SRI hash
+# Create GC root to prevent garbage collection:
+ssh root@prometheus.maisiliym.criome \
+  'nix-store --add-root /nix/var/nix/gcroots/llm-<name> -r /nix/store/<path>'
+```
+When `nix build` evaluates `pkgs.fetchurl` with the same hash, it finds the store path already present — zero re-download.
+
+### Testing a model interactively (BEFORE committing to config)
+```
+ssh root@prometheus.maisiliym.criome
+systemctl stop prometheus-llama-<old-model>
+
+# Test manually with desired context size:
+/nix/store/<llama-cpp>/bin/llama-server \
+  --host :: --port 11437 \
+  --model /nix/store/<model-path> \
+  --n-gpu-layers 99 --ctx-size 65536 \
+  --no-warmup --no-mmap --no-webui \
+  --parallel 1 --api-key sk-no-key-required \
+  -fit off
+
+# In another terminal, test:
+curl http://localhost:11437/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-no-key-required" \
+  -d '{"model":"x","messages":[{"role":"user","content":"hi"}],"max_tokens":8}'
+
+# Check memory:
+free -h
+
+# If it works, THEN update litellm.json and deploy.
+```
+
+### Sequential model loading
+Multiple models on one GPU must load sequentially — simultaneous Vulkan allocations cause OOM crashes. The llama services use `After=` dependencies so each waits for the previous. But `After=` means "start after unit starts", not "start after model is loaded". For reliable multi-model setups, verify the first model is serving before starting the second.
+
+### Protecting headless access from model OOM
+A crash-looping model service can consume all memory and kill hostapd/SSH. Mitigations:
+- Add `MemoryMax=` to llama service systemd config
+- Add `StartLimitBurst=3` and `StartLimitIntervalSec=60` to limit restart frequency
+- Always test model loading interactively before committing to config
+
+### Current deployment (March 2026)
+- **Model**: Qwen3.5-122B-A10B Q4_K_M — 76.5GB, 10B active MoE, Feb 2026
+- **Context**: 128K tokens
+- **Speed**: ~26 tok/s on Vulkan GPU
+- **Port**: 11437 (direct), 11434 (litellm proxy)
+- **Benchmarks**: GPQA 86.6, SWE-bench 72%, LiveCodeBench 78.9, HMLT 91.4
+
+## Debugging Commands
+
+### Network
+```
+# Find devices on link-local ethernet
+ping ff02::1%enp0s31f6
+
+# Set NM to link-local only (stops DHCP from disconnecting)
+nmcli connection modify "Wired connection 1" ipv4.method link-local ipv6.method link-local
+nmcli connection up "Wired connection 1"
+
+# Scan for WiFi AP
+nmcli device wifi rescan; sleep 5; nmcli device wifi list
+
+# Check hostapd
+ssh root@<host> 'systemctl is-active hostapd; journalctl -u hostapd --no-pager -n 10'
+
+# Check bridge exists
+ssh root@<host> 'ip link show br-lan; ip addr show br-lan'
+
+# Check networkd config files
+ssh root@<host> 'ls /etc/systemd/network/'
+```
+
+### LLM services
+```
+# Check model loading
+ssh root@prometheus.maisiliym.criome 'journalctl -u prometheus-llama-<model> --no-pager -n 10'
+
+# Check Vulkan GPU detection
+ssh root@prometheus.maisiliym.criome 'journalctl -u prometheus-llama-<model> --no-pager | grep -iE "vulkan|gpu|device|offload|layers"'
+
+# Check memory fit errors
+ssh root@prometheus.maisiliym.criome 'journalctl -u prometheus-llama-<model> --no-pager | grep -iE "fit|memory|free device"'
+
+# Check OOM kills
+ssh root@prometheus.maisiliym.criome 'dmesg | grep -i oom | tail -5'
+
+# Check TTM params active
+ssh root@prometheus.maisiliym.criome 'cat /proc/cmdline | tr " " "\n" | grep ttm'
+
+# Quick model test
+curl -s --max-time 30 http://prometheus.maisiliym.criome:11437/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-no-key-required" \
+  -d '{"model":"x","messages":[{"role":"user","content":"hi"}],"max_tokens":8}' | jq '.timings.predicted_per_second'
+
+# Check litellm proxy
+ssh root@prometheus.maisiliym.criome 'journalctl -u prometheus-litellm --no-pager -n 10'
+```
+
+### Nix store
+```
+# Verify store integrity
+ssh root@<host> 'nix-store --verify --check-contents 2>&1 | tail -5'
+
+# List GC roots (model shards)
+ssh root@<host> 'ls -la /nix/var/nix/gcroots/llm-*'
+
+# Check which system profile is active
+ssh root@<host> 'readlink /nix/var/nix/profiles/system; readlink /run/current-system'
+
+# Check what system booted vs what's deployed
+ssh root@<host> 'readlink /run/current-system; readlink result'
+```
+
+### NixOS deploy recovery
+```
+# Emergency: mask a crash-looping service
+ssh root@<host> 'systemctl stop <service>; systemctl mask <service>'
+# Note: mask fails on NixOS (read-only /etc/systemd/system). Use kill instead:
+ssh root@<host> 'systemctl stop <service>; pkill -f <process-name>'
+
+# Force set system profile and switch in one shot
+ssh root@<host> 'GOOD=$(readlink result); nix-env -p /nix/var/nix/profiles/system --set $GOOD; $GOOD/bin/switch-to-configuration switch; $GOOD/bin/switch-to-configuration boot; echo DONE'
+```
+
 ## Coding Style & Naming Conventions
 - Adhere to the Nix-specific Sema object style defined in `NIX_GUIDELINES.md`. The universal principles, with their original Rust examples, are in `GUIDELINES.md` for context.
 - Nix files use 2-space indentation and prefer the existing formatting in the file.
@@ -237,7 +407,8 @@ Split tunnel: IPv4 user traffic goes through the VPN. Yggdrasil (IPv6) and Tails
 - Network modules (`nix/mkCriomOS/network/`) derive host data from horizon.
 - When editing network behavior, update Maisiliym first, then CriomOS.
 - For production deployment, use `github:LiGoldragon/maisiliym` (not local path overrides).
-- `centerLike` = `typeIs.center || typeIs.largeAI` — headless server nodes.
+- `centerLike` = `typeIs.center || typeIs.largeAI || typeIs."largeAI-router"` — headless server nodes.
+- `behavesAs.router` = `typeIs.hybrid || typeIs.router || typeIs."largeAI-router"` — nodes running hostapd + NAT.
 
 ## Tree-Sitter Grammar Integration
 
