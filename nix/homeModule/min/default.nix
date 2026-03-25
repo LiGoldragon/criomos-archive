@@ -7,7 +7,6 @@
   horizon,
   config,
   world,
-  litellmProxy,
   inputs,
   # Todo(data)
   ...
@@ -214,7 +213,7 @@ let
   piAgentGatewayProvider = if largeAINodeName != null then largeAINodeName else "local";
   piAgentGatewayBaseUrl =
     if hasLargeAI
-    then "http://${largeAIHost}:${toString largeAIConfig.gatewayPort}/v1"
+    then "http://${largeAIHost}:${toString largeAIConfig.serverPort}/v1"
     else null;
 
   piAgentModels = {
@@ -255,7 +254,6 @@ let
     codex
     opencode
     llama-cpp
-    litellmProxy
   ] ++ optional (piAgent != null) piAgent;
 
   nixpkgsPackages =

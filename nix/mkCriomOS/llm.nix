@@ -8,22 +8,16 @@
 let
   inherit (builtins)
     concatStringsSep
-    elemAt
+    filter
     fromJSON
-    genList
     head
     length
-    listToAttrs
     map
-    pathExists
     readFile
     toString
     ;
-  inherit (lib) foldl';
 
-  litellmProxy = pkgs.callPackage ../litellm-proxy.nix { };
   llamaCppPackage = pkgs.callPackage ../llama-cpp-prometheus.nix { inherit pkgs; };
-  yamlFormat = pkgs.formats.yaml { };
 
   nodeName = horizon.node.name;
 
@@ -31,16 +25,14 @@ let
   configPath = ../../data/config/largeAI/litellm.json;
   cfg = fromJSON (readFile configPath);
 
-  gatewayPort = cfg.gatewayPort;
+  serverPort = cfg.serverPort;
   apiKey = cfg.apiKey;
 
   runtimeUser = "llama";
   runtimeHome = "/var/lib/llama";
 
-  litellmRouterConfigPath = "/etc/litellm-router.yaml";
-
-  # Resolve model source to a store path
-  mkModelPath = spec:
+  # Resolve model source to a store path (file or directory of shards)
+  mkModelStorePath = spec:
     let source = spec.source; in
     if source.kind == "multi-shard"
     then
@@ -49,101 +41,56 @@ let
           drv = pkgs.fetchurl { url = shard.url; sha256 = shard.sha256; };
           inherit (shard) filename;
         }) source.shards;
-        modelDir = pkgs.runCommand "model-shards-${spec.modelId}" {} (
-          "mkdir -p $out\n"
-          + concatStringsSep "\n" (map (s: "ln -s ${s.drv} $out/${s.filename}") fetched)
-        );
-      in "${modelDir}/${(head source.shards).filename}"
+      in pkgs.runCommand "model-${spec.modelId}" {} (
+        "mkdir -p $out\n"
+        + concatStringsSep "\n" (map (s: "ln -s ${s.drv} $out/${s.filename}") fetched)
+      )
     else if source.kind == "fetchurl"
-    then pkgs.fetchurl { url = source.url; sha256 = source.sha256; }
-    else if source.kind == "local-file"
-    then pkgs.runCommand "local-file-${source.filename}"
-      { nativeBuildInputs = [ pkgs.coreutils ]; allowSubstitutes = true; preferLocalBuild = true; }
-      "cp ${source.path} $out"
-    else source.path;
+    then
+      # Single-file model — place in a directory so router sees it by filename
+      let drv = pkgs.fetchurl { url = source.url; sha256 = source.sha256; }; in
+      pkgs.runCommand "model-${spec.modelId}" {} ''
+        mkdir -p $out
+        ln -s ${drv} $out/${source.filename}
+      ''
+    else throw "Unknown source kind: ${source.kind}";
 
-  mkRuntimeModel = index: spec: {
-    inherit (spec) modelId descriptor reasoning contextWindow maxTokens ctxSize port;
-    alias = "${nodeName}-${spec.modelId}";
-    canonicalId = spec.modelId;
-    serviceName = "${nodeName}-llama-${spec.modelId}";
-    modelPathStr = mkModelPath spec;
-    order = index + 1;
-  };
+  # Build the models-dir: a directory of subdirectories, one per model
+  # Router mode uses subdirectory name as model name
+  modelsDir = pkgs.runCommand "llm-models-dir" {} (
+    "mkdir -p $out\n"
+    + concatStringsSep "\n" (map (spec:
+      "ln -s ${mkModelStorePath spec} $out/${spec.modelId}"
+    ) cfg.models)
+  );
 
-  runtimeModels = genList (i: mkRuntimeModel i (elemAt cfg.models i)) (length cfg.models);
+  # Generate presets.ini for per-model config
+  presetDefaults = cfg.presetDefaults;
 
-  litellmRouterData = {
-    model_list = map (model: {
-      model_name = model.canonicalId;
-      litellm_params = {
-        model = "openai/${model.alias}";
-        api_base = "http://127.0.0.1:${toString model.port}/v1";
-        api_key = apiKey;
-      };
-      order = model.order;
-    }) runtimeModels;
+  globalPreset = concatStringsSep "\n" [
+    "[*]"
+    "n-gpu-layers = ${toString (presetDefaults."n-gpu-layers" or 99)}"
+    "no-mmap = ${if presetDefaults."no-mmap" or true then "true" else "false"}"
+    "no-warmup = ${if presetDefaults."no-warmup" or true then "true" else "false"}"
+    "fit = ${presetDefaults.fit or "off"}"
+    "parallel = ${toString (presetDefaults.parallel or 1)}"
+    ""
+  ];
 
-    router_settings = cfg.routerSettings // {
-      model_group_alias = foldl' (acc: model:
-        acc // { ${model.canonicalId} = model.canonicalId; }
-      ) { } runtimeModels;
-    };
+  mkModelPreset = spec:
+    let
+      lines = [
+        "[${spec.modelId}]"
+        "ctx-size = ${toString spec.ctxSize}"
+      ] ++ lib.optional (spec.loadOnStartup or false) "load-on-startup = true";
+    in concatStringsSep "\n" lines + "\n";
 
-    litellm_settings = cfg.litellmSettings;
-  };
+  presetsIni = pkgs.writeText "llm-presets.ini" (
+    globalPreset
+    + concatStringsSep "\n" (map mkModelPreset cfg.models)
+  );
 
-  litellmRouterFile = yamlFormat.generate "litellm-router.yaml" litellmRouterData;
-
-  # Chain model loading: each service waits for the previous to avoid
-  # Vulkan memory contention during simultaneous large allocations.
-  prevServiceName = index:
-    if index == 0 then null
-    else (elemAt runtimeModels (index - 1)).serviceName;
-
-  mkLlamaService = model: {
-    name = model.serviceName;
-    value = {
-      description = "${model.descriptor} llama.cpp OpenAI-compatible service";
-      wants = [ "network-online.target" ];
-      after = [ "network-online.target" ]
-        ++ (if prevServiceName (model.order - 1) != null
-            then [ "${prevServiceName (model.order - 1)}.service" ]
-            else []);
-
-      serviceConfig = {
-        Type = "simple";
-        User = runtimeUser;
-        WorkingDirectory = runtimeHome;
-        Environment = [
-          "HOME=${runtimeHome}"
-          "HSA_OVERRIDE_GFX_VERSION=11.5.1"
-        ];
-
-        ExecStart =
-          "${llamaCppPackage}/bin/llama-server"
-          + " --host ::"
-          + " --port ${toString model.port}"
-          + " --model ${model.modelPathStr}"
-          + " --n-gpu-layers 99"
-          + " --alias ${model.alias}"
-          + " --api-key ${apiKey}"
-          + " --parallel 1"
-          + " --ctx-size ${toString model.ctxSize}"
-          + " --no-warmup"
-          + " --no-mmap"
-          + " --no-webui"
-          + " -fit off";
-
-        Restart = "on-failure";
-        RestartSec = 5;
-      };
-
-      wantedBy = [ "multi-user.target" ];
-    };
-  };
-
-  llamaServices = listToAttrs (map mkLlamaService runtimeModels);
+  serviceName = "${nodeName}-llama-router";
 
 in
 {
@@ -158,46 +105,46 @@ in
   };
   users.groups.llama = {};
 
-  environment.etc."litellm-router.yaml" = {
-    source = litellmRouterFile;
-    mode = "0644";
-  };
-
-  networking.firewall.allowedTCPPorts = [ gatewayPort ] ++ map (model: model.port) runtimeModels;
+  networking.firewall.allowedTCPPorts = [ serverPort ];
 
   systemd.tmpfiles.rules = [
     "d /var/lib/llama 0755 llama llama - -"
-    "d /var/lib/llama/models 0755 llama llama - -"
   ];
 
-  systemd.services = lib.mapAttrs (_: svc: svc // {
-    serviceConfig = svc.serviceConfig // { StateDirectory = "llama"; };
-  }) llamaServices // {
-    "${nodeName}-litellm" = {
-      description = "${nodeName} LiteLLM gateway";
-      wants = [ "network-online.target" ];
-      after = [ "network-online.target" ];
+  systemd.services.${serviceName} = {
+    description = "${nodeName} llama.cpp router — multi-model on-demand serving";
+    wants = [ "network-online.target" ];
+    after = [ "network-online.target" ];
 
-      restartTriggers = [ config.environment.etc."litellm-router.yaml".source ];
+    serviceConfig = {
+      Type = "simple";
+      User = runtimeUser;
+      WorkingDirectory = runtimeHome;
+      Environment = [
+        "HOME=${runtimeHome}"
+        "HSA_OVERRIDE_GFX_VERSION=11.5.1"
+      ];
 
-      serviceConfig = {
-        Type = "simple";
-        User = runtimeUser;
-        WorkingDirectory = runtimeHome;
-        Environment = [ "HOME=${runtimeHome}" ];
+      ExecStart = concatStringsSep " " [
+        "${llamaCppPackage}/bin/llama-server"
+        "--host ::"
+        "--port ${toString serverPort}"
+        "--api-key ${apiKey}"
+        "--models-dir ${modelsDir}"
+        "--models-preset ${presetsIni}"
+        "--models-max ${toString cfg.router.modelsMax}"
+        "--no-webui"
+      ];
 
-        ExecStart =
-          "${litellmProxy}/bin/litellm"
-          + " --config ${litellmRouterConfigPath}"
-          + " --host ::"
-          + " --port ${toString gatewayPort}";
+      Restart = "on-failure";
+      RestartSec = 5;
+      StateDirectory = "llama";
 
-        Restart = "on-failure";
-        RestartSec = 5;
-        StateDirectory = "llama";
-      };
-
-      wantedBy = [ "multi-user.target" ];
+      # Prevent OOM from killing system services (hostapd, SSH)
+      MemoryMax = "110G";
+      MemoryHigh = "100G";
     };
+
+    wantedBy = [ "multi-user.target" ];
   };
 }

@@ -127,8 +127,6 @@ let
       pkgsAndWorld = mkPkgsAndWorldFromSystem system;
       inherit (pkgsAndWorld) pkgs world;
       horizon = crioZone;
-      litellmProxy = pkgs.callPackage ./nix/litellm-proxy.nix { };
-
       mkUserHome =
         userName: user:
         let
@@ -141,7 +139,6 @@ let
               world
               horizon
               user
-              litellmProxy
               inputs
               ;
           };

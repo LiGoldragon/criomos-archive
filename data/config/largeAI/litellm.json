@@ -1,5 +1,5 @@
 {
-  "gatewayPort": 11434,
+  "serverPort": 11434,
   "apiKey": "sk-no-key-required",
 
   "piAgent": {
@@ -9,18 +9,18 @@
     "compaction": { "enabled": false }
   },
 
-  "litellmSettings": {
-    "drop_params": true,
-    "modify_params": true,
-    "logging": { "level": "info" }
+  "router": {
+    "modelsMax": 1,
+    "_comment": "modelsMax=1: only one model loaded at a time; LRU-evicts on swap"
   },
 
-  "routerSettings": {
-    "enable_pre_call_checks": false,
-    "cooldown_time": 5,
-    "allowed_fails": 10,
-    "num_retries": 3,
-    "retry_after": 2
+  "presetDefaults": {
+    "n-gpu-layers": 99,
+    "no-mmap": true,
+    "no-warmup": true,
+    "fit": "off",
+    "parallel": 1,
+    "_comment": "Global defaults for all models — applied via [*] in presets.ini"
   },
 
   "models": [
@@ -51,45 +51,127 @@
       "contextWindow": 131072,
       "maxTokens": 4096,
       "ctxSize": 131072,
-      "port": 11437
-    }
-  ],
-
-  "shardCache": {
-    "_comment": "Pre-fetched model shards kept for future use — not served",
-    "gpt-oss-120b": {
+      "loadOnStartup": true,
+      "sizeGB": 76.5
+    },
+    {
+      "modelId": "gpt-oss-120b",
+      "descriptor": "GPT-OSS 120B Q4_K_M (Jan 2025 — general + coding)",
       "source": {
         "kind": "multi-shard",
         "shards": [
-          { "sha256": "sha256-sddHTKqScXuKf3XjwdEAbrQPO9NZFSLlorCV82sSdX0=", "filename": "gpt-oss-120b-Q4_K_M-00001-of-00002.gguf" },
-          { "sha256": "sha256-t8xPfdjf0lKQDXmrRiq8CtS/BuS88OWeSRtmJb/uNuY=", "filename": "gpt-oss-120b-Q4_K_M-00002-of-00002.gguf" }
+          {
+            "url": "https://huggingface.co/unsloth/gpt-oss-120b-GGUF/resolve/main/Q4_K_M/gpt-oss-120b-Q4_K_M-00001-of-00002.gguf",
+            "sha256": "sha256-sddHTKqScXuKf3XjwdEAbrQPO9NZFSLlorCV82sSdX0=",
+            "filename": "gpt-oss-120b-Q4_K_M-00001-of-00002.gguf"
+          },
+          {
+            "url": "https://huggingface.co/unsloth/gpt-oss-120b-GGUF/resolve/main/Q4_K_M/gpt-oss-120b-Q4_K_M-00002-of-00002.gguf",
+            "sha256": "sha256-t8xPfdjf0lKQDXmrRiq8CtS/BuS88OWeSRtmJb/uNuY=",
+            "filename": "gpt-oss-120b-Q4_K_M-00002-of-00002.gguf"
+          }
         ]
-      }
+      },
+      "reasoning": true,
+      "contextWindow": 131072,
+      "maxTokens": 4096,
+      "ctxSize": 65536,
+      "loadOnStartup": false,
+      "sizeGB": 63
     },
-    "glm-4.7-flash": {
-      "source": { "sha256": "sha256-jAkisDMmkypAMVzpK77gHMg2rRhmQmgBkUPImL3X3Qs=" }
-    },
-    "qwen3.5-27b": {
-      "source": { "sha256": "sha256-awoQGwqGaX/hHqvMGn23Jpmp89Sxi2oax16j+ywmxFA=" }
-    },
-    "nemotron-3-nano-30b-a3b": {
-      "source": { "sha256": "sha256-QzqcDTnGw0NCBHl7MJkcTRR8DyUyhpDWCGLsOeKpIYg=" }
-    },
-    "qwen3-8b": {
-      "source": { "sha256": "sha256-DPv3RXYPB6dt3rNY3QJaJ/LhHRypyaQWmjc9UpkP6G4=" }
-    },
-    "nemotron-3-super-120b-a12b": {
+    {
+      "modelId": "nemotron-3-super-120b-a12b",
+      "descriptor": "Nemotron 3 Super 120B-A12B UD-Q4_K_M (Mar 2025 — reasoning MoE)",
       "source": {
         "kind": "multi-shard",
         "shards": [
-          { "sha256": "sha256-8iCD62sVrLUpBTCKsIPosMw4iXAFzEXoiBq9FkWAqsI=" },
-          { "sha256": "sha256-bWWt2oh1nxvOpxTk2gnauOzEImWle4f5v3/jy39TuIk=" },
-          { "sha256": "sha256-KxJsUTlt0x+7EnP7KyjQyFArq141eoUvZ696S29bp5w=" }
+          {
+            "url": "https://huggingface.co/unsloth/NVIDIA-Nemotron-3-Super-120B-A12B-GGUF/resolve/main/UD-Q4_K_M/NVIDIA-Nemotron-3-Super-120B-A12B-UD-Q4_K_M-00001-of-00003.gguf",
+            "sha256": "sha256-8iCD62sVrLUpBTCKsIPosMw4iXAFzEXoiBq9FkWAqsI=",
+            "filename": "NVIDIA-Nemotron-3-Super-120B-A12B-UD-Q4_K_M-00001-of-00003.gguf"
+          },
+          {
+            "url": "https://huggingface.co/unsloth/NVIDIA-Nemotron-3-Super-120B-A12B-GGUF/resolve/main/UD-Q4_K_M/NVIDIA-Nemotron-3-Super-120B-A12B-UD-Q4_K_M-00002-of-00003.gguf",
+            "sha256": "sha256-bWWt2oh1nxvOpxTk2gnauOzEImWle4f5v3/jy39TuIk=",
+            "filename": "NVIDIA-Nemotron-3-Super-120B-A12B-UD-Q4_K_M-00002-of-00003.gguf"
+          },
+          {
+            "url": "https://huggingface.co/unsloth/NVIDIA-Nemotron-3-Super-120B-A12B-GGUF/resolve/main/UD-Q4_K_M/NVIDIA-Nemotron-3-Super-120B-A12B-UD-Q4_K_M-00003-of-00003.gguf",
+            "sha256": "sha256-KxJsUTlt0x+7EnP7KyjQyFArq141eoUvZ696S29bp5w=",
+            "filename": "NVIDIA-Nemotron-3-Super-120B-A12B-UD-Q4_K_M-00003-of-00003.gguf"
+          }
         ]
-      }
+      },
+      "reasoning": true,
+      "contextWindow": 131072,
+      "maxTokens": 4096,
+      "ctxSize": 32768,
+      "loadOnStartup": false,
+      "sizeGB": 63
     },
-    "llama-3.2-1b-instruct": {
-      "source": { "sha256": "sha256-HQ6UGexOEq73PM9P/RInA+lMSDRKlrx8Xw8ncsIVLOM=" }
+    {
+      "modelId": "glm-4.7-flash",
+      "descriptor": "GLM 4.7 Flash Q4_K_M (Dec 2024 — fast general)",
+      "source": {
+        "kind": "fetchurl",
+        "url": "https://huggingface.co/unsloth/GLM-4.7-Flash-GGUF/resolve/main/GLM-4.7-Flash-Q4_K_M.gguf",
+        "sha256": "sha256-jAkisDMmkypAMVzpK77gHMg2rRhmQmgBkUPImL3X3Qs=",
+        "filename": "GLM-4.7-Flash-Q4_K_M.gguf"
+      },
+      "reasoning": false,
+      "contextWindow": 131072,
+      "maxTokens": 4096,
+      "ctxSize": 131072,
+      "loadOnStartup": false,
+      "sizeGB": 32
+    },
+    {
+      "modelId": "nemotron-3-nano-30b-a3b",
+      "descriptor": "Nemotron 3 Nano 30B-A3B Q4_K_M (Mar 2025 — fast MoE)",
+      "source": {
+        "kind": "fetchurl",
+        "url": "https://huggingface.co/unsloth/Nemotron-3-Nano-30B-A3B-GGUF/resolve/main/Nemotron-3-Nano-30B-A3B-Q4_K_M.gguf",
+        "sha256": "sha256-QzqcDTnGw0NCBHl7MJkcTRR8DyUyhpDWCGLsOeKpIYg=",
+        "filename": "Nemotron-3-Nano-30B-A3B-Q4_K_M.gguf"
+      },
+      "reasoning": true,
+      "contextWindow": 131072,
+      "maxTokens": 4096,
+      "ctxSize": 131072,
+      "loadOnStartup": false,
+      "sizeGB": 17
+    },
+    {
+      "modelId": "qwen3.5-27b",
+      "descriptor": "Qwen3.5 27B Q4_K_M (Feb 2026 — dense reasoning)",
+      "source": {
+        "kind": "fetchurl",
+        "url": "https://huggingface.co/unsloth/Qwen3.5-27B-GGUF/resolve/main/Qwen3.5-27B-Q4_K_M.gguf",
+        "sha256": "sha256-awoQGwqGaX/hHqvMGn23Jpmp89Sxi2oax16j+ywmxFA=",
+        "filename": "Qwen3.5-27B-Q4_K_M.gguf"
+      },
+      "reasoning": true,
+      "contextWindow": 131072,
+      "maxTokens": 4096,
+      "ctxSize": 131072,
+      "loadOnStartup": false,
+      "sizeGB": 17
+    },
+    {
+      "modelId": "qwen3-8b",
+      "descriptor": "Qwen3 8B Q4_K_M (Apr 2025 — fast reasoning)",
+      "source": {
+        "kind": "fetchurl",
+        "url": "https://huggingface.co/unsloth/Qwen3-8B-GGUF/resolve/main/Qwen3-8B-Q4_K_M.gguf",
+        "sha256": "sha256-DPv3RXYPB6dt3rNY3QJaJ/LhHRypyaQWmjc9UpkP6G4=",
+        "filename": "Qwen3-8B-Q4_K_M.gguf"
+      },
+      "reasoning": true,
+      "contextWindow": 131072,
+      "maxTokens": 4096,
+      "ctxSize": 32768,
+      "loadOnStartup": false,
+      "sizeGB": 5
     }
-  }
+  ]
 }
