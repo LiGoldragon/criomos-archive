@@ -3,6 +3,7 @@
   world,
   homeModules,
   criomos-lib,
+  inputs,
   ...
 }:
 let
