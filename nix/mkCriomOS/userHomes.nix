@@ -25,6 +25,7 @@ in
         world
         horizon
         criomos-lib
+        inputs
         ;
     };
     sharedModules = homeModules;
