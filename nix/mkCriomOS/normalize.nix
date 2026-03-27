@@ -26,7 +26,6 @@ let
     sizedAtLeast
     useColemak
     behavesAs
-    centerLike
     ;
 
   # TODO
@@ -129,7 +128,7 @@ in
   nixpkgs.overlays = mkOverride 0 [ ];
 
   networking.networkmanager = {
-    enable = sizedAtLeast.min && !behavesAs.router && !behavesAs.iso && !centerLike;
+    enable = sizedAtLeast.min && !behavesAs.router && !behavesAs.iso && !behavesAs.center;
   };
 
   programs = {

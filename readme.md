@@ -27,7 +27,7 @@ an evolved version of NixOS, which is used for the bootstrap version.
 
   - GPU memory: Vulkan on Strix Halo only sees ~64GB of 128GB unified RAM by default.
     TTM kernel params (`ttm.page_pool_size=27787264 ttm.pages_limit=27787264`) expand
-    this to ~106GB. Set in `nix/mkCriomOS/metal/default.nix` for `centerIgnoresSuspend` nodes.
+    this to ~106GB. Set in `nix/mkCriomOS/metal/default.nix` for `behavesAs.center` nodes.
 - Networking: the live image is Ethernet-first; `nix/mkCriomOS/normalize.nix`
   enables NetworkManager for sized nodes so a plugged-in cable is detected
   during the initial boot before other transports are considered.

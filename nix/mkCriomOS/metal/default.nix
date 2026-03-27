@@ -24,7 +24,6 @@ let
     computerIs
     ;
 
-  centerIgnoresSuspend = typeIs.center || typeIs.largeAI || typeIs."largeAI-router";
 
   enableWaydroid = sizedAtLeast.max && behavesAs.edge;
 
@@ -199,13 +198,21 @@ in
         ] else [])
         # largeAI GPU tuning — expose 5/6 of unified RAM to GPU via TTM
         # Without this, Vulkan only sees ~64GB on 128GB Strix Halo.
-        (optionals (centerIgnoresSuspend) [
+        (optionals (behavesAs.center) [
           "ttm.page_pool_size=27787264"
           "ttm.pages_limit=27787264"
         ])
       ];
 
   };
+
+  # Headless nodes: set EPP to "power" for aggressive idle downclocking.
+  # The sysfs file only exists on CPUs with EPP support (AMD amd-pstate,
+  # Intel intel_pstate HWP), so the rule is a no-op on unsupported hardware.
+  systemd.tmpfiles.rules =
+    optionals behavesAs.center [
+      "w /sys/devices/system/cpu/cpu*/cpufreq/energy_performance_preference - - - - power"
+    ];
 
   powerManagement =
     let
@@ -292,7 +299,7 @@ in
     };
 
     logind.settings.Login = {
-      HandleLidSwitch = if centerIgnoresSuspend then "ignore" else "suspend";
+      HandleLidSwitch = if behavesAs.center then "ignore" else "suspend";
       HandleLidSwitchExternalPower = if behavesAs.lowPower then "suspend" else "ignore";
     };
 

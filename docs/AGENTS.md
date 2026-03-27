@@ -175,12 +175,12 @@ Major nixpkgs upgrades (>1 month gap) require:
 ### Edge nodes (ouranos, zeus, tiger, etc.)
 - Use **NetworkManager** — wifi, VPN, user switching
 - `networking.networkmanager.enable = true`
-- Gated by `sizedAtLeast.min && !centerLike`
+- Gated by `sizedAtLeast.min && !behavesAs.center`
 
 ### Headless nodes (prometheus, balboa)
 - Use **systemd-networkd** — static, reliable, no GUI
 - `networking.useNetworkd = true` via `nix/mkCriomOS/network/networkd.nix`
-- Gated by `centerLike` (= `typeIs.center || typeIs.largeAI`)
+- Gated by `behavesAs.center` (= `typeIs.center || typeIs.largeAI`)
 - USB ethernet dongles auto-bridge to `br-lan` (matched by driver: `cdc_ether r8152 ax88179_178a asix`)
 
 ### SSH access
@@ -199,7 +199,7 @@ When adding node-level configuration (like NordVPN):
 6. **capnp** — optionally update `capnp/criosphere.capnp` to keep the concept doc in sync (not required for builds).
 
 ## Adding System Packages
-- Per-node conditional packages: `nix/mkCriomOS/normalize.nix` — use `sizedAtLeast.min`/`.med`/`.max`, `behavesAs.*`, or `centerLike` guards.
+- Per-node conditional packages: `nix/mkCriomOS/normalize.nix` — use `sizedAtLeast.min`/`.med`/`.max`, `behavesAs.*`, or `behavesAs.center` guards.
 - ISO nodes (`behavesAs.iso`): keep packages minimal — rescue tools only.
 - Home profile packages: `nix/homeModule/min/default.nix` — add to `nixpkgsPackages`, `worldPackages`, or as a standalone `writeScriptBin`.
 - Tokenized scripts (gopass-wrapped): follow the pattern in `nix/homeModule/med/default.nix` — use full nix store paths for dependencies (`${pkgs.gopass}/bin/gopass`).
@@ -262,7 +262,7 @@ A single `llama-server` process manages all models via `--models-dir` and `--mod
   ttm.page_pool_size=27787264  # 5/6 of 128GB in pages
   ttm.pages_limit=27787264
   ```
-  These are set in `nix/mkCriomOS/metal/default.nix` for `centerIgnoresSuspend` nodes.
+  These are set in `nix/mkCriomOS/metal/default.nix` for `behavesAs.center` nodes.
 - `hardware.graphics.enable = true` is required for Vulkan ICD — without it, llama-server falls back to CPU.
 - `fit = off` in presets.ini bypasses llama.cpp's conservative memory check that rejects models on unified memory APUs.
 - **GPU memory budget with TTM**: ~106GB usable. Without TTM: ~64GB. Calculate model weights + KV cache before deploying.
@@ -423,7 +423,7 @@ ssh root@<host> 'GOOD=$(readlink result); nix-env -p /nix/var/nix/profiles/syste
 - Network modules (`nix/mkCriomOS/network/`) derive host data from horizon.
 - When editing network behavior, update Maisiliym first, then CriomOS.
 - For production deployment, use `github:LiGoldragon/maisiliym` (not local path overrides).
-- `centerLike` = `typeIs.center || typeIs.largeAI || typeIs."largeAI-router"` — headless server nodes.
+- `behavesAs.center` = `typeIs.center || typeIs.largeAI || typeIs."largeAI-router"` — headless server nodes.
 - `behavesAs.router` = `typeIs.hybrid || typeIs.router || typeIs."largeAI-router"` — nodes running hostapd + NAT.
 
 ## Tree-Sitter Grammar Integration

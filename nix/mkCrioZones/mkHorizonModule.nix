@@ -188,13 +188,12 @@ let
 
         in
         rec {
-          centerLike = typeIs.center || typeIs.largeAI || typeIs."largeAI-router";
           isFullyTrusted = trust == 3;
           sizedAtLeast = mkSizeAtLeast size;
           isBuilder =
-            !typeIs.edge && isFullyTrusted && (sizedAtLeast.med || centerLike) && hasBasePrecriads;
-          isDispatcher = !centerLike && isFullyTrusted && sizedAtLeast.min;
-          isNixCache = centerLike && sizedAtLeast.min && hasBasePrecriads;
+            !typeIs.edge && isFullyTrusted && (sizedAtLeast.med || behavesAs.center) && hasBasePrecriads;
+          isDispatcher = !behavesAs.center && isFullyTrusted && sizedAtLeast.min;
+          isNixCache = behavesAs.center && sizedAtLeast.min && hasBasePrecriads;
           hasNixPreCriad = node.nixPreCriome != null && node.nixPreCriome != "";
           hasYggPrecriad = yggAddress != null && yggAddress != "";
           hasSshPrecriad = hasAttr "ssh" inputNode.preCriomes;
@@ -217,6 +216,7 @@ let
           nixUrl = if isNixCache then ("http://" + nixCacheDomain) else null;
 
           behavesAs = rec {
+            center = typeIs.center || typeIs.largeAI || typeIs."largeAI-router";
             router = typeIs.hybrid || typeIs.router || typeIs."largeAI-router";
             edge = typeIs.edge || typeIs.hybrid || typeIs.edgeTesting;
             nextGen = typeIs.edgeTesting || typeIs.hybrid;

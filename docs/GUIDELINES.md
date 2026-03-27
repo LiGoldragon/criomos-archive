@@ -229,7 +229,7 @@ is stated as fact. Non‑boilerplate behavior is documented. Boilerplate is not.
 
 Any non-default NixOS switch must be driven by node-horizon data rather than
 local literals. The handling of `logind.settings.Login.HandleLidSwitch` in
-`nix/mkCriomOS/metal/default.nix` now reads a horizon-derived `centerIgnoresSuspend`
+`nix/mkCriomOS/metal/default.nix` now reads a horizon-derived `behavesAs.center`
 boolean that is rooted in `horizon.node.typeIs.center`, ensuring the no-suspend
 behavior is explicitly center-driven. The example relies on the center/server
 semantics, where the central server nodes built for CriomOS ignore the lid switch

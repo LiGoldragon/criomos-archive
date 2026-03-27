@@ -44,7 +44,7 @@ Vulkan sees only ~64GB by default on 128GB Strix Halo APUs. Kernel params expand
 ttm.page_pool_size=27787264   # 5/6 of 128GB in 4KB pages
 ttm.pages_limit=27787264
 ```
-Set in `nix/mkCriomOS/metal/default.nix` for `centerIgnoresSuspend` nodes.
+Set in `nix/mkCriomOS/metal/default.nix` for `behavesAs.center` nodes.
 
 Additionally:
 - `hardware.graphics.enable = true` — required for Vulkan ICD (Mesa RADV). Without it, llama-server falls back to CPU.

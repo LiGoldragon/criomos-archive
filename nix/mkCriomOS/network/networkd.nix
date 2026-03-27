@@ -6,13 +6,13 @@
 }:
 let
   inherit (lib) mkIf;
-  inherit (horizon.node.methods) centerLike behavesAs;
+  inherit (horizon.node.methods) behavesAs;
 
   hotplugSubnet = "10.47.0";
 
 in
 # Router nodes provide their own networkd config with bridge/hostapd
-mkIf (centerLike && !behavesAs.router) {
+mkIf (behavesAs.center && !behavesAs.router) {
   networking.useNetworkd = true;
   systemd.network.enable = true;
 
