@@ -11,7 +11,8 @@
 
   "router": {
     "modelsMax": 1,
-    "_comment": "modelsMax=1: only one model loaded at a time; LRU-evicts on swap"
+    "sleepIdleSeconds": 300,
+    "_comment": "modelsMax=1: only one model loaded at a time; LRU-evicts on swap. sleepIdleSeconds=300: unload weights after 5 min idle"
   },
 
   "presetDefaults": {

@@ -6,7 +6,7 @@
 - Home Manager modules are in `nix/homeModule/` (with `min/`, `med/`, `max/` profiles).
 - Package and tooling overlays are in `nix/pkdjz/` and `nix/mkPkgs/`.
 - Schema concept definitions are in `capnp/` (not consumed by builds — Nix is the production schema).
-- LLM model config (single source of truth): `data/config/largeAI/litellm.json` — serves `llm.nix`, litellm proxy, and pi agent settings.
+- LLM model config (single source of truth): `data/config/largeAI/llm.json` — serves `llm.nix`, llama.cpp router, and pi agent settings.
 - Lock files for external service data live in `data/config/` (e.g., `data/config/nordvpn/servers-lock.json`).
 - Inputs are pinned in `npins/` and `flake.lock`.
 - Rust crates live in `src/` (e.g., `src/brightness-ctl/`).
@@ -206,7 +206,7 @@ When adding node-level configuration (like NordVPN):
 
 ## Lock File / Config Pattern
 External service data uses JSON config files in `data/config/`:
-- `data/config/largeAI/litellm.json` — LLM models (single source of truth for services, proxy, and pi agent).
+- `data/config/largeAI/llm.json` — LLM models (single source of truth for services, proxy, and pi agent).
 - `data/config/nordvpn/servers-lock.json` — NordVPN server list with hashes.
 - Nix modules read these at build time via `fromJSON (readFile <path>)`.
 - After updating, review the diff with `jj diff`, then push.
@@ -236,7 +236,7 @@ Split tunnel: IPv4 user traffic goes through the VPN. Yggdrasil (IPv6) and Tails
 ## LLM Runtime (largeAI nodes)
 
 ### Architecture
-- Single config file: `data/config/largeAI/litellm.json` — defines models, presets, pi agent settings.
+- Single config file: `data/config/largeAI/llm.json` — defines models, presets, pi agent settings.
 - `nix/mkCriomOS/llm.nix` reads the config and generates one router service + `models-dir` + `presets.ini`.
 - `nix/homeModule/min/default.nix` reads the same config and generates `.pi/agent/models.json` + settings for the pi coding agent.
 - The LLM module loads on any node with `typeIs.largeAI` or `typeIs."largeAI-router"`.
@@ -251,7 +251,7 @@ A single `llama-server` process manages all models via `--models-dir` and `--mod
 - `POST /models/unload {"model":"<id>"}` — explicit unload
 - `GET /v1/models` — list all models and their load status
 - Requesting an unloaded model auto-loads it (evicts current model)
-- Per-model config (ctx-size, flags) via INI presets generated from `litellm.json`
+- Per-model config (ctx-size, flags) via INI presets generated from `llm.json`
 - Service name: `${nodeName}-llama-router` (e.g. `prometheus-llama-router`)
 - Single port: 11434 for all models
 
@@ -283,7 +283,7 @@ nix hash to-sri --type sha256 <hash>
 # resolve/main/file.gguf → resolve/<commit>/file.gguf
 # Get the commit: curl -s https://huggingface.co/api/models/<org>/<repo> | jq .sha
 
-# Add to litellm.json with the SRI hash and pinned URL
+# Add to llm.json with the SRI hash and pinned URL
 # Create GC root to prevent garbage collection:
 ssh root@prometheus.maisiliym.criome \
   'nix-store --add-root /nix/var/nix/gcroots/llm-<name> -r /nix/store/<path>'

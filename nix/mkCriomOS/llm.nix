@@ -22,7 +22,7 @@ let
   nodeName = horizon.node.name;
 
   # Unified config — single source of truth for all LLM services
-  configPath = ../../data/config/largeAI/litellm.json;
+  configPath = ../../data/config/largeAI/llm.json;
   cfg = fromJSON (readFile configPath);
 
   serverPort = cfg.serverPort;
@@ -125,7 +125,7 @@ in
         "HSA_OVERRIDE_GFX_VERSION=11.5.1"
       ];
 
-      ExecStart = concatStringsSep " " [
+      ExecStart = concatStringsSep " " ([
         "${llamaCppPackage}/bin/llama-server"
         "--host ::"
         "--port ${toString serverPort}"
@@ -134,7 +134,7 @@ in
         "--models-preset ${presetsIni}"
         "--models-max ${toString cfg.router.modelsMax}"
         "--no-webui"
-      ];
+      ] ++ lib.optional (cfg.router ? sleepIdleSeconds) "--sleep-idle-seconds ${toString cfg.router.sleepIdleSeconds}");
 
       Restart = "on-failure";
       RestartSec = 5;

@@ -37,7 +37,7 @@ let
   homeDir = config.home.homeDirectory;
 
   # Unified LLM config — single source of truth
-  largeAIConfigPath = ../../../data/config/largeAI/litellm.json;
+  largeAIConfigPath = ../../../data/config/largeAI/llm.json;
   largeAIConfig = builtins.fromJSON (builtins.readFile largeAIConfigPath);
   largeAIModels = largeAIConfig.models;
 
@@ -208,7 +208,7 @@ let
 
   unixDeveloperPackages = unixUtilities ++ programmingTools;
 
-  # Pi agent config — derived entirely from largeAI/litellm.json + horizon
+  # Pi agent config — derived entirely from largeAI/llm.json + horizon
   piAgentGatewayProvider = if largeAINodeName != null then largeAINodeName else "local";
   piAgentGatewayBaseUrl =
     if hasLargeAI

@@ -3,11 +3,22 @@
 ## Overview
 The largeAI runtime uses llama.cpp's **router mode** to serve multiple models
 on demand from a single systemd service. Models are loaded/unloaded automatically
-(LRU eviction) — only one model in memory at a time. Configuration is read from
-`data/config/largeAI/litellm.json`.
+(LRU eviction) — only one model in memory at a time. Idle models auto-unload
+after `sleepIdleSeconds` (default 300s). Configuration is read from
+`data/config/largeAI/llm.json`.
+
+## History
+The config file was originally `litellm.json` from an earlier architecture that
+used LiteLLM as a proxy in front of llama.cpp. LiteLLM was abandoned because:
+- It added an unnecessary Python process between clients and llama.cpp.
+- llama.cpp's native router mode (`--models-dir`, `--models-max`) replaced all
+  proxy functionality: multi-model serving, on-demand loading, LRU eviction.
+- The proxy layer complicated debugging and added latency without benefit.
+The file was renamed to `llm.json` (2026-03-28) to reflect the direct
+llama.cpp architecture.
 
 ## Architecture
-- **Config**: `data/config/largeAI/litellm.json` — single source of truth for models, presets, pi agent settings.
+- **Config**: `data/config/largeAI/llm.json` — single source of truth for models, presets, pi agent settings.
 - **LLM module**: `nix/mkCriomOS/llm.nix` — generates one systemd router service + models-dir + presets.ini.
 - **Home module**: `nix/homeModule/min/default.nix` — generates pi agent config from the same JSON.
 - **Gate**: `(typeIs.largeAI or false) || (typeIs."largeAI-router" or false)` in `default.nix`.
@@ -116,6 +127,6 @@ ssh root@prometheus.maisiliym.criome \
 ## Implementation references
 - Router service: `nix/mkCriomOS/llm.nix`
 - Binary package: `nix/llama-cpp-prometheus.nix`
-- Model config: `data/config/largeAI/litellm.json`
+- Model config: `data/config/largeAI/llm.json`
 - GPU/TTM setup: `nix/mkCriomOS/metal/default.nix`
 - Home agent config: `nix/homeModule/min/default.nix`
