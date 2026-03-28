@@ -57,6 +57,10 @@ let
   hasModelSpecificPowerTweaks = model != null && builtins.hasAttr model modelSpecificPowerTweaks;
 
   modelKernelModulesIndex = {
+    "GMKtec EVO-X2" = [
+      "nvme"
+      "mt7925e"
+    ];
     ThinkPadE15Gen2Intel = [
       "nvme"
       "thunderbolt"
