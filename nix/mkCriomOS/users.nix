@@ -36,7 +36,7 @@ let
         [ "audio" ]
         ++ (optional (config.programs.sway.enable == true) "sway")
         ++ (optionals (trust >= 2) (
-          [ "video" ] ++ (optional (config.networking.networkmanager.enable == true)) "networkmanager"
+          [ "video" ] ++ (optional (config.networking.networkmanager.enable == true) "networkmanager")
         ))
         ++ (optionals (trust >= 3) [
           "adbusers"

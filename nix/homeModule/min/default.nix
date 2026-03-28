@@ -656,7 +656,7 @@ mkIf sizedAtLeast.min {
           hideOnClose=false
           passExecutable=${waylandPass}/bin/pass
           passTemplate=login\nurl
-          pwgenExecutable=${pkgs.pwgen}bin/pwgen
+          pwgenExecutable=${pkgs.pwgen}/bin/pwgen
           startMinimized=false
           templateAllFields=false
           useAutoclear=true
