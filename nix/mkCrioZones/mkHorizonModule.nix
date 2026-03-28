@@ -226,6 +226,8 @@ let
             iso = !virtualMachine && (inputNode.io.disks == { });
           };
 
+          hasVideoOutput = behavesAs.edge;
+
         };
 
     in
