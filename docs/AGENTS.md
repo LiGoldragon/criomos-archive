@@ -22,61 +22,118 @@
 - Verdicts: error, evolution, dependency, gap, redundancy, violation, drift.
 
 ## Build Commands
-- **Always push changes before building.** Build from origin, not the dirty working tree — this ensures the nix store cache is populated with correct hashes:
-  ```
-  jj bookmark set dev -r @ && jj git push -b dev
-  jj new
-  nix build github:Criome/CriomOS/dev#crioZones.maisiliym.<node>.os --no-link --print-out-paths --refresh
-  ```
-- Never use `nix build .#` for deployment builds — only for local eval testing.
-- Never use `<nixpkgs>` / `NIX_PATH` style commands in this repo. Use flake attrs and `nix shell nixpkgs#<pkg>` for ad-hoc tools.
-- Build a home profile:
-  ```
-  nix build github:Criome/CriomOS/dev#crioZones.maisiliym.<node>.home.<user> --no-link --print-out-paths
-  ```
-- Build a VM (for ISO-type nodes):
-  ```
-  nix build github:Criome/CriomOS/dev#crioZones.maisiliym.<node>.vm --no-link --print-out-paths
-  ```
-- Test with a local Maisiliym override (not for production):
-  ```
-  nix build .#crioZones.maisiliym.<node>.os --override-input maisiliym path:/home/li/git/maisiliym --no-link --print-out-paths
-  ```
-- Update a flake input:
-  ```
-  nix flake update <input-name>
-  ```
+
+**Always push before building.** Build from origin, not the dirty tree:
+```
+jj bookmark set main -r @ && jj git push -b main
+jj new
+```
+
+Build attrs: `github:Criome/CriomOS#crioZones.maisiliym.<node>.<target>`
+
+| Target | What |
+|--------|------|
+| `.os` | System without home profiles |
+| `.fullOs` | System with home-manager users |
+| `.home.<user>` | Standalone home profile |
+| `.vm` | QEMU VM (for ISO-type nodes) |
+| `.deployManifest` | JSON deploy manifest |
+
+**Build locally** (eval testing only):
+```
+nix eval .#crioZones.maisiliym.<node>.os.name --no-write-lock-file
+```
+
+**Build on the target node** (preferred — store paths land directly, no copy needed):
+```
+ssh root@<node> systemd-run --unit=<name>-build \
+  nix build github:Criome/CriomOS#crioZones.maisiliym.<node>.os \
+    --no-link --print-out-paths --refresh --no-write-lock-file
+```
+Check progress: `journalctl -u <name>-build -f --no-pager`
+
+Headless nodes need `--no-write-lock-file` (no git on PATH in minimal profiles).
+
+**Build from a different machine** (then copy):
+```
+nix build github:Criome/CriomOS#crioZones.maisiliym.<node>.os \
+  --no-link --print-out-paths --refresh
+```
+
+**`--refresh` is required** after pushing — nix caches flake refs and won't pick up new commits without it. Alternative: use the explicit commit hash in the URL.
+
+**Local Maisiliym override** (not for production):
+```
+nix build .#crioZones.maisiliym.<node>.os \
+  --override-input maisiliym path:/home/li/git/maisiliym --no-link --print-out-paths
+```
+
+**Update a flake input:**
+```
+nix flake update <input-name>
+```
+
+Never use `<nixpkgs>` / `NIX_PATH` in this repo. Use `nix shell nixpkgs#<pkg>` for ad-hoc tools.
 
 ## Deployment
 
-### Standard deployment (via Yggdrasil)
+### Standard deployment
 
-1. **Build** from origin:
+1. **Push and build** (on the target node or locally):
    ```
-   nix build github:Criome/CriomOS/dev#crioZones.maisiliym.<node>.os --no-link --print-out-paths --refresh
+   ssh root@<node> systemd-run --unit=<node>-build \
+     nix build github:Criome/CriomOS#crioZones.maisiliym.<node>.os \
+       --no-link --print-out-paths --refresh --no-write-lock-file
    ```
+   Get the store path from: `journalctl -u <node>-build --no-pager | tail -3`
 
-2. **Copy** via Yggdrasil:
+2. **Copy** (only if built on a different machine):
    ```
-   nix copy --to "ssh://root@[<ygg-address>]" <store-path>
-   ```
-
-3. **Activate**:
-   ```
-   ssh root@<ygg-address> <store-path>/bin/switch-to-configuration switch
+   nix copy --to "ssh://root@<node>" <store-path>
    ```
 
-4. **Home profile activation** (run as root, `su` to the target user):
+3. **Set profile and activate**:
    ```
-   nix copy --to "ssh://root@[<ygg-address>]" <home-store-path>
-   ssh root@<ygg-address> su -l <user> -c '<home-store-path>/activate'
+   ssh root@<node> 'nix-env -p /nix/var/nix/profiles/system --set <store-path> && \
+     <store-path>/bin/switch-to-configuration switch'
    ```
+   `nix-env --set` updates the system profile so the bootloader picks the right generation.
+   Without it, a reboot may boot an old generation.
 
-### Local deployment (already on the target node)
+4. **If rebooting** (e.g. kernel param changes):
+   ```
+   ssh root@<node> 'nix-env -p /nix/var/nix/profiles/system --set <store-path> && \
+     <store-path>/bin/switch-to-configuration boot && reboot'
+   ```
+   Use `boot` instead of `switch` when you want changes to take effect only after reboot.
+
+### Home profile activation
+Build and activate separately (run as root, `su` to the target user):
 ```
-ssh root@localhost <store-path>/bin/switch-to-configuration switch
-ssh root@localhost su -l <user> -c '<home-store-path>/activate'
+nix copy --to "ssh://root@<node>" <home-store-path>
+ssh root@<node> su -l <user> -c '<home-store-path>/activate'
 ```
+Alternatively, `fullOs` includes home-manager — `switch-to-configuration switch` activates both OS and home profiles in one step.
+
+### Node addressing
+
+| Method | When to use | Example |
+|--------|------------|---------|
+| DNS name | Unbound running on target | `prometheus.maisiliym.criome` |
+| Yggdrasil address | Always works (direct mesh) | `200:ca41:6b12:fba:d7bc:cfc6:4aaa:165f` |
+| Link-local | Yggdrasil down, direct ethernet | `fe80::...%enp0s31f6` |
+
+DNS requires the target's Unbound to be running. For deployment, prefer DNS when available, fall back to Ygg addresses.
+
+Known Yggdrasil addresses:
+- ouranos: `201:6de1:5500:7cac:2db9:759e:42d2:fb1d`
+- prometheus: `200:ca41:6b12:fba:d7bc:cfc6:4aaa:165f`
+
+### SSH-safe long builds
+
+On headless nodes, builds may outlast the SSH connection. Options:
+- **`systemd-run`** (as root): `systemd-run --unit=<name> nix build ...` — survives SSH disconnect, logs to journal.
+- **`pueue`** (as user): `pueue add -- nix build ...` — requires `loginctl enable-linger <user>` or the user session dies on disconnect.
 
 ### Recovery deployment (via asklepios live USB)
 When a node is unresponsive, boot the asklepios USB, then:
@@ -110,15 +167,6 @@ When a node is unresponsive, boot the asklepios USB, then:
 
 5. **Never run `activate` or `switch-to-configuration switch` inside a chroot** — it will break the live USB environment. Only use `nixos-install` or `switch-to-configuration boot`.
 
-### Persistent boot — updating the system profile
-`switch-to-configuration boot` only writes a bootloader entry. It does NOT update the system profile.
-To make a build persist across reboots, **always set the profile first**:
-```
-nix-env -p /nix/var/nix/profiles/system --set <store-path>
-<store-path>/bin/switch-to-configuration switch
-```
-Without `nix-env --set`, the bootloader may boot an old generation.
-
 ### Dangerous operations — DO NOT DO
 - **Never** run a system's `activate` script inside a chroot of a mounted install — it overwrites `/etc` on the live system.
 - **Never** deploy a major nixpkgs upgrade to a headless machine without testing on a machine with a screen first.
@@ -127,13 +175,6 @@ Without `nix-env --set`, the bootloader may boot an old generation.
 - **Never** deploy a model that exceeds the GPU memory budget without testing interactively first (see LLM section).
 - **Never** edit config files in a panic to "fix" a deployment — verify what's actually deployed first, then make one deliberate change.
 - **Never** use hashes from web searches or model cards for `fetchurl` — always `nix-prefetch-url` on the target node and pin HuggingFace URLs to specific repo commits (`resolve/<commit>/` not `resolve/main/`).
-- **Never** build on a remote node with `github:.../main` after pushing a fix — nix caches the old ref. Use the explicit commit hash or `--refresh`.
-
-### Known node addresses (Yggdrasil)
-- ouranos: `201:6de1:5500:7cac:2db9:759e:42d2:fb1d`
-- prometheus: `200:ca41:6b12:fba:d7bc:cfc6:4aaa:165f`
-
-DNS resolution (`ouranos.maisiliym.criome`) requires the target node's Unbound to be running. Use Yggdrasil addresses directly for deployment.
 
 ### Link-local access (when Yggdrasil is down)
 If the router blocks inter-client TCP but allows IPv6 multicast, or for direct ethernet:
