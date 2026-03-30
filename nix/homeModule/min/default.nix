@@ -247,12 +247,14 @@ let
 
   piAgent = inputs.llm-agents.packages.${pkgs.system}.pi or null;
 
-  AIPackages = with pkgs; [
-    gemini-cli
-    claude-code
+  codex = inputs.codex-cli.packages.${pkgs.system}.default;
+
+  AIPackages = [
+    pkgs.gemini-cli
+    pkgs.claude-code
     codex
-    opencode
-    llama-cpp
+    pkgs.opencode
+    pkgs.llama-cpp
   ] ++ optional (piAgent != null) piAgent;
 
   nixpkgsPackages =

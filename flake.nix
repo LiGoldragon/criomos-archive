@@ -117,6 +117,10 @@
       url = "github:Criome/aski";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    codex-cli = {
+      url = "github:sadjow/codex-cli-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     superchat = {
       url = "github:yibie/superchat";
       flake = false;
