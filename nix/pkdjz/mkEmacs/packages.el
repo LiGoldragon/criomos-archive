@@ -85,6 +85,8 @@
 ;; Non-working - requires an elisp package, like nix-ts-mode
 (use-package
  treesit
+ :custom
+ (treesit-font-lock-level 4)
  :config
  (define-derived-mode
   capnp-ts-mode
