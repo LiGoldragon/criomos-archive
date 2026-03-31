@@ -9,7 +9,6 @@ use std::process::Command;
 struct Backlight {
     brightness: u64,
     max: u64,
-    step: u64,
     sysfs: &'static str,
 }
 
@@ -61,37 +60,53 @@ impl From<io::Error> for Error {
     }
 }
 
-// --- Backlight ---
+// --- Constants ---
 
 const SYSFS_PATH: &str = "/sys/class/backlight/intel_backlight";
-const GAMMA_STEP: f64 = 0.02;
-const GAMMA_FLOOR: f64 = 0.02;
 const DBUS_DEST: &str = "rs.wl-gammarelay";
 const DBUS_PATH: &str = "/";
 const DBUS_IFACE: &str = "rs.wl.gammarelay";
+
+/// Perceptual step fraction: each key press shifts 15% of current brightness.
+const STEP_NUM: u64 = 15;
+const STEP_DEN: u64 = 100;
+
+/// Software gamma tiers below hardware minimum. Geometrically spaced so each
+/// step roughly halves perceived brightness. The last tier is effectively off.
+const GAMMA_LEVELS: [f64; 6] = [1.0, 0.6, 0.35, 0.15, 0.05, 0.01];
+
+// --- Backlight ---
 
 impl Backlight {
     fn from_sysfs() -> Result<Self, Error> {
         let max = read_sysfs_u64(SYSFS_PATH, "max_brightness")?;
         let brightness = read_sysfs_u64(SYSFS_PATH, "brightness")?;
-        let step = max / 100;
         Ok(Self {
             brightness,
             max,
-            step,
             sysfs: SYSFS_PATH,
         })
     }
 
+    /// Smallest hardware brightness value — the floor before gamma takes over.
+    fn min_hw(&self) -> u64 {
+        (self.max / 500).max(1)
+    }
+
+    /// Perceptual step proportional to current level, floored at min_hw.
+    fn step(&self) -> u64 {
+        (self.brightness * STEP_NUM / STEP_DEN).max(self.min_hw())
+    }
+
     fn set(&mut self, value: u64) -> Result<(), Error> {
-        let clamped = value.clamp(self.step, self.max);
+        let clamped = value.clamp(self.min_hw(), self.max);
         fs::write(format!("{}/brightness", self.sysfs), clamped.to_string())?;
         self.brightness = clamped;
         Ok(())
     }
 
     fn at_minimum(&self) -> bool {
-        self.brightness <= self.step
+        self.brightness <= self.min_hw()
     }
 
     fn hardware_pct(&self) -> f64 {
@@ -103,7 +118,9 @@ impl Backlight {
 
 impl GammaBrightness {
     fn from_dbus() -> Result<Self, Error> {
-        let output = busctl_cmd(&["--user", "get-property", DBUS_DEST, DBUS_PATH, DBUS_IFACE, "Brightness"])?;
+        let output = busctl_cmd(&[
+            "--user", "get-property", DBUS_DEST, DBUS_PATH, DBUS_IFACE, "Brightness",
+        ])?;
         let val = output
             .split_whitespace()
             .nth(1)
@@ -114,7 +131,8 @@ impl GammaBrightness {
     }
 
     fn set(&mut self, value: f64) -> Result<(), Error> {
-        let clamped = value.clamp(GAMMA_FLOOR, 1.0);
+        let floor = GAMMA_LEVELS[GAMMA_LEVELS.len() - 1];
+        let clamped = value.clamp(floor, 1.0);
         busctl_cmd(&[
             "--user", "set-property", DBUS_DEST, DBUS_PATH, DBUS_IFACE,
             "Brightness", "d", &clamped.to_string(),
@@ -124,7 +142,36 @@ impl GammaBrightness {
     }
 
     fn below_full(&self) -> bool {
-        self.0 < 1.0
+        self.0 < 1.0 - f64::EPSILON
+    }
+
+    /// Index of the nearest matching tier in GAMMA_LEVELS.
+    fn level_index(&self) -> usize {
+        GAMMA_LEVELS
+            .iter()
+            .enumerate()
+            .min_by(|(_, a), (_, b)| {
+                (self.0 - *a).abs().partial_cmp(&(self.0 - *b).abs()).unwrap()
+            })
+            .map(|(i, _)| i)
+            .unwrap_or(0)
+    }
+
+    /// Step toward darker: advance to the next lower gamma tier.
+    fn step_down(&mut self) -> Result<(), Error> {
+        let idx = self.level_index();
+        let next = (idx + 1).min(GAMMA_LEVELS.len() - 1);
+        self.set(GAMMA_LEVELS[next])
+    }
+
+    /// Step toward brighter: advance to the next higher gamma tier.
+    fn step_up(&mut self) -> Result<(), Error> {
+        let idx = self.level_index();
+        if idx == 0 {
+            self.set(1.0)
+        } else {
+            self.set(GAMMA_LEVELS[idx - 1])
+        }
     }
 }
 
@@ -148,9 +195,25 @@ impl EffectiveBrightness {
         let pct = self.hardware_pct * self.gamma;
         (pct.clamp(0.0, 100.0)) as u8
     }
+
+    fn notify(&self) -> Result<(), Error> {
+        let arc = self.to_arc();
+        let sw_tag = if self.gamma < 1.0 - f64::EPSILON { " (sw)" } else { "" };
+        let label = format!("{arc}{sw_tag}");
+        let bar = self.progress_bar().to_string();
+
+        run_as_user("notify-send", &[
+            "-h", "string:x-canonical-private-synchronous:brightness",
+            "-h", &format!("int:value:{bar}"),
+            "-t", "1500",
+            "Brightness",
+            &label,
+        ])?;
+        Ok(())
+    }
 }
 
-// --- Arc (degree/minute/second display) ---
+// --- Arc ---
 
 impl fmt::Display for Arc {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -184,42 +247,23 @@ impl Direction {
         match self {
             Self::Up => {
                 if gamma.below_full() {
-                    let new = (gamma.0 + GAMMA_STEP).min(1.0);
-                    gamma.set(new)?;
+                    gamma.step_up()?;
                 } else {
-                    backlight.set(backlight.brightness + backlight.step)?;
+                    let step = backlight.step();
+                    backlight.set(backlight.brightness + step)?;
                 }
             }
             Self::Down => {
                 if backlight.at_minimum() {
-                    backlight.set(backlight.step)?;
-                    let new = (gamma.0 - GAMMA_STEP).max(GAMMA_FLOOR);
-                    gamma.set(new)?;
+                    gamma.step_down()?;
                 } else {
-                    backlight.set(backlight.brightness - backlight.step)?;
+                    let step = backlight.step();
+                    backlight.set(backlight.brightness.saturating_sub(step))?;
                 }
             }
         }
         Ok(())
     }
-}
-
-// --- Notification ---
-
-fn notify(effective: &EffectiveBrightness, gamma: &GammaBrightness) -> Result<(), Error> {
-    let arc = effective.to_arc();
-    let sw_tag = if gamma.below_full() { " (sw)" } else { "" };
-    let label = format!("{arc}{sw_tag}");
-    let bar = effective.progress_bar().to_string();
-
-    run_as_user("notify-send", &[
-        "-h", "string:x-canonical-private-synchronous:brightness",
-        "-h", &format!("int:value:{bar}"),
-        "-t", "1500",
-        "Brightness",
-        &label,
-    ])?;
-    Ok(())
 }
 
 // --- Helpers ---
@@ -272,7 +316,7 @@ fn run(direction_arg: &str) -> Result<(), Error> {
     direction.apply(&mut backlight, &mut gamma)?;
 
     let effective = EffectiveBrightness::from_state(&backlight, &gamma);
-    notify(&effective, &gamma)?;
+    effective.notify()?;
 
     Ok(())
 }
