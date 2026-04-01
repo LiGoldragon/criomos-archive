@@ -654,7 +654,7 @@
   (:features)
   (:format
    ;; mdformat reads stdin when given "-" and writes formatted markdown to stdout.
-   (format-all--buffer-easy executable "--wrap" "80" "-"))))
+   (format-all--buffer-easy executable "--wrap" "no" "-"))))
 
 
 ;; ─────────────────────────────────────────────────────────────
