@@ -36,8 +36,8 @@ let
   hw = interfaceMap.${model} or (throw "router: no interface map for model ${model}");
 
   lanBridgeInterface = "br-lan";
-  lanSubnetPrefix = "10.18.0";
-  lanAddress = "${lanSubnetPrefix}.1";
+  lanSubnetPrefix = constants.network.lan.subnetPrefix;
+  lanAddress = constants.network.lan.gateway;
   lanFullAddress = "${lanAddress}/24";
 
   useNftables = true;

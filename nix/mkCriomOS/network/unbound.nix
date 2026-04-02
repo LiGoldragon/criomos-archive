@@ -1,5 +1,6 @@
 {
   config,
+  constants,
   lib,
   pkgs,
   horizon,
@@ -18,17 +19,20 @@ let
     ;
   inherit (lib) filter mapAttrsToList concatMapStringsSep lowPrio;
   inherit (horizon) cluster node exNodes;
+  inherit (horizon.node.methods) behavesAs;
 
   tailnetBaseDomain = "tailnet.${cluster.name}.criome";
   headscaleEnabled = config.services.headscale.enable;
 
+  lanGateway = constants.network.lan.gateway;
+  lanSubnet = constants.network.lan.subnet;
+
+  # Router nodes also listen on br-lan so wifi/LAN clients can resolve DNS.
   listenIPs = [
     "::1"
     "127.0.0.1"
-  ];
-  allowedIPs = [
-    "::1"
-    "127.0.0.1"
+  ] ++ lib.optionals behavesAs.router [
+    lanGateway
   ];
 
   TLSDNServers = {
@@ -104,6 +108,12 @@ in
     settings = {
       server = {
         interface = listenIPs;
+        access-control = [
+          "127.0.0.0/8 allow"
+          "::1/128 allow"
+        ] ++ lib.optionals behavesAs.router [
+          "${lanSubnet} allow"
+        ];
         do-not-query-localhost = false;
         tls-cert-bundle = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
         local-data = localDnsRecords;

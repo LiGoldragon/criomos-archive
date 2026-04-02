@@ -66,6 +66,12 @@ in
       };
     };
 
+    lan = {
+      subnetPrefix = "10.18.0";
+      gateway = "10.18.0.1";
+      subnet = "10.18.0.0/24";
+    };
+
     nat64 = {
       pool = rec {
         subnet = "64:ff9b::";
