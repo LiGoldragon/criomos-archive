@@ -121,19 +121,20 @@ Alternatively, `fullOs` includes home-manager — `switch-to-configuration switc
 |--------|------------|---------|
 | DNS name | Unbound running on target | `prometheus.maisiliym.criome` |
 | Yggdrasil address | Always works (direct mesh) | `200:ca41:6b12:fba:d7bc:cfc6:4aaa:165f` |
+| WAN IP | br-lan down, router still on home LAN | `192.168.1.20` (prometheus) |
 | Link-local | Yggdrasil down, direct ethernet | `fe80::...%enp0s31f6` |
 
-DNS requires the target's Unbound to be running. For deployment, prefer DNS when available, fall back to Ygg addresses.
+DNS requires the target's Unbound to be running. For deployment, prefer DNS when available, fall back to Ygg addresses. When br-lan is down (e.g. after hostapd restart), the WAN interface (`eno1`) is still reachable on the home LAN.
 
-Known Yggdrasil addresses:
-- ouranos: `201:6de1:5500:7cac:2db9:759e:42d2:fb1d`
-- prometheus: `200:ca41:6b12:fba:d7bc:cfc6:4aaa:165f`
+Known addresses:
+- ouranos: Ygg `201:6de1:5500:7cac:2db9:759e:42d2:fb1d`
+- prometheus: Ygg `200:ca41:6b12:fba:d7bc:cfc6:4aaa:165f`, WAN `192.168.1.20`
 
 ### SSH-safe long builds
 
 On headless nodes, builds may outlast the SSH connection. Options:
-- **`systemd-run`** (as root): `systemd-run --unit=<name> nix build ...` — survives SSH disconnect, logs to journal.
-- **`pueue`** (as user): `pueue add -- nix build ...` — requires `loginctl enable-linger <user>` or the user session dies on disconnect.
+- **`systemd-run`** (as root, preferred): `systemd-run --unit=<name> nix build ...` — survives SSH disconnect, logs to journal. Check with `journalctl -u <name>`.
+- **`pueue`** (as user): `pueue add -- nix build ...` — **requires `loginctl enable-linger <user>`**. Without linger, systemd kills the user session (including pueued and all its tasks) when SSH disconnects. Check with `pueue status`.
 
 ### Recovery deployment (via asklepios live USB)
 When a node is unresponsive, boot the asklepios USB, then:
@@ -168,6 +169,7 @@ When a node is unresponsive, boot the asklepios USB, then:
 5. **Never run `activate` or `switch-to-configuration switch` inside a chroot** — it will break the live USB environment. Only use `nixos-install` or `switch-to-configuration boot`.
 
 ### Dangerous operations — DO NOT DO
+- **Never** restart `hostapd` or reload the wifi module on a router node you're connected through — it tears down `br-lan`, dropping ALL bridge members (USB ethernet, wifi) and killing Yggdrasil. Use the WAN IP (`192.168.1.20` for prometheus) as a fallback path before touching network services.
 - **Never** run a system's `activate` script inside a chroot of a mounted install — it overwrites `/etc` on the live system.
 - **Never** deploy a major nixpkgs upgrade to a headless machine without testing on a machine with a screen first.
 - **Never** deploy to a headless node without the asklepios USB available for recovery.
@@ -175,6 +177,26 @@ When a node is unresponsive, boot the asklepios USB, then:
 - **Never** deploy a model that exceeds the GPU memory budget without testing interactively first (see LLM section).
 - **Never** edit config files in a panic to "fix" a deployment — verify what's actually deployed first, then make one deliberate change.
 - **Never** use hashes from web searches or model cards for `fetchurl` — always `nix-prefetch-url` on the target node and pin HuggingFace URLs to specific repo commits (`resolve/<commit>/` not `resolve/main/`).
+
+### Bridge recovery (after hostapd/wifi restart)
+When `br-lan` is recreated, USB ethernet ports and kea lose their state:
+```
+# Re-add USB ethernet to bridge
+ssh root@<wan-ip> 'ip link set enp197s0f4u1 master br-lan'
+
+# Restart kea (stale socket after bridge recreation)
+ssh root@<wan-ip> 'systemctl restart kea-dhcp4-server'
+
+# Verify bridge members
+ssh root@<wan-ip> 'bridge link show'
+```
+
+### MT7925 wifi radio stuck (no beacons)
+If hostapd reports ENABLED but the AP is invisible to clients, the MT7925 radio is stuck. Reload the driver:
+```
+ssh root@<wan-ip> 'systemctl stop hostapd && modprobe -r mt7925e && sleep 2 && modprobe mt7925e && sleep 3 && systemctl start hostapd'
+```
+Then re-add USB ethernet to the bridge (see above) — the bridge is recreated during this process.
 
 ### Link-local access (when Yggdrasil is down)
 If the router blocks inter-client TCP but allows IPv6 multicast, or for direct ethernet:
@@ -216,13 +238,14 @@ Major nixpkgs upgrades (>1 month gap) require:
 ### Edge nodes (ouranos, zeus, tiger, etc.)
 - Use **NetworkManager** — wifi, VPN, user switching
 - `networking.networkmanager.enable = true`
-- Gated by `sizedAtLeast.min && !behavesAs.center`
+- Gated by `sizedAtLeast.min && !behavesAs.router && !behavesAs.iso && !behavesAs.center`
 
 ### Headless nodes (prometheus, balboa)
 - Use **systemd-networkd** — static, reliable, no GUI
 - `networking.useNetworkd = true` via `nix/mkCriomOS/network/networkd.nix`
-- Gated by `behavesAs.center` (= `typeIs.center || typeIs.largeAI`)
+- Gated by `behavesAs.center && !behavesAs.router`
 - USB ethernet dongles auto-bridge to `br-lan` (matched by driver: `cdc_ether r8152 ax88179_178a asix`)
+- **DNS**: unbound listens on `127.0.0.1` only; router nodes also listen on `10.18.0.1` (LAN gateway)
 
 ### SSH access
 - **Keys only** — no password auth, ever. Keys come from the criosphere (`datom.nix` preCriomes).
@@ -287,6 +310,7 @@ Split tunnel: IPv4 user traffic goes through the VPN. Yggdrasil (IPv6) and Tails
 ### Router mode (llama.cpp native)
 A single `llama-server` process manages all models via `--models-dir` and `--models-preset`:
 - `--models-max 1` — only one model loaded at a time; LRU-evicts on swap
+- `--sleep-idle-seconds 300` — unloads model weights after 5 min idle; next request auto-reloads. Frees GPU memory so GFXOFF can fully power-gate the shaders. Configured via `sleepIdleSeconds` in `llm.json`.
 - Each model runs as a child process — killed on swap, memory fully freed
 - `POST /models/load {"model":"<id>"}` — explicit load
 - `POST /models/unload {"model":"<id>"}` — explicit unload
@@ -295,6 +319,12 @@ A single `llama-server` process manages all models via `--models-dir` and `--mod
 - Per-model config (ctx-size, flags) via INI presets generated from `llm.json`
 - Service name: `${nodeName}-llama-router` (e.g. `prometheus-llama-router`)
 - Single port: 11434 for all models
+
+### Power management (headless nodes)
+- **CPU EPP**: `behavesAs.center` nodes set `energy_performance_preference` to `power` via tmpfiles rule. This aggressively downclocks idle cores, reducing fan noise and power. Clocks still ramp on load (~5-10ms latency).
+- **GPU display engine**: `amdgpu.dc=0` kernel param on nodes without video output (`!hasVideoOutput && !behavesAs.iso && hasYggPrecriad && hasSshPrecriad`). Skips DCN initialization, saves ~1W idle.
+- **GFXOFF**: Automatic on RDNA 3.5 — shaders power-gate when GPU is idle (0% busy). No configuration needed. Verified working on Strix Halo via `/sys/kernel/debug/dri/0/amdgpu_gfxoff`.
+- **Idle model unload**: `sleepIdleSeconds` in `llm.json` (default 300s) unloads model weights after idle, freeing GTT memory and letting the memory controller drop to its lowest state.
 
 ### Strix Halo GPU memory
 - Vulkan on Strix Halo defaults to ~64GB visible device memory despite 128GB unified RAM.
@@ -379,8 +409,14 @@ nmcli device wifi rescan; sleep 5; nmcli device wifi list
 # Check hostapd
 ssh root@<host> 'systemctl is-active hostapd; journalctl -u hostapd --no-pager -n 10'
 
-# Check bridge exists
-ssh root@<host> 'ip link show br-lan; ip addr show br-lan'
+# Check bridge and its members
+ssh root@<host> 'ip link show br-lan; ip addr show br-lan; bridge link show'
+
+# Check unbound listening (should include 10.18.0.1 on router nodes)
+ssh root@<host> 'ss -ulnp | grep unbound'
+
+# Check kea DHCP
+ssh root@<host> 'systemctl is-active kea-dhcp4-server; journalctl -u kea-dhcp4-server --no-pager -n 5'
 
 # Check networkd config files
 ssh root@<host> 'ls /etc/systemd/network/'
@@ -418,6 +454,27 @@ curl -s http://prometheus.maisiliym.criome:11434/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer sk-no-key-required" \
   -d '{"model":"qwen3-8b","messages":[{"role":"user","content":"hi"}],"max_tokens":8}'
+```
+
+### GPU power
+```
+# GPU power draw (microwatts)
+ssh root@<host> 'cat /sys/class/drm/card0/device/hwmon/hwmon*/power1_average'
+
+# GFXOFF state (1=shaders gated, 0=awake)
+ssh root@<host> 'od -An -tu4 -N4 /sys/kernel/debug/dri/0/amdgpu_gfxoff'
+
+# GPU clocks and utilization
+ssh root@<host> 'cat /sys/class/drm/card0/device/pp_dpm_sclk; echo "Busy:"; cat /sys/class/drm/card0/device/gpu_busy_percent'
+
+# GTT (GPU memory) usage
+ssh root@<host> 'cat /sys/class/drm/card0/device/mem_info_gtt_used'
+
+# CPU EPP setting
+ssh root@<host> 'cat /sys/devices/system/cpu/cpu0/cpufreq/energy_performance_preference'
+
+# Check amdgpu.dc=0 in boot params
+ssh root@<host> 'cat /proc/cmdline | tr " " "\n" | grep amdgpu'
 ```
 
 ### Nix store
@@ -464,8 +521,10 @@ ssh root@<host> 'GOOD=$(readlink result); nix-env -p /nix/var/nix/profiles/syste
 - Network modules (`nix/mkCriomOS/network/`) derive host data from horizon.
 - When editing network behavior, update Maisiliym first, then CriomOS.
 - For production deployment, use `github:LiGoldragon/maisiliym` (not local path overrides).
-- `behavesAs.center` = `typeIs.center || typeIs.largeAI || typeIs."largeAI-router"` — headless server nodes.
+- `behavesAs.largeAI` = `typeIs.largeAI || typeIs."largeAI-router"` — nodes serving LLM inference.
+- `behavesAs.center` = `typeIs.center || behavesAs.largeAI` — headless server nodes.
 - `behavesAs.router` = `typeIs.hybrid || typeIs.router || typeIs."largeAI-router"` — nodes running hostapd + NAT.
+- `hasVideoOutput` = `behavesAs.edge` — nodes with a display attached.
 
 ## Tree-Sitter Grammar Integration
 
