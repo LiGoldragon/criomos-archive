@@ -8,9 +8,15 @@ let
   inherit (user.methods) isCodeDev sizedAtLeast;
 
   visualjj = pkgs.vscode-extensions.visualjj.visualjj.overrideAttrs (old: {
-    nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.autoPatchelfHook ];
-    buildInputs = [ pkgs.stdenv.cc.cc.lib ];
-    dontAutoPatchelf = false;
+    postInstall = (old.postInstall or "") + ''
+      jj=$out/share/vscode/extensions/visualjj.visualjj/dist/bin/jj
+      if [ -f "$jj" ]; then
+        ${pkgs.patchelf}/bin/patchelf \
+          --set-interpreter "$(cat ${pkgs.stdenv.cc}/nix-support/dynamic-linker)" \
+          --set-rpath "${lib.makeLibraryPath [ pkgs.stdenv.cc.cc.lib ]}" \
+          "$jj"
+      fi
+    '';
   });
 
 in
