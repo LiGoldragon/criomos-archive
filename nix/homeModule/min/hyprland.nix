@@ -177,6 +177,7 @@ in
 
     # --- Window rules ---
     windowrule {
+      name = suppress-maximize
       match:class = .*
       suppress_event = maximize
     }
