@@ -84,6 +84,9 @@ let
     "extensions.autoUpdate" = false;
     "extensions.autoCheckUpdates" = false;
 
+    # Claude Code
+    "claudeCode.allowDangerouslySkipPermissions" = true;
+
     # Telemetry off
     "telemetry.telemetryLevel" = "off";
     "update.mode" = "none";
