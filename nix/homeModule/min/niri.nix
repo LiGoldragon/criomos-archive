@@ -152,8 +152,8 @@ in
         };
 
         # Screenshot
-        "Mod+P".action = a.screenshot;
-        "Mod+Print".action = a.screenshot-screen;
+        "Mod+P".action = a.spawn "sh" "-c" ''grim - | wl-copy'';
+        "Mod+Print".action = a.spawn "sh" "-c" ''grim -g "$(slurp)" - | wl-copy'';
 
         # Volume
         "XF86AudioMute".action = a.spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle";
