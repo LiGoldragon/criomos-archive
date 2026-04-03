@@ -57,9 +57,9 @@ let
   };
 
   settingsJson = toJSON {
-    # Darkman portal — auto dark/light via dconf color-scheme
+    # Theme — stylix generates base16 theme, darkman switches via portal
     "window.autoDetectColorScheme" = true;
-    "workbench.preferredDarkColorTheme" = "Default Dark Modern";
+    "workbench.preferredDarkColorTheme" = "Stylix";
     "workbench.preferredLightColorTheme" = "Default Light Modern";
 
     # jj as primary SCM — hide git, show VisualJJ in Source Control panel

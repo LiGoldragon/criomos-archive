@@ -342,7 +342,7 @@ in
         # Darkman manages these at runtime
         emacs.enable = false;
         ghostty.enable = false;
-        vscode.enable = false;
+        vscode.enable = true;
         wezterm.enable = false;
         waybar.enable = false;
         fzf.enable = false;
