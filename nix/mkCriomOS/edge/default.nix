@@ -58,7 +58,7 @@ in
         GTK = {
           application_prefer_dark_theme = true;
           cursor_theme_name = "Adwaita";
-          icon_theme_name = "Papirus-Dark";
+          icon_theme_name = lib.mkForce "Papirus-Dark";
           theme_name = "Adwaita";
         };
       };
