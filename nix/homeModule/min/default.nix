@@ -394,7 +394,17 @@ mkIf sizedAtLeast.min {
     };
 
     hyprsunset = {
+      enable = false;
+    };
+    gammastep = {
       enable = true;
+      provider = "manual";
+      latitude = 36.7;
+      longitude = -4.4;
+      temperature = {
+        day = 6500;
+        night = 3500;
+      };
     };
 
     gpg-agent = {
