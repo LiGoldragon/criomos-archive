@@ -7,22 +7,19 @@
 let
   inherit (user.methods) isCodeDev sizedAtLeast;
 
-  storageFile = "$HOME/.config/VSCodium/User/globalStorage/storage.json";
+  vscodium = pkgs.vscodium.overrideAttrs (old: {
+    postFixup = (old.postFixup or "") + ''
+      wrapProgram $out/bin/codium \
+        --prefix PATH : ${lib.makeBinPath [ pkgs.jujutsu pkgs.nil ]}
+    '';
+  });
 
 in
 lib.mkIf (sizedAtLeast.med && isCodeDev) {
 
-  home.activation.vscodiumGlobalStorage =
-    lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      if [ -f "${storageFile}" ]; then
-        ${pkgs.jq}/bin/jq '.theme = "vs-dark"' "${storageFile}" > "${storageFile}.tmp" \
-          && mv "${storageFile}.tmp" "${storageFile}"
-      fi
-    '';
-
   programs.vscode = {
     enable = true;
-    package = pkgs.vscodium;
+    package = vscodium;
 
     profiles.default = {
       extensions = with pkgs.vscode-extensions; [
@@ -37,7 +34,6 @@ lib.mkIf (sizedAtLeast.med && isCodeDev) {
         "window.autoDetectColorScheme" = true;
 
         # jj as primary SCM — hide git
-        "visualjj.path" = "${pkgs.jujutsu}/bin/jj";
         "git.enabled" = false;
 
         # direnv — auto-reload on .envrc change
@@ -45,12 +41,11 @@ lib.mkIf (sizedAtLeast.med && isCodeDev) {
 
         # Nix
         "nix.enableLanguageServer" = true;
-        "nix.serverPath" = "${pkgs.nil}/bin/nil";
 
         # Terminal
         "terminal.integrated.defaultProfile.linux" = "zsh";
 
-        # Suppress welcome/theme picker
+        # Suppress welcome tab and extension walkthroughs
         "workbench.startupEditor" = "none";
         "workbench.welcomePage.walkthroughs.openOnInstall" = false;
 
