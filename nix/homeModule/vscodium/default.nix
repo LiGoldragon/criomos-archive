@@ -30,6 +30,15 @@ let
     '';
   };
 
+  claude-code = pkgs.vscode-extensions.anthropic.claude-code.overrideAttrs (old: {
+    postInstall = (old.postInstall or "") + ''
+      substituteInPlace \
+        "$out/share/vscode/extensions/anthropic.claude-code/webview/index.js" \
+        --replace-fail 'theme:"vs-dark"' \
+        'theme:document.body.classList.contains("vscode-light")?"vs":"vs-dark"'
+    '';
+  });
+
   settingsJson = toJSON {
     # Darkman portal — auto dark/light via dconf color-scheme
     "window.autoDetectColorScheme" = true;
@@ -79,7 +88,7 @@ lib.mkIf (sizedAtLeast.med && isCodeDev) {
     profiles.default = {
       extensions = [
         visualjj
-        pkgs.vscode-extensions.anthropic.claude-code
+        claude-code
         pkgs.vscode-extensions.mkhl.direnv
         pkgs.vscode-extensions.jnoortheen.nix-ide
       ];
