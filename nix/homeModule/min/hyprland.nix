@@ -178,7 +178,7 @@ in
       disable_hyprland_logo = yes
       animate_manual_resizes = yes
       animate_mouse_windowdragging = yes
-      disable_autoreload = yes
+      disable_autoreload = no
     }
   '';
 
