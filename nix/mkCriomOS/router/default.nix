@@ -182,7 +182,7 @@ in
         matchConfig.Name = hw.wan;
         networkConfig = {
           DHCP = "ipv4";
-          KeepConfiguration = "dhcp";
+          KeepConfiguration = "dynamic-on-stop";
         };
         dhcpV4Config = {
           SendRelease = false;
