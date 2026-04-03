@@ -133,6 +133,7 @@ in
           rebind-timer = 2000;
           interfaces-config = {
             interfaces = [ lanBridgeInterface ];
+            dhcp-socket-type = "raw";
           };
           lease-database = {
             type = "memfile";
@@ -161,6 +162,8 @@ in
     };
   };
 
+  systemd.services.kea-dhcp4-server.after = [ "systemd-networkd.service" ];
+
   systemd.network = {
     enable = true;
     wait-online.anyInterface = true;
@@ -179,6 +182,10 @@ in
         matchConfig.Name = hw.wan;
         networkConfig = {
           DHCP = "ipv4";
+          KeepConfiguration = "dhcp-on-stop";
+        };
+        dhcpV4Config = {
+          SendRelease = false;
         };
         linkConfig.RequiredForOnline = "routable";
       };
