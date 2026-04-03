@@ -1,7 +1,7 @@
 { pkgs, config, ... }:
 let
   terminal = "${pkgs.ghostty}/bin/ghostty";
-  launcher = "wofi --show drun";
+  launcher = "${pkgs.wofi}/bin/wofi";
   lock = "${pkgs.hyprlock}/bin/hyprlock";
 
   strip = color: builtins.substring 1 6 color;
@@ -79,7 +79,7 @@ in
       binds = {
         # Launch
         "Mod+Shift+Return".action = a.spawn terminal;
-        "Mod+O".action = a.spawn launcher;
+        "Mod+O".action = a.spawn launcher "--show" "drun";
 
         # Window
         "Mod+Q".action = a.close-window;
