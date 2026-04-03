@@ -147,6 +147,7 @@ in
     bind = $M,  ${right}, layoutmsg, removemaster
     bind = $MS, ${left},  layoutmsg, mfact -0.05
     bind = $MS, ${right}, layoutmsg, mfact +0.05
+    bind = $M,  C,        layoutmsg, orientationcycle left top
 
     # Focus cycling
     bind = $M,  Tab, cyclenext
