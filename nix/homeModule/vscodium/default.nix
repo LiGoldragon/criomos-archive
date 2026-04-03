@@ -8,10 +8,9 @@ let
   inherit (user.methods) isCodeDev sizedAtLeast;
 
   visualjj = pkgs.vscode-extensions.visualjj.visualjj.overrideAttrs (old: {
-    postInstall = (old.postInstall or "") + ''
-      rm -f $out/share/vscode/extensions/visualjj.visualjj/dist/bin/jj
-      ln -s ${pkgs.jujutsu}/bin/jj $out/share/vscode/extensions/visualjj.visualjj/dist/bin/jj
-    '';
+    nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.autoPatchelfHook ];
+    buildInputs = [ pkgs.stdenv.cc.cc.lib ];
+    dontAutoPatchelf = false;
   });
 
 in
@@ -47,6 +46,10 @@ lib.mkIf (sizedAtLeast.med && isCodeDev) {
         # Suppress welcome tab and extension walkthroughs
         "workbench.startupEditor" = "none";
         "workbench.welcomePage.walkthroughs.openOnInstall" = false;
+
+        # Extensions managed by Nix — no marketplace updates
+        "extensions.autoUpdate" = false;
+        "extensions.autoCheckUpdates" = false;
 
         # Telemetry off
         "telemetry.telemetryLevel" = "off";
