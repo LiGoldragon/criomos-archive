@@ -7,10 +7,10 @@
 let
   inherit (user.methods) isCodeDev sizedAtLeast;
 
-  vscodium = pkgs.vscodium.overrideAttrs (old: {
-    postFixup = (old.postFixup or "") + ''
-      wrapProgram $out/bin/codium \
-        --prefix PATH : ${lib.makeBinPath [ pkgs.jujutsu pkgs.nil ]}
+  visualjj = pkgs.vscode-extensions.visualjj.visualjj.overrideAttrs (old: {
+    postInstall = (old.postInstall or "") + ''
+      rm -f $out/share/vscode/extensions/visualjj.visualjj/dist/bin/jj
+      ln -s ${pkgs.jujutsu}/bin/jj $out/share/vscode/extensions/visualjj.visualjj/dist/bin/jj
     '';
   });
 
@@ -19,15 +19,14 @@ lib.mkIf (sizedAtLeast.med && isCodeDev) {
 
   programs.vscode = {
     enable = true;
-    package = vscodium;
+    package = pkgs.vscodium;
 
     profiles.default = {
-      extensions = with pkgs.vscode-extensions; [
-        visualjj.visualjj
+      extensions = [ visualjj ] ++ (with pkgs.vscode-extensions; [
         anthropic.claude-code
         mkhl.direnv
         jnoortheen.nix-ide
-      ];
+      ]);
 
       userSettings = {
         # Darkman portal — auto dark/light with stylix base16 as dark theme
