@@ -39,6 +39,10 @@ lib.mkIf (sizedAtLeast.med && isCodeDev) {
         # Terminal
         "terminal.integrated.defaultProfile.linux" = "zsh";
 
+        # Suppress welcome/theme picker
+        "workbench.startupEditor" = "none";
+        "workbench.welcomePage.walkthroughs.openOnInstall" = false;
+
         # Telemetry off
         "telemetry.telemetryLevel" = "off";
         "update.mode" = "none";
