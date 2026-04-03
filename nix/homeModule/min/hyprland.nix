@@ -97,7 +97,7 @@ in
       animation = fadeIn,        1, 1.7, almostLinear
       animation = fadeOut,       1, 1.5, almostLinear
       animation = fade,          1, 3,   quick
-      animation = workspaces,    1, 1.9, almostLinear,  fade
+      animation = workspaces,    1, 1.9, almostLinear,  slide
     }
 
     # --- Master layout ---
@@ -113,7 +113,7 @@ in
     }
 
     # --- Gestures ---
-    gesture = 3, vertical, workspace
+    gesture = 3, horizontal, workspace
 
     # --- Variables ---
     $M   = ${modifier}
@@ -154,19 +154,19 @@ in
     bind = $MS, Tab, cyclenext, prev
     bind = $MS, Tab, bringactivetotop
 
-    # Workspace cycling (hyprnome)
-    bind = $MC, ${up},    exec, hyprnome --previous
-    bind = $MC, ${down},  exec, hyprnome
-    bind = $MC, ${left},  exec, hyprnome --previous --move
-    bind = $MC, ${right}, exec, hyprnome --move
+    # Workspace cycling (hyprnome) — horizontal like GNOME
+    bind = $MC, ${left},  exec, hyprnome --previous
+    bind = $MC, ${right}, exec, hyprnome
+    bind = $MC, ${up},    exec, hyprnome --previous --move
+    bind = $MC, ${down},  exec, hyprnome --move
 
     # Special workspace
     bind = $M,  F2, togglespecialworkspace
     bind = $MS, F2, movetoworkspace, special
 
-    # Mouse
-    bind  = $M, mouse_down, workspace, e+1
-    bind  = $M, mouse_up,   workspace, e-1
+    # Mouse — scroll through workspaces
+    bind  = $M, mouse_right, workspace, e+1
+    bind  = $M, mouse_left,  workspace, e-1
     bindm = $M, mouse:272,  movewindow
     bindm = $M, mouse:273,  resizewindow
 
@@ -198,13 +198,13 @@ in
     }
 
     listener {
-      timeout = 300
+      timeout = 600
       on-timeout = hyprctl dispatch dpms off
       on-resume = hyprctl dispatch dpms on
     }
 
     listener {
-      timeout = 600
+      timeout = 3600
       on-timeout = loginctl lock-session
     }
   '';
