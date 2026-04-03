@@ -24,7 +24,6 @@ in
 
   programs.niri = {
     enable = true;
-    package = inputs.niri-flake.packages.${pkgs.stdenv.hostPlatform.system}.niri-unstable;
     settings = {
       prefer-no-csd = true;
 
