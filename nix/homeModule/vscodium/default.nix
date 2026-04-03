@@ -7,8 +7,19 @@
 let
   inherit (user.methods) isCodeDev sizedAtLeast;
 
+  storageFile = "$HOME/.config/VSCodium/User/globalStorage/storage.json";
+
 in
 lib.mkIf (sizedAtLeast.med && isCodeDev) {
+
+  home.activation.vscodiumGlobalStorage =
+    lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      if [ -f "${storageFile}" ]; then
+        ${pkgs.jq}/bin/jq '.theme = "vs-dark"' "${storageFile}" > "${storageFile}.tmp" \
+          && mv "${storageFile}.tmp" "${storageFile}"
+      fi
+    '';
+
   programs.vscode = {
     enable = true;
     package = pkgs.vscodium;
