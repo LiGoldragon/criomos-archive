@@ -101,5 +101,19 @@ in
     tumbler.enable = sizedAtLeast.med;
 
     pulseaudio.enable = false;
+
+    keyd = {
+      enable = sizedAtLeast.min;
+      keyboards.laptop = {
+        ids = [ "0001:0001" ];
+        extraConfig = ''
+          [main]
+          include(colemak)
+          capslock = leftcontrol
+          leftalt = leftmeta
+          leftmeta = leftalt
+        '';
+      };
+    };
   };
 }
