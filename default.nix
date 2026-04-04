@@ -38,6 +38,7 @@ let
 
   homeModules = [
     inputs.stylix.homeModules.stylix
+    inputs.niri-flake.homeModules.config
     local.criomOSHomeModule
   ];
 

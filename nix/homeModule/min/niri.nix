@@ -1,4 +1,4 @@
-{ pkgs, config, inputs, ... }:
+{ pkgs, config, ... }:
 let
   terminal = "${pkgs.ghostty}/bin/ghostty";
   launcher = "${pkgs.wofi}/bin/wofi";
@@ -11,8 +11,6 @@ let
 
 in
 {
-  imports = [ inputs.niri-flake.homeModules.config ];
-
   programs.niri.settings.environment = {
     "XDG_CURRENT_DESKTOP" = "niri:GNOME";
   };
