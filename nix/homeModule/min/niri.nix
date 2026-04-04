@@ -93,11 +93,11 @@ in
       ];
 
       animations = {
-        window-open.easing = { curve = "ease-out-expo"; duration-ms = 200; };
-        window-close.easing = { curve = "ease-out-quad"; duration-ms = 150; };
-        workspace-switch.easing = { curve = "ease-out-expo"; duration-ms = 250; };
-        horizontal-view-movement.easing = { curve = "ease-out-expo"; duration-ms = 200; };
-        config-notification-open-close.easing = { curve = "ease-out-quad"; duration-ms = 200; };
+        window-open.kind.easing = { curve = "ease-out-expo"; duration-ms = 200; };
+        window-close.kind.easing = { curve = "ease-out-quad"; duration-ms = 150; };
+        workspace-switch.kind.easing = { curve = "ease-out-expo"; duration-ms = 250; };
+        horizontal-view-movement.kind.easing = { curve = "ease-out-expo"; duration-ms = 200; };
+        config-notification-open-close.kind.easing = { curve = "ease-out-quad"; duration-ms = 200; };
       };
 
       binds = {
