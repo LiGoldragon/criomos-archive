@@ -15,6 +15,7 @@ let
   magenta = colors.base0E;
   cyan = colors.base0C;
   orange = colors.base09;
+  muted = colors.base04;
 
   # TODO - module for packages
   sysMonitor = "btm";
@@ -78,50 +79,44 @@ in
         };
       };
       cpu = {
-        format = "<span foreground='${green}'> </span>";
-        tooltip = true;
-        tooltip-format = "{usage}% · {avg_frequency} GHz";
-        interval = 5;
+        format = "<span foreground='${muted}'> </span>{usage}%";
+        format-alt = "<span foreground='${muted}'> </span>{avg_frequency} GHz";
+        interval = 2;
         on-click-right = displaySystemInfo;
       };
       memory = {
-        format = "<span foreground='${cyan}'>󰟜 </span>";
-        tooltip = true;
-        tooltip-format = "{used} / {total} GiB ({percentage}%)";
-        interval = 5;
+        format = "<span foreground='${muted}'>󰟜 </span>{}%";
+        format-alt = "<span foreground='${muted}'>󰟜 </span>{used} GiB";
+        interval = 2;
         on-click-right = displaySystemInfo;
       };
       disk = {
-        format = "<span foreground='${orange}'>󰋊 </span>";
-        tooltip = true;
-        tooltip-format = "{used} / {total} ({percentage_used}%)";
+        format = "<span foreground='${muted}'>󰋊 </span>{percentage_used}%";
         interval = 60;
         on-click-right = displaySystemInfo;
       };
       network = {
-        format-wifi = "<span foreground='${magenta}'> </span>";
-        format-ethernet = "<span foreground='${magenta}'>󰀂 </span>";
-        tooltip-format = "{essid} · {ifname} via {gwaddr} ({signalStrength}%)";
+        format-wifi = "<span foreground='${muted}'> </span>{signalStrength}%";
+        format-ethernet = "<span foreground='${muted}'>󰀂 </span>";
+        tooltip-format = "Connected to {essid} {ifname} via {gwaddr}";
         format-linked = "{ifname} (No IP)";
-        format-disconnected = "<span foreground='${magenta}'>󰖪 </span>";
+        format-disconnected = "<span foreground='${muted}'>󰖪 </span>";
       };
       tray = {
         icon-size = 20;
         spacing = 8;
       };
       pulseaudio = {
-        format = "<span foreground='${blue}'>{icon}</span>";
-        format-muted = "<span foreground='${blue}'> </span>";
+        format = "<span foreground='${muted}'>{icon}</span>{volume}%";
+        format-muted = "<span foreground='${muted}'> </span>{volume}%";
         format-icons = {
           default = [ " " ];
         };
-        tooltip = true;
-        tooltip-format = "{volume}%";
         scroll-step = 2;
         on-click = launchVolumeControl;
       };
       battery = {
-        format = "<span foreground='${yellow}'>{icon}</span>";
+        format = "<span foreground='${muted}'>{icon}</span>{capacity}%";
         format-icons = [
           " "
           " "
@@ -129,20 +124,21 @@ in
           " "
           " "
         ];
-        format-charging = "<span foreground='${yellow}'> </span>";
-        format-full = "<span foreground='${yellow}'> </span>";
-        format-warning = "<span foreground='${yellow}'> </span>";
+        format-charging = "<span foreground='${muted}'> </span>{capacity}%";
+        format-full = "<span foreground='${muted}'> </span>{capacity}%";
+        format-warning = "<span foreground='${yellow}'> </span>{capacity}%";
         interval = 5;
         states = {
           warning = 20;
         };
+        format-time = "{H}h{M}m";
         tooltip = true;
-        tooltip-format = "{capacity}% · {time}";
+        tooltip-format = "{time}";
       };
       "niri/language" = {
-        format = "<span foreground='${yellow}'> </span>";
-        tooltip = true;
-        tooltip-format = "{}";
+        format = "<span foreground='${muted}'> </span>{}";
+        format-fr = "FR";
+        format-en = "US";
       };
       "custom/launcher" = {
         format = "";
@@ -154,13 +150,13 @@ in
         format = "{icon} ";
         format-icons = {
           notification = "<span foreground='red'><sup></sup></span>  <span foreground='${red}'></span>";
-          none = "  <span foreground='${red}'></span>";
+          none = "  <span foreground='${muted}'></span>";
           dnd-notification = "<span foreground='red'><sup></sup></span>  <span foreground='${red}'></span>";
-          dnd-none = "  <span foreground='${red}'></span>";
+          dnd-none = "  <span foreground='${muted}'></span>";
           inhibited-notification = "<span foreground='red'><sup></sup></span>  <span foreground='${red}'></span>";
-          inhibited-none = "  <span foreground='${red}'></span>";
+          inhibited-none = "  <span foreground='${muted}'></span>";
           dnd-inhibited-notification = "<span foreground='red'><sup></sup></span>  <span foreground='${red}'></span>";
-          dnd-inhibited-none = "  <span foreground='${red}'></span>";
+          dnd-inhibited-none = "  <span foreground='${muted}'></span>";
         };
         return-type = "json";
         exec-if = "which swaync-client";
