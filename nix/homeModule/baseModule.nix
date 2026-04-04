@@ -209,6 +209,19 @@ let
       ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-theme "'${gtkTheme}'"
       ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/icon-theme "'${iconTheme}'"
 
+      # --- GTK settings.ini (GTK3 reads file, not dconf) ---
+      for v in gtk-3.0 gtk-4.0; do
+        mkdir -p "$HOME/.config/$v"
+        cat > "$HOME/.config/$v/settings.ini" << 'GTKEOF'
+[Settings]
+gtk-theme-name=${gtkTheme}
+gtk-cursor-theme-name=Bibata-Modern-Classic
+gtk-cursor-theme-size=24
+gtk-font-name=DejaVu Sans 12
+gtk-icon-theme-name=${iconTheme}
+GTKEOF
+      done
+
       # --- Ghostty config (darkman owns this file) ---
       mkdir -p "$HOME/.config/ghostty"
       cat > "$HOME/.config/ghostty/config" << 'GHOSTTY'
@@ -289,17 +302,12 @@ in
         (pkgs.writeShellScriptBin "theme-dark" ''${pkgs.darkman}/bin/darkman set dark'')
         (pkgs.writeShellScriptBin "theme-light" ''${pkgs.darkman}/bin/darkman set light'')
         pkgs.papirus-icon-theme
+        pkgs.adw-gtk3
       ];
       file.".config/emacs-ignis-themes".source = emacsThemeDir;
     };
 
-    gtk = {
-      enable = true;
-      iconTheme = {
-        package = pkgs.papirus-icon-theme;
-        name = "Papirus-Dark";
-      };
-    };
+    gtk.enable = false;
 
     programs.zsh.initContent = lib.mkBefore terminalInitHook;
 
