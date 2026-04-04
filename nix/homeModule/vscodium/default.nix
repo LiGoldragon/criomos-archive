@@ -34,12 +34,12 @@ let
     mktplcRef = {
       name = "claude-code";
       publisher = "anthropic";
-      version = "2.1.90";
+      version = "2.1.92";
     };
     vsix = pkgs.fetchurl {
-      name = "claude-code-2.1.90-linux-x64.vsix";
-      url = "https://open-vsx.org/api/anthropic/claude-code/linux-x64/2.1.90/file/anthropic.claude-code-2.1.90@linux-x64.vsix";
-      hash = "sha256-ij8sE8JCXKhQzSarOECjhEijGVxLCFUA0PmqlOF3ZoQ=";
+      name = "claude-code-2.1.92-linux-x64.vsix";
+      url = "https://open-vsx.org/api/anthropic/claude-code/linux-x64/2.1.92/file/anthropic.claude-code-2.1.92@linux-x64.vsix";
+      hash = "sha256-dZ9625x6qCWwI2tY/GP3QSNoG/Sxi6nZGHNFnSSIy+Y=";
     };
     postInstall = ''
       extDir="$out/share/vscode/extensions/anthropic.claude-code"

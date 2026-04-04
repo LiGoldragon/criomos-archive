@@ -334,6 +334,7 @@ in
         ghostty.enable = false;
         vscode.enable = false;
         wezterm.enable = false;
+        wofi.enable = false;
         waybar.enable = false;
         fzf.enable = false;
         gtk.enable = true;

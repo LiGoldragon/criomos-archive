@@ -33,7 +33,7 @@ in
           xkb = {
             layout = "us";
             variant = "colemak";
-            options = "ctrl:nocaps";
+            options = "ctrl:nocaps,altwin:swap_ralt_rwin";
           };
           repeat-delay = 200;
           repeat-rate = 50;
