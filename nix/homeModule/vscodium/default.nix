@@ -60,7 +60,7 @@ let
     let
       src = builtins.fetchGit {
         url = "git@github.com:LiGoldragon/vscode-aski.git";
-        rev = "7fdaa478c45704e7d30aedf166207d021edf0b3c";
+        rev = "d33e9491fbac65c2489c679920532158c970920e";
       };
     in
     pkgs.buildNpmPackage {
