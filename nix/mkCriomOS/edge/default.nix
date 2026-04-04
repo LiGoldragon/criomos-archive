@@ -16,6 +16,8 @@ let
       nautilus
       libinput
       gnome-control-center
+      niri
+      xdg-utils
     ]
   );
 
@@ -50,8 +52,6 @@ in
 
     firejail.enable = sizedAtLeast.med;
 
-    niri.enable = sizedAtLeast.min;
-
     regreet = {
       enable = sizedAtLeast.min;
       settings = {
@@ -79,7 +79,12 @@ in
     };
   };
 
+  security.polkit.enable = true;
+  security.pam.services.swaylock = { };
+  hardware.graphics.enable = lib.mkDefault true;
+
   services = {
+    displayManager.sessionPackages = [ pkgs.niri ];
     avahi.enable = sizedAtLeast.min;
 
     blueman.enable = sizedAtLeast.min;
