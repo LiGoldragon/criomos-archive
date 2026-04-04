@@ -4,6 +4,7 @@
   pkgs,
   pkdjz,
   world,
+  inputs,
   ...
 }:
 let
@@ -133,6 +134,7 @@ lib.mkIf sizedAtLeast.med {
         lazygit
         #== rust
         spotify-player
+        inputs.mentci-v1.packages.${pkgs.stdenv.hostPlatform.system}.mentci-codium
       ]
       ++ graphicalPackages
       ++ optionals isCodeDev (codingPackages ++ lispDevPackages);

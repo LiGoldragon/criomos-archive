@@ -59,6 +59,10 @@
     # System
     kibord.url = "github:LiGoldragon/kibord/testing";
     skrips.url = "github:criome/skrips/testing";
+    mentci-v1 = {
+      url = "github:LiGoldragon/Mentci-v1";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # Websites - TODO: bad design
     mkZolaWebsite.url = "github:criome/mkZolaWebsite";
