@@ -77,7 +77,8 @@ let
         mkdir -p $extDir
         cp -r out grammars queries package.json language-configuration.json $extDir/
         # web-tree-sitter WASM needed at runtime
-        cp -r node_modules/web-tree-sitter $extDir/node_modules/
+        mkdir -p $extDir/node_modules/web-tree-sitter
+        cp -rL node_modules/web-tree-sitter/. $extDir/node_modules/web-tree-sitter/
       '';
       passthru = {
         vscodeExtPublisher = "criome";
