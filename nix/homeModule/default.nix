@@ -5,7 +5,7 @@
     ./vscodium
     ./min
     ./min/niri.nix
-    ./min/waybar.nix
+    ./min/sfwbar.nix
     ./med
     ./med/qutebrowser.nix
     ./max

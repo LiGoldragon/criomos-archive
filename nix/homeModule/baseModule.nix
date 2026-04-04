@@ -102,80 +102,6 @@ let
   '';
 
   /*
-    Generate waybar CSS with base16 @define-color variables.
-    Written as a real file by darkman — not managed by home-manager.
-  */
-  mkWaybarCss = c: pkgs.writeText "waybar-style.css" ''
-    @define-color base00 ${c.base00}; @define-color base01 ${c.base01};
-    @define-color base02 ${c.base02}; @define-color base03 ${c.base03};
-    @define-color base04 ${c.base04}; @define-color base05 ${c.base05};
-    @define-color base06 ${c.base06}; @define-color base07 ${c.base07};
-
-    @define-color base08 ${c.base08}; @define-color base09 ${c.base09};
-    @define-color base0A ${c.base0A}; @define-color base0B ${c.base0B};
-    @define-color base0C ${c.base0C}; @define-color base0D ${c.base0D};
-    @define-color base0E ${c.base0E}; @define-color base0F ${c.base0F};
-
-    * {
-        font-family: "IosevkaTerm Nerd Font";
-        font-size: 13px;
-        min-height: 0;
-    }
-    window#waybar {
-        background: transparent;
-        color: @base05;
-    }
-    tooltip {
-        background: alpha(@base00, 0.9);
-        border: 1px solid alpha(@base02, 0.5);
-        border-radius: 8px;
-        color: @base05;
-    }
-
-    .modules-left, .modules-center, .modules-right {
-        background: alpha(@base00, 0.85);
-        border-radius: 10px;
-        padding: 0 4px;
-        margin: 4px 4px;
-    }
-
-    #clock {
-        padding: 0 6px;
-        color: @base05;
-    }
-    #cpu, #memory, #disk, #pulseaudio, #network,
-    #battery, #language, #tray {
-        padding: 0 4px;
-        color: @base03;
-    }
-    #battery.warning { color: @base0A; }
-    #custom-power {
-        padding: 0 8px;
-        color: @base03;
-    }
-    #custom-power:hover { color: @base08; }
-    #custom-notification {
-        padding: 0 6px;
-        color: @base03;
-    }
-
-    #workspaces button {
-        padding: 0 5px;
-        color: @base03;
-        border: none;
-        border-radius: 6px;
-    }
-    #workspaces button.focused,
-    #workspaces button.active {
-        color: @base05;
-        background: alpha(@base02, 0.5);
-    }
-  '';
-
-  darkWaybarCss = mkWaybarCss dark;
-  lightWaybarCss = mkWaybarCss light;
-
-  /*
     Generate fzf color string from base16 palette.
   */
   mkFzfColors = c:
@@ -200,7 +126,7 @@ let
     Writes real config files and reloads every app that doesn't
     follow the XDG portal natively.
   */
-  mkApplyScript = { mode, scheme, waybarCss }:
+  mkApplyScript = { mode, scheme }:
     let
       c = parseScheme scheme;
       oscSeq = mkOscSequence c;
@@ -241,12 +167,6 @@ background = ${c.base00}
 foreground = ${c.base05}
 GHOSTTY
 
-      # --- Waybar: write CSS, signal reload ---
-      mkdir -p "$HOME/.config/waybar"
-      cp -f ${waybarCss} "$HOME/.config/waybar/style.css"
-      chmod 644 "$HOME/.config/waybar/style.css"
-      ${pkgs.procps}/bin/pkill -SIGUSR2 waybar 2>/dev/null || true
-
       # --- Terminals: OSC sequences to all PTYs ---
       SEQ="${oscSeq}"
       for pty in /dev/pts/[0-9]*; do
@@ -269,11 +189,9 @@ GHOSTTY
 
   applyDark = mkApplyScript {
     mode = "dark"; scheme = darkScheme;
-    waybarCss = darkWaybarCss;
   };
   applyLight = mkApplyScript {
     mode = "light"; scheme = lightScheme;
-    waybarCss = lightWaybarCss;
   };
 
   /*
