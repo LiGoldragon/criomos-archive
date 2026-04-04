@@ -72,9 +72,9 @@ in
         };
         focus-ring = {
           enable = true;
-          width = 2;
-          active.color = "${colors.base0D}90";
-          inactive.color = "transparent";
+          width = 3;
+          active.color = "${colors.base0D}";
+          inactive.color = "${colors.base02}";
         };
       };
 
