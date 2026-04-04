@@ -177,4 +177,13 @@ lib.mkIf sizedAtLeast.med {
 
     };
   };
+
+  xdg.desktopEntries.mentci-codium = {
+    name = "Mentci Codium";
+    comment = "VSCodium with Mentci devshell environment";
+    exec = "${inputs.mentci-v1.packages.${pkgs.stdenv.hostPlatform.system}.mentci-codium}/bin/mentci-codium";
+    icon = "vscodium";
+    terminal = false;
+    categories = [ "Development" "IDE" "TextEditor" ];
+  };
 }
