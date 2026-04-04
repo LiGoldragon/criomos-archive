@@ -108,11 +108,21 @@ Never use `<nixpkgs>` / `NIX_PATH` in this repo. Use `nix shell nixpkgs#<pkg>` f
    Use `boot` instead of `switch` when you want changes to take effect only after reboot.
 
 ### Home profile activation
-Build and activate separately (run as root, `su` to the target user):
+
+Local (current node):
 ```
-nix copy --to "ssh://root@<node>" <home-store-path>
-ssh root@<node> su -l <user> -c '<home-store-path>/activate'
+"$(nix build .#crioZones.<cluster>.<node>.home.<user> --no-link --print-out-paths)"/activate
 ```
+
+Remote:
+```
+path=$(nix build .#crioZones.<cluster>.<node>.home.<user> --no-link --print-out-paths)
+nix copy --to "ssh://root@<node>" "$path"
+ssh root@<node> su -l <user> -c "\"$path\"/activate"
+```
+
+Never split build and activate into separate commands that expose store paths — use subshell expansion so the path stays in the shell, not in agent context.
+
 Alternatively, `fullOs` includes home-manager — `switch-to-configuration switch` activates both OS and home profiles in one step.
 
 ### Node addressing

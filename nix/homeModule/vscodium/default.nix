@@ -56,6 +56,39 @@ let
     '';
   };
 
+  vscode-aski =
+    let
+      src = builtins.fetchGit {
+        url = "git@github.com:LiGoldragon/vscode-aski.git";
+        rev = "7fdaa478c45704e7d30aedf166207d021edf0b3c";
+      };
+    in
+    pkgs.buildNpmPackage {
+      pname = "vscode-extension-criome-vscode-aski";
+      version = "0.1.0";
+      inherit src;
+      npmDepsHash = "sha256-Cc515svhzCyo7KWvKiL7TlrciotuUGi4RVbiJa+DXKs=";
+      dontNpmBuild = true;
+      buildPhase = ''
+        npx esbuild src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node
+      '';
+      installPhase = ''
+        extDir=$out/share/vscode/extensions/criome.vscode-aski
+        mkdir -p $extDir
+        cp -r out grammars queries package.json language-configuration.json $extDir/
+        # web-tree-sitter WASM needed at runtime
+        mkdir -p $extDir/node_modules/web-tree-sitter
+        cp node_modules/web-tree-sitter/tree-sitter.js $extDir/node_modules/web-tree-sitter/
+        cp node_modules/web-tree-sitter/tree-sitter.wasm $extDir/node_modules/web-tree-sitter/ 2>/dev/null || true
+        cp node_modules/web-tree-sitter/package.json $extDir/node_modules/web-tree-sitter/
+      '';
+      passthru = {
+        vscodeExtPublisher = "criome";
+        vscodeExtName = "vscode-aski";
+        vscodeExtUniqueId = "criome.vscode-aski";
+      };
+    };
+
   settingsJson = toJSON {
     # Theme — stylix generates base16 theme, darkman switches via portal
     "window.autoDetectColorScheme" = true;
@@ -110,6 +143,7 @@ lib.mkIf (sizedAtLeast.med && isCodeDev) {
       extensions = [
         visualjj
         claude-code
+        vscode-aski
         pkgs.vscode-extensions.mkhl.direnv
         pkgs.vscode-extensions.jnoortheen.nix-ide
       ];
