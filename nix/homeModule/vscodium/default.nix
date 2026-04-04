@@ -60,12 +60,12 @@ let
     let
       src = builtins.fetchGit {
         url = "git@github.com:LiGoldragon/vscode-aski.git";
-        rev = "2b6e48679d79672180387bf4eb95bd83a32ee598";
+        rev = "7dc0633d07187d3b30a68e0f891d0233ca4622de";
       };
     in
     pkgs.buildNpmPackage {
       pname = "vscode-extension-criome-vscode-aski";
-      version = "0.1.0";
+      version = "0.2.0";
       inherit src;
       npmDepsHash = "sha256-0JjCGpgLQM79CUhV6//fEcJJr79BmtqPIq9a2mtWDiQ=";
       dontNpmBuild = true;
