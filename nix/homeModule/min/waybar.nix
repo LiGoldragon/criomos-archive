@@ -12,14 +12,10 @@ let
   green = colors.base0B;
   yellow = colors.base0A;
   blue = colors.base0D;
-  magenta = colors.base0E;
-  cyan = colors.base0C;
-  orange = colors.base09;
   muted = colors.base04;
+  fg = colors.base05;
 
-  # TODO - module for packages
   sysMonitor = "btm";
-  launcher = "rofi -show drun";
   displaySystemInfo = "${pkgs.ghostty}/bin/ghostty -e ${sysMonitor}";
   launchVolumeControl = "pwvucontrol";
 
@@ -37,9 +33,7 @@ in
       margin-left = 8;
       margin-right = 8;
       modules-left = [
-        "custom/launcher"
         "niri/workspaces"
-        "tray"
       ];
       modules-center = [ "clock" ];
       modules-right = [
@@ -50,7 +44,8 @@ in
         "network"
         "battery"
         "niri/language"
-        "custom/notification"
+        "tray"
+        "custom/power"
       ];
       clock = {
         calendar = {
@@ -58,10 +53,10 @@ in
             today = "<span color='${green}'><b>{}</b></span>";
           };
         };
-        format = "  {:%H:%M}";
+        format = " {:%H:%M}";
         tooltip = "true";
         tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
-        format-alt = "  {:%d/%m}";
+        format-alt = " {:%d/%m}";
       };
       "niri/workspaces" = {
         format = "{icon}";
@@ -79,36 +74,36 @@ in
         };
       };
       cpu = {
-        format = "<span foreground='${muted}'> </span>{usage}%";
-        format-alt = "<span foreground='${muted}'> </span>{avg_frequency} GHz";
+        format = " {usage}%";
+        format-alt = " {avg_frequency} GHz";
         interval = 2;
         on-click-right = displaySystemInfo;
       };
       memory = {
-        format = "<span foreground='${muted}'>󰟜 </span>{}%";
-        format-alt = "<span foreground='${muted}'>󰟜 </span>{used} GiB";
+        format = "󰟜 {}%";
+        format-alt = "󰟜 {used} GiB";
         interval = 2;
         on-click-right = displaySystemInfo;
       };
       disk = {
-        format = "<span foreground='${muted}'>󰋊 </span>{percentage_used}%";
+        format = "󰋊 {percentage_used}%";
         interval = 60;
         on-click-right = displaySystemInfo;
       };
       network = {
-        format-wifi = "<span foreground='${muted}'> </span>{signalStrength}%";
-        format-ethernet = "<span foreground='${muted}'>󰀂 </span>";
+        format-wifi = "  {signalStrength}%";
+        format-ethernet = "󰀂 ";
         tooltip-format = "Connected to {essid} {ifname} via {gwaddr}";
         format-linked = "{ifname} (No IP)";
-        format-disconnected = "<span foreground='${muted}'>󰖪 </span>";
+        format-disconnected = "󰖪 ";
       };
       tray = {
         icon-size = 20;
         spacing = 8;
       };
       pulseaudio = {
-        format = "<span foreground='${muted}'>{icon}</span>{volume}%";
-        format-muted = "<span foreground='${muted}'> </span>{volume}%";
+        format = "{icon}{volume}%";
+        format-muted = " {volume}%";
         format-icons = {
           default = [ " " ];
         };
@@ -116,7 +111,7 @@ in
         on-click = launchVolumeControl;
       };
       battery = {
-        format = "<span foreground='${muted}'>{icon}</span>{capacity}%";
+        format = "{icon}{capacity}%";
         format-icons = [
           " "
           " "
@@ -124,9 +119,9 @@ in
           " "
           " "
         ];
-        format-charging = "<span foreground='${muted}'> </span>{capacity}%";
-        format-full = "<span foreground='${muted}'> </span>{capacity}%";
-        format-warning = "<span foreground='${yellow}'> </span>{capacity}%";
+        format-charging = " {capacity}%";
+        format-full = " {capacity}%";
+        format-warning = " {capacity}%";
         interval = 5;
         states = {
           warning = 20;
@@ -136,36 +131,15 @@ in
         tooltip-format = "{time}";
       };
       "niri/language" = {
-        format = "<span foreground='${muted}'> </span>{}";
+        format = " {}";
         format-fr = "FR";
         format-en = "US";
       };
-      "custom/launcher" = {
-        format = "";
-        on-click = launcher;
-        tooltip = "true";
-      };
-      "custom/notification" = {
+      "custom/power" = {
+        format = "⏻";
         tooltip = false;
-        format = "{icon} ";
-        format-icons = {
-          notification = "<span foreground='red'><sup></sup></span>  <span foreground='${red}'></span>";
-          none = "  <span foreground='${muted}'></span>";
-          dnd-notification = "<span foreground='red'><sup></sup></span>  <span foreground='${red}'></span>";
-          dnd-none = "  <span foreground='${muted}'></span>";
-          inhibited-notification = "<span foreground='red'><sup></sup></span>  <span foreground='${red}'></span>";
-          inhibited-none = "  <span foreground='${muted}'></span>";
-          dnd-inhibited-notification = "<span foreground='red'><sup></sup></span>  <span foreground='${red}'></span>";
-          dnd-inhibited-none = "  <span foreground='${muted}'></span>";
-        };
-        return-type = "json";
-        exec-if = "which swaync-client";
-        exec = "swaync-client -swb";
-        on-click = "swaync-client -t -sw";
-        on-click-right = "swaync-client -d -sw";
-        escape = true;
+        on-click = "${pkgs.wofi}/bin/wofi --show dmenu --prompt 'Session' --cache-file /dev/null <<< $'Lock\nSuspend\nLogout\nReboot\nShutdown' | ${pkgs.bash}/bin/bash -c 'read choice; case $choice in Lock) loginctl lock-session;; Suspend) systemctl suspend;; Logout) niri msg action quit;; Reboot) systemctl reboot;; Shutdown) systemctl poweroff;; esac'";
       };
-
     };
   };
 }

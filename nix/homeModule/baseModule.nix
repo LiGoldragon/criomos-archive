@@ -139,17 +139,25 @@ let
         margin: 4px 4px;
     }
 
-    #wireplumber, #pulseaudio, #sndio,
-    #upower, #battery,
-    #network, #user, #clock, #backlight,
-    #cpu, #disk, #idle_inhibitor, #temperature,
-    #mpd, #language, #keyboard-state, #memory,
-    #window, #bluetooth, #tray,
-    #custom-launcher, #custom-notification {
+    #clock {
         padding: 0 6px;
-        color: @base04;
+        color: @base05;
     }
-    #clock { color: @base05; }
+    #cpu, #memory, #disk, #pulseaudio, #network,
+    #battery, #language, #tray {
+        padding: 0 4px;
+        color: @base03;
+    }
+    #battery.warning { color: @base0A; }
+    #custom-power {
+        padding: 0 8px;
+        color: @base03;
+    }
+    #custom-power:hover { color: @base08; }
+    #custom-notification {
+        padding: 0 6px;
+        color: @base03;
+    }
 
     #workspaces button {
         padding: 0 5px;
