@@ -8,16 +8,14 @@ let
   inherit (horizon.node.methods) behavesAs;
   colors = config.lib.stylix.colors.withHashtag;
 
-  red = colors.base08;
-  green = colors.base0B;
-  yellow = colors.base0A;
-  blue = colors.base0D;
-  muted = colors.base04;
+  muted = colors.base03;
   fg = colors.base05;
+  yellow = colors.base0A;
 
   sysMonitor = "btm";
   displaySystemInfo = "${pkgs.ghostty}/bin/ghostty -e ${sysMonitor}";
   launchVolumeControl = "pwvucontrol";
+  launcher = "${pkgs.nwg-drawer}/bin/nwg-drawer";
 
 in
 {
@@ -33,6 +31,7 @@ in
       margin-left = 8;
       margin-right = 8;
       modules-left = [
+        "custom/launcher"
         "niri/workspaces"
       ];
       modules-center = [ "clock" ];
@@ -43,20 +42,17 @@ in
         "pulseaudio"
         "network"
         "battery"
-        "niri/language"
         "tray"
         "custom/power"
       ];
       clock = {
-        calendar = {
-          format = {
-            today = "<span color='${green}'><b>{}</b></span>";
-          };
-        };
         format = " {:%H:%M}";
         tooltip = "true";
         tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
         format-alt = " {:%d/%m}";
+        calendar = {
+          format.today = "<b>{}</b>";
+        };
       };
       "niri/workspaces" = {
         format = "{icon}";
@@ -76,30 +72,31 @@ in
       cpu = {
         format = " {usage}%";
         format-alt = " {avg_frequency} GHz";
-        interval = 2;
+        interval = 5;
         on-click-right = displaySystemInfo;
       };
       memory = {
         format = "󰟜 {}%";
         format-alt = "󰟜 {used} GiB";
-        interval = 2;
+        interval = 5;
         on-click-right = displaySystemInfo;
       };
       disk = {
         format = "󰋊 {percentage_used}%";
+        format-alt = "󰋊 {free}";
         interval = 60;
         on-click-right = displaySystemInfo;
       };
       network = {
-        format-wifi = "  {signalStrength}%";
-        format-ethernet = "󰀂 ";
+        format-wifi = " {signalStrength}%";
+        format-ethernet = "󰀂";
         tooltip-format = "Connected to {essid} {ifname} via {gwaddr}";
         format-linked = "{ifname} (No IP)";
-        format-disconnected = "󰖪 ";
+        format-disconnected = "󰖪";
       };
       tray = {
-        icon-size = 20;
-        spacing = 8;
+        icon-size = 18;
+        spacing = 6;
       };
       pulseaudio = {
         format = "{icon}{volume}%";
@@ -112,33 +109,33 @@ in
       };
       battery = {
         format = "{icon}{capacity}%";
-        format-icons = [
-          " "
-          " "
-          " "
-          " "
-          " "
-        ];
+        format-icons = [ " " " " " " " " " " ];
         format-charging = " {capacity}%";
         format-full = " {capacity}%";
         format-warning = " {capacity}%";
-        interval = 5;
-        states = {
-          warning = 20;
-        };
-        format-time = "{H}h{M}m";
+        interval = 10;
+        states.warning = 20;
         tooltip = true;
         tooltip-format = "{time}";
       };
-      "niri/language" = {
-        format = " {}";
-        format-fr = "FR";
-        format-en = "US";
+      "custom/launcher" = {
+        format = "󰀻";
+        on-click = launcher;
+        tooltip = false;
       };
       "custom/power" = {
         format = "⏻";
         tooltip = false;
-        on-click = "${pkgs.wofi}/bin/wofi --show dmenu --prompt 'Session' --cache-file /dev/null <<< $'Lock\nSuspend\nLogout\nReboot\nShutdown' | ${pkgs.bash}/bin/bash -c 'read choice; case $choice in Lock) loginctl lock-session;; Suspend) systemctl suspend;; Logout) niri msg action quit;; Reboot) systemctl reboot;; Shutdown) systemctl poweroff;; esac'";
+        on-click = "${pkgs.writeShellScript "power-menu" ''
+          choice=$(printf 'Lock\nSuspend\nLogout\nReboot\nShutdown' | ${pkgs.wofi}/bin/wofi --show dmenu --prompt Session --cache-file /dev/null)
+          case "$choice" in
+            Lock) loginctl lock-session;;
+            Suspend) systemctl suspend;;
+            Logout) niri msg action quit;;
+            Reboot) systemctl reboot;;
+            Shutdown) systemctl poweroff;;
+          esac
+        ''}";
       };
     };
   };

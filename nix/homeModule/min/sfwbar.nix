@@ -8,11 +8,12 @@ let
   inherit (horizon.node.methods) behavesAs;
   terminal = "${pkgs.ghostty}/bin/ghostty";
   launcher = "${pkgs.nwg-drawer}/bin/nwg-drawer";
-  volumeControl = "pwvucontrol";
+  powerMenu = "${pkgs.nwg-bar}/bin/nwg-bar";
+  swayncClient = "${pkgs.swaynotificationcenter}/bin/swaync-client";
 
   sfwbarConfig = pkgs.writeText "sfwbar.config" ''
     Set Term = "${terminal}"
-    Set VolumeAction = "${volumeControl}"
+    Set VolumeAction = "pwvucontrol"
 
     TriggerAction "SIGRTMIN+1", SwitcherEvent "forward"
     TriggerAction "SIGRTMIN+2", SwitcherEvent "back"
@@ -64,11 +65,8 @@ let
         css = "* { -GtkWidget-hexpand: true; }"
       }
 
-      # System widgets
-      include("cpu.widget")
-      include("memory.widget")
-      include("network-module.widget")
       include("volume.widget")
+      include("network-module.widget")
       include("battery-svg.widget")
 
       tray {
@@ -88,19 +86,17 @@ let
         }
       }
 
-      # Power button
+      # Notifications
+      button {
+        value = "preferences-system-notifications-symbolic"
+        action = Exec "${swayncClient} -t -sw"
+        css = "* { min-height: 16px; min-width: 16px; padding: 0 4px; }"
+      }
+
+      # Power
       button {
         value = "system-shutdown-symbolic"
-        action = Exec "${pkgs.writeShellScript "power-menu" ''
-          choice=$(printf 'Lock\nSuspend\nLogout\nReboot\nShutdown' | ${pkgs.wofi}/bin/wofi --show dmenu --prompt Session --cache-file /dev/null)
-          case "$choice" in
-            Lock) loginctl lock-session;;
-            Suspend) systemctl suspend;;
-            Logout) niri msg action quit;;
-            Reboot) systemctl reboot;;
-            Shutdown) systemctl poweroff;;
-          esac
-        ''}"
+        action = Exec "${powerMenu}"
         css = "* { min-height: 16px; min-width: 16px; padding: 0 6px; }"
       }
     }
@@ -188,40 +184,6 @@ let
       border: none;
     }
 
-    chart#cpu_chart {
-      background: alpha(@theme_fg_color, 0.08);
-      min-width: 9px;
-      -GtkWidget-vexpand: true;
-      margin: 3px 1px;
-      border: none;
-      color: alpha(@theme_fg_color, 0.4);
-    }
-
-    progressbar#memory {
-      -GtkWidget-direction: top;
-      -GtkWidget-vexpand: true;
-      min-width: 9px;
-      border: none;
-      margin: 3px 1px;
-    }
-
-    progressbar#memory trough {
-      min-height: 2px;
-      min-width: 9px;
-      border: none;
-      border-radius: 0px;
-      background: alpha(@theme_fg_color, 0.08);
-    }
-
-    progressbar#memory progress {
-      -GtkWidget-hexpand: true;
-      min-width: 9px;
-      border-radius: 0px;
-      border: none;
-      margin: 0px;
-      background-color: alpha(@theme_fg_color, 0.3);
-    }
-
     label#clock {
       padding: 0 4px;
       -GtkWidget-vexpand: true;
@@ -259,10 +221,18 @@ let
     }
   '';
 in
-{
-  home.packages = lib.mkIf behavesAs.edge [ pkgs.sfwbar ];
+lib.mkIf behavesAs.edge {
+  home.packages = [
+    pkgs.sfwbar
+    pkgs.nwg-drawer
+    pkgs.nwg-bar
+    pkgs.nwg-look
+    pkgs.nwg-displays
+    pkgs.nwg-clipman
+    pkgs.swaynotificationcenter
+  ];
 
-  xdg.configFile."sfwbar/sfwbar.config" = lib.mkIf behavesAs.edge {
-    source = sfwbarConfig;
-  };
+  xdg.configFile."sfwbar/sfwbar.config".source = sfwbarConfig;
+
+  services.swaync.enable = true;
 }
