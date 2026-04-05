@@ -182,10 +182,6 @@ in
         "XF86AudioRaiseVolume".action = a.spawn "wpctl" "set-volume" "-l" "1" "@DEFAULT_AUDIO_SINK@" "5%+";
         "XF86AudioLowerVolume".action = a.spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-";
 
-        # Brightness
-        "XF86MonBrightnessUp".action = a.spawn "${pkgs.brightnessctl}/bin/brightnessctl" "set" "5%+";
-        "XF86MonBrightnessDown".action = a.spawn "${pkgs.brightnessctl}/bin/brightnessctl" "set" "5%-";
-
         # Lock
         "Mod+L".action = a.spawn "sh" "-c" "noctalia-shell ipc call lockScreen lock && sleep 3 && niri msg action power-off-monitors";
 
