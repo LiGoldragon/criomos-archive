@@ -67,9 +67,13 @@ const DBUS_DEST: &str = "rs.wl-gammarelay";
 const DBUS_PATH: &str = "/";
 const DBUS_IFACE: &str = "rs.wl.gammarelay";
 
-/// Perceptual step fraction: each key press shifts 15% of current brightness.
-const STEP_NUM: u64 = 15;
-const STEP_DEN: u64 = 100;
+/// Step sizing: sqrt curve — fast climb from minimum, big steps at the top.
+/// step = max * 0.08 * sqrt(brightness / max) + min_hw
+/// At min_hw (~48): step ≈ 130 (fast escape)
+/// At 25%:          step ≈ 1020 (medium)
+/// At 50%:          step ≈ 1400 (large)
+/// At 100%:         step ≈ 1985 (~8% of max — 2-3 key presses from top)
+const STEP_SCALE: f64 = 0.08;
 
 /// Software gamma tiers below hardware minimum. Linearly spaced with 7 steps
 /// from full gamma down to effectively off.
@@ -93,9 +97,11 @@ impl Backlight {
         (self.max / 500).max(1)
     }
 
-    /// Perceptual step proportional to current level, floored at min_hw.
+    /// Sqrt-curve step: fast from minimum, substantial at the top.
     fn step(&self) -> u64 {
-        (self.brightness * STEP_NUM / STEP_DEN).max(self.min_hw())
+        let ratio = self.brightness as f64 / self.max as f64;
+        let s = (self.max as f64 * STEP_SCALE * ratio.sqrt()) as u64;
+        s.max(self.min_hw())
     }
 
     fn set(&mut self, value: u64) -> Result<(), Error> {
