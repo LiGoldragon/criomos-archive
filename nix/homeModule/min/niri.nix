@@ -97,12 +97,7 @@ in
       binds = {
         # Launch
         "Mod+Shift+Return".action = a.spawn terminal;
-        "Mod+O".action = a.spawn "${pkgs.writeShellScript "noctalia-launcher" ''
-          pid=$(${pkgs.procps}/bin/pgrep -f 'quickshell.*noctalia' | head -1)
-          if [ -n "$pid" ]; then
-            exec noctalia-shell ipc --pid "$pid" call launcher toggle
-          fi
-        ''}";
+        "Mod+O".action = a.spawn "noctalia-shell" "ipc" "call" "launcher" "toggle";
 
         # Window
         "Mod+Q".action = a.close-window;
