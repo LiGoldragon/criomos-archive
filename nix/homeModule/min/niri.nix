@@ -97,7 +97,8 @@ in
       binds = {
         # Launch
         "Mod+Shift+Return".action = a.spawn terminal;
-        "Mod+O".action = a.spawn "noctalia-shell" "ipc" "call" "launcher" "toggle";
+        "Mod+O" = { action = a.toggle-overview; repeat = false; };
+        "Mod+Space".action = a.spawn "noctalia-shell" "ipc" "call" "launcher" "toggle";
 
         # Window
         "Mod+Q".action = a.close-window;
@@ -129,7 +130,7 @@ in
         "Mod+F".action = a.maximize-column;
         "Mod+B".action = a.center-column;
 
-        # Workspaces (vertical: up/down)
+        # Workspaces (Colemak U=up E=down)
         "Mod+Ctrl+U".action = a.focus-workspace-up;
         "Mod+Ctrl+E".action = a.focus-workspace-down;
         "Mod+Ctrl+Shift+U".action = a.move-column-to-workspace-up;
@@ -138,11 +139,11 @@ in
         # Tab/focus cycling
         "Mod+Tab".action = a.focus-workspace-previous;
 
-        # Monitor
-        "Mod+Shift+Left".action = a.focus-monitor-left;
-        "Mod+Shift+Right".action = a.focus-monitor-right;
-        "Mod+Shift+Ctrl+Left".action = a.move-column-to-monitor-left;
-        "Mod+Shift+Ctrl+Right".action = a.move-column-to-monitor-right;
+        # Monitor (Colemak N=left I=right)
+        "Mod+Ctrl+N".action = a.focus-monitor-left;
+        "Mod+Ctrl+I".action = a.focus-monitor-right;
+        "Mod+Ctrl+Shift+N".action = a.move-column-to-monitor-left;
+        "Mod+Ctrl+Shift+I".action = a.move-column-to-monitor-right;
 
         # Numbered workspaces
         "Mod+1".action.focus-workspace = 1;
@@ -183,7 +184,7 @@ in
       };
 
       gestures = {
-        hot-corners.enable = false;
+        hot-corners.enable = true;
       };
     };
   };
