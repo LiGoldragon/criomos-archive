@@ -63,7 +63,7 @@ let
     let
       src = builtins.fetchGit {
         url = "https://github.com/LiGoldragon/vscode-aski.git";
-        rev = "7e7cfd5fe4bcb0b99979f8eb9c5e6a01072b087d";
+        rev = "e66abfb27d8d3e811fc92461693e54cf3d635d69";
       };
     in
     pkgs.buildNpmPackage {
@@ -78,7 +78,7 @@ let
       installPhase = ''
         extDir=$out/share/vscode/extensions/criome.vscode-aski
         mkdir -p $extDir $extDir/grammars
-        cp -r out package.json language-configuration.json $extDir/
+        cp -r out syntaxes package.json language-configuration.json $extDir/
         # WASM + queries from aski flake (pure Nix build)
         cp ${askiWasm}/tree-sitter-aski.wasm $extDir/grammars/
         cp -r ${askiWasm}/queries $extDir/
