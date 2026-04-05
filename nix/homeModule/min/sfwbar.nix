@@ -11,7 +11,23 @@ lib.mkIf behavesAs.edge {
     enable = true;
     systemd.enable = false;
     settings = {
-      bar.widgetSettings.Battery.displayMode = "graphic-full";
+      bar.widgets = {
+        left = [
+          { id = "Launcher"; }
+          { id = "MediaMini"; }
+        ];
+        center = [
+          { id = "Workspace"; }
+        ];
+        right = [
+          { id = "Tray"; }
+          { id = "NotificationHistory"; }
+          { id = "Battery"; displayMode = "graphic-full"; }
+          { id = "Volume"; }
+          { id = "Brightness"; }
+          { id = "ControlCenter"; }
+        ];
+      };
     };
   };
 }
