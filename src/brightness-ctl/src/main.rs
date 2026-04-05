@@ -276,11 +276,30 @@ fn read_sysfs_u64(base: &str, name: &str) -> Result<u64, Error> {
         .map_err(|e| Error::Parse(e.to_string()))
 }
 
+/// Find the user owning the active graphical seat session.
+fn active_session_user() -> Result<(String, u32), Error> {
+    let output = Command::new("loginctl")
+        .args(["list-sessions", "--no-legend", "--no-pager"])
+        .output()?;
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    for line in stdout.lines() {
+        let fields: Vec<&str> = line.split_whitespace().collect();
+        // SESSION UID USER SEAT
+        if fields.len() >= 4 && !fields[3].is_empty() {
+            let uid: u32 = fields[1]
+                .parse()
+                .map_err(|e: std::num::ParseIntError| Error::Parse(e.to_string()))?;
+            return Ok((fields[2].to_string(), uid));
+        }
+    }
+    Err(Error::Dbus("no active graphical session".into()))
+}
+
 fn run_as_user(cmd: &str, args: &[&str]) -> Result<String, Error> {
-    let uid = 1001u32;
+    let (user, uid) = active_session_user()?;
     let addr = format!("unix:path=/run/user/{uid}/bus");
     let output = Command::new("runuser")
-        .args(["-u", "li", "--"])
+        .args(["-u", &user, "--"])
         .arg("env")
         .arg(format!("DBUS_SESSION_BUS_ADDRESS={addr}"))
         .arg(cmd)
@@ -311,12 +330,27 @@ fn main() {
 fn run(direction_arg: &str) -> Result<(), Error> {
     let direction = Direction::from_arg(direction_arg)?;
     let mut backlight = Backlight::from_sysfs()?;
-    let mut gamma = GammaBrightness::from_dbus()?;
 
-    direction.apply(&mut backlight, &mut gamma)?;
-
-    let effective = EffectiveBrightness::from_state(&backlight, &gamma);
-    effective.notify()?;
+    match GammaBrightness::from_dbus() {
+        Ok(mut gamma) => {
+            direction.apply(&mut backlight, &mut gamma)?;
+            let effective = EffectiveBrightness::from_state(&backlight, &gamma);
+            let _ = effective.notify();
+        }
+        Err(_) => {
+            // No graphical session — hardware-only brightness
+            match &direction {
+                Direction::Up => {
+                    let step = backlight.step();
+                    backlight.set(backlight.brightness + step)?;
+                }
+                Direction::Down => {
+                    let step = backlight.step();
+                    backlight.set(backlight.brightness.saturating_sub(step))?;
+                }
+            }
+        }
+    }
 
     Ok(())
 }
