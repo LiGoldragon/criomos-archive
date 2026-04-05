@@ -187,7 +187,7 @@ in
         "XF86MonBrightnessDown".action = a.spawn "${pkgs.brightnessctl}/bin/brightnessctl" "set" "5%-";
 
         # Lock
-        "Mod+L".action = a.spawn "noctalia-shell" "ipc" "call" "lockScreen" "lock";
+        "Mod+L".action = a.spawn "sh" "-c" "noctalia-shell ipc call lockScreen lock && niri msg action power-off-monitors";
 
         # Hotkey overlay
         "Mod+Shift+S".action = a.show-hotkey-overlay;
