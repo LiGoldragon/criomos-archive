@@ -100,6 +100,7 @@ in
         "Mod+Shift+Return".action = a.spawn terminal;
         "Mod+O" = { action = a.toggle-overview; repeat = false; };
         "Mod+D".action = a.spawn "noctalia-shell" "ipc" "call" "launcher" "toggle";
+        "Mod+Space".action = a.spawn "noctalia-shell" "ipc" "call" "launcher" "toggle";
 
         # Window
         "Mod+Q".action = a.close-window;
