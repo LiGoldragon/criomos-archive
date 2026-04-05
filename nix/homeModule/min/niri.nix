@@ -1,6 +1,7 @@
-{ pkgs, config, ... }:
+{ pkgs, config, user, ... }:
 let
   terminal = "${pkgs.ghostty}/bin/ghostty";
+  inherit (user.methods) useFastRepeat;
 
   a = config.lib.niri.actions;
 
@@ -28,8 +29,8 @@ in
             variant = "colemak";
             options = "ctrl:nocaps,altwin:swap_ralt_rwin";
           };
-          repeat-delay = 200;
-          repeat-rate = 50;
+          repeat-delay = if useFastRepeat then 200 else 600;
+          repeat-rate = if useFastRepeat then 50 else 25;
         };
         touchpad = {
           tap = true;
@@ -96,6 +97,7 @@ in
       binds = {
         # Launch
         "Mod+Shift+Return".action = a.spawn terminal;
+        "Mod+O".action = a.spawn "noctalia-shell" "ipc" "call" "launcher" "toggle";
 
         # Window
         "Mod+Q".action = a.close-window;

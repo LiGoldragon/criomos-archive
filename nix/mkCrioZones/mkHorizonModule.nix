@@ -339,6 +339,7 @@ let
         gitSigningKey = if hasPreCriome then ("&" + user.preCriomes.${node.name}.keygrip) else null;
 
         useColemak = user.keyboard == "colemak";
+        useFastRepeat = inputUser.fastRepeat or true;
 
         isMultimediaDev = elem user.species [
           "multimedia"
