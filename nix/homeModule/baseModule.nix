@@ -250,6 +250,7 @@ in
       settings = {
         lat = 36.7;
         lng = -4.4;
+        usegeoclue = true;
         dbusserver = true;
         portal = true;
       };
