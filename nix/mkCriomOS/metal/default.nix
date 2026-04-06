@@ -267,6 +267,10 @@ in
         isAllowed = true;
         isSystem = true;
       };
+      appConfig.darkman = {
+        isAllowed = true;
+        isSystem = false;
+      };
     };
 
     localtimed = {
