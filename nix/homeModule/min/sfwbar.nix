@@ -23,6 +23,7 @@ lib.mkIf behavesAs.edge {
       bar.widgets = {
         left = [
           { id = "Launcher"; }
+          { id = "Clock"; }
           { id = "MediaMini"; }
         ];
         center = [
@@ -33,7 +34,6 @@ lib.mkIf behavesAs.edge {
           { id = "Battery"; displayMode = "graphic"; }
           { id = "Volume"; }
           { id = "Brightness"; }
-          { id = "Clock"; }
           { id = "ControlCenter"; }
         ];
       };
