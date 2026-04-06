@@ -1054,11 +1054,11 @@
         "sema-src": "sema-src"
       },
       "locked": {
-        "lastModified": 1775488539,
-        "narHash": "sha256-roBCO2123A9UCd38VrwncsSNlWAjyZDSkiPs0mtcBQg=",
+        "lastModified": 1775488971,
+        "narHash": "sha256-JRDNtDETGYwCQOoN3vOOQ5/F8W7BCewou9f8IREghVw=",
         "owner": "LiGoldragon",
         "repo": "Mentci",
-        "rev": "ec4b1400787a8180cb3a53d69c88c645e32d5fd5",
+        "rev": "8ac9cb5f95dc44b04f4adc659e8995dc2e86db10",
         "type": "github"
       },
       "original": {
