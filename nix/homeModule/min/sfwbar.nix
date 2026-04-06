@@ -16,11 +16,10 @@ lib.mkIf behavesAs.edge {
       idle = {
         enabled = true;
         screenOffTimeout = 300;
-        lockTimeout = 600;
-        suspendTimeout = 1800;
+        lockTimeout = 3600;
+        suspendTimeout = 0;
         fadeDuration = 5;
       };
-      general.lockOnSuspend = true;
       bar.widgets = {
         left = [
           { id = "Launcher"; }
