@@ -159,11 +159,33 @@ lib.mkIf sizedAtLeast.med {
     VISUAL = lib.mkForce "codium --wait";
   };
 
-  xdg.mimeApps.defaultApplications = {
-    "text/plain" = "codium.desktop";
-    "text/markdown" = "codium.desktop";
-    "text/x-markdown" = "codium.desktop";
-  };
+  xdg.mimeApps.defaultApplications = builtins.listToAttrs (map (t: {
+    name = t;
+    value = "codium.desktop";
+  }) [
+    "text/plain"
+    "text/markdown"
+    "text/x-markdown"
+    "text/x-python"
+    "text/x-shellscript"
+    "text/x-c"
+    "text/x-c++"
+    "text/x-rust"
+    "text/x-go"
+    "text/x-java"
+    "text/x-toml"
+    "text/x-nix"
+    "text/x-lua"
+    "text/x-diff"
+    "text/x-log"
+    "text/csv"
+    "text/xml"
+    "application/json"
+    "application/x-yaml"
+    "application/xml"
+    "application/toml"
+    "application/x-shellscript"
+  ]);
 
   home.activation.seedVscodiumSettings =
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''

@@ -47,22 +47,6 @@
         "type": "github"
       }
     },
-    "annas-archive-src": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1775490165,
-        "narHash": "sha256-jYqK3UjtWOuOj9KwehM3e5d9jmd2n17g3owccjwWigc=",
-        "owner": "LiGoldragon",
-        "repo": "annas-archive",
-        "rev": "9faaf2f66a0970fb112a1c32d9b22c3d0b4cdbdc",
-        "type": "github"
-      },
-      "original": {
-        "owner": "LiGoldragon",
-        "repo": "annas-archive",
-        "type": "github"
-      }
-    },
     "aski": {
       "inputs": {
         "aski-core-src": "aski-core-src",
@@ -240,6 +224,22 @@
         "owner": "tinted-theming",
         "repo": "base16-vim",
         "rev": "577fe8125d74ff456cf942c733a85d769afe58b7",
+        "type": "github"
+      }
+    },
+    "bibliotheca-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1775490165,
+        "narHash": "sha256-jYqK3UjtWOuOj9KwehM3e5d9jmd2n17g3owccjwWigc=",
+        "owner": "LiGoldragon",
+        "repo": "bibliotheca",
+        "rev": "9faaf2f66a0970fb112a1c32d9b22c3d0b4cdbdc",
+        "type": "github"
+      },
+      "original": {
+        "owner": "LiGoldragon",
+        "repo": "bibliotheca",
         "type": "github"
       }
     },
@@ -434,55 +434,8 @@
       },
       "original": {
         "owner": "LiGoldragon",
+        "ref": "v1",
         "repo": "criome-cozo",
-        "type": "github"
-      }
-    },
-    "criome-store-contract-src": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1774255554,
-        "narHash": "sha256-nsBE91L3Svcp/UWdV4H4EJ2QLkLL1VFXEYqRVK4zYUo=",
-        "owner": "LiGoldragon",
-        "repo": "criome-store-contract",
-        "rev": "671a27815ee2158603620b7381f6f095086d3468",
-        "type": "github"
-      },
-      "original": {
-        "owner": "LiGoldragon",
-        "repo": "criome-store-contract",
-        "type": "github"
-      }
-    },
-    "criome-store-src": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1775473571,
-        "narHash": "sha256-xpVYSFTDCXULcSNCKIg22BeYwPu9BecqZxkzRZrrfFU=",
-        "owner": "LiGoldragon",
-        "repo": "criome-store",
-        "rev": "6c41bb2ffd9b5d26de6b2780f4cec13649e5939c",
-        "type": "github"
-      },
-      "original": {
-        "owner": "LiGoldragon",
-        "repo": "criome-store",
-        "type": "github"
-      }
-    },
-    "criome-stored-src": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1774700326,
-        "narHash": "sha256-aK9VQu0g7ZpTLoNs5RiGVWfOndi7uQJ0VZ/FIs03aZg=",
-        "owner": "LiGoldragon",
-        "repo": "criome-stored",
-        "rev": "8cb275152667907b1e59bf48a2981816660c7a9c",
-        "type": "github"
-      },
-      "original": {
-        "owner": "LiGoldragon",
-        "repo": "criome-stored",
         "type": "github"
       }
     },
@@ -1030,17 +983,15 @@
     },
     "mentci": {
       "inputs": {
-        "annas-archive-src": "annas-archive-src",
+        "bibliotheca-src": "bibliotheca-src",
         "claude-chill-src": "claude-chill-src",
         "claude-code": "claude-code",
         "crane": "crane_3",
         "criome-cozo-src": "criome-cozo-src",
-        "criome-store-contract-src": "criome-store-contract-src",
-        "criome-store-src": "criome-store-src",
-        "criome-stored-src": "criome-stored-src",
         "fenix": "fenix",
         "flake-utils": "flake-utils_5",
         "lojix-src": "lojix-src",
+        "nexus-src": "nexus-src",
         "nixpkgs": [
           "nixpkgs"
         ],
@@ -1048,17 +999,14 @@
         "samskara-core-src": "samskara-core-src",
         "samskara-lojix-contract-src": "samskara-lojix-contract-src",
         "samskara-reader-src": "samskara-reader-src",
-        "samskara-src": "samskara-src",
-        "sema-codegen-src": "sema-codegen-src",
-        "sema-core-src": "sema-core-src",
-        "sema-src": "sema-src"
+        "samskara-src": "samskara-src"
       },
       "locked": {
-        "lastModified": 1775502581,
-        "narHash": "sha256-pRrUiCxhR7hUnFvugBgV6B6kiJUojC6P7JkexwhcQCg=",
+        "lastModified": 1775564537,
+        "narHash": "sha256-8yfOvwRUxG7ZhfldGY7Js0z9OAiekiUAF5E2V24rg0U=",
         "owner": "LiGoldragon",
         "repo": "Mentci",
-        "rev": "32b204bd56779785aca91237e3e2794974c58d43",
+        "rev": "6f7ad750f95987dba6dec637f2e721f82a700dfa",
         "type": "github"
       },
       "original": {
@@ -1111,6 +1059,22 @@
       "original": {
         "owner": "LiGoldragon",
         "repo": "ndi",
+        "type": "github"
+      }
+    },
+    "nexus-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1775563699,
+        "narHash": "sha256-dOpl1h22VfLMqFphJJGrcqJEPIDMekYH675mgjgBFhA=",
+        "owner": "LiGoldragon",
+        "repo": "nexus",
+        "rev": "c7039f9e99308825ff886dd710e97b0bf81c0683",
+        "type": "github"
+      },
+      "original": {
+        "owner": "LiGoldragon",
+        "repo": "nexus",
         "type": "github"
       }
     },
@@ -1518,6 +1482,7 @@
       },
       "original": {
         "owner": "LiGoldragon",
+        "ref": "v1",
         "repo": "samskara-codegen",
         "type": "github"
       }
@@ -1534,6 +1499,7 @@
       },
       "original": {
         "owner": "LiGoldragon",
+        "ref": "v1",
         "repo": "samskara-core",
         "type": "github"
       }
@@ -1550,6 +1516,7 @@
       },
       "original": {
         "owner": "LiGoldragon",
+        "ref": "v1",
         "repo": "samskara-lojix-contract",
         "type": "github"
       }
@@ -1614,54 +1581,6 @@
       "original": {
         "owner": "AnaSeahawk",
         "repo": "website",
-        "type": "github"
-      }
-    },
-    "sema-codegen-src": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1774700312,
-        "narHash": "sha256-9wDR6zicjRC/BWis8yPv2PjGTydYgQIZzGovYQMgdeQ=",
-        "owner": "LiGoldragon",
-        "repo": "sema-codegen",
-        "rev": "3b5a70af4886176f460cc5d0f480127a7dd0160f",
-        "type": "github"
-      },
-      "original": {
-        "owner": "LiGoldragon",
-        "repo": "sema-codegen",
-        "type": "github"
-      }
-    },
-    "sema-core-src": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1774700307,
-        "narHash": "sha256-ttkkkwOHd2/UYKO0ZSQqkW24FjR9VHhUj5R9eBJsySo=",
-        "owner": "LiGoldragon",
-        "repo": "sema-core",
-        "rev": "31558853012f00ed82fb0af36aa787074a7fd0eb",
-        "type": "github"
-      },
-      "original": {
-        "owner": "LiGoldragon",
-        "repo": "sema-core",
-        "type": "github"
-      }
-    },
-    "sema-src": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1774700310,
-        "narHash": "sha256-LUfcclunbRHsBE/WNF8i/trx93mhs1MkFQhluwXGUaE=",
-        "owner": "LiGoldragon",
-        "repo": "sema",
-        "rev": "dfe08d104ecdbf65303d300164330d665a3f75a6",
-        "type": "github"
-      },
-      "original": {
-        "owner": "LiGoldragon",
-        "repo": "sema",
         "type": "github"
       }
     },
