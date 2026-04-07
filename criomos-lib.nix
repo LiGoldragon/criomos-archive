@@ -2,6 +2,39 @@ with builtins;
 
 rec {
 
+  /*
+    Produces a HM activation hook that deep-merges nixSettings into a mutable
+    JSON file. Nix-declared keys always win; user-added keys are preserved.
+    Requires lib and pkgs from the calling module.
+
+    Usage:
+      home.activation.mergeMySettings = mkJsonMerge {
+        inherit lib pkgs;
+        file = "$HOME/.config/App/settings.json";
+        nixSettings = { "my.key" = true; };
+      };
+  */
+  mkJsonMerge =
+    { lib, pkgs, file, nixSettings }:
+    let
+      nixJson = toJSON nixSettings;
+      jq = "${pkgs.jq}/bin/jq";
+    in
+    lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      target="${file}"
+      mkdir -p "$(dirname "$target")"
+      if [ -f "$target" ]; then
+        ${jq} -s '.[0] * .[1]' "$target" <<'NIX_SETTINGS' > "$target.tmp"
+      ${nixJson}
+      NIX_SETTINGS
+        mv "$target.tmp" "$target"
+      else
+        cat > "$target" <<'NIX_SETTINGS'
+      ${nixJson}
+      NIX_SETTINGS
+      fi
+    '';
+
   callWith =
     lambda: closure:
     let

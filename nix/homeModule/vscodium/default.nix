@@ -3,11 +3,12 @@
   lib,
   user,
   inputs,
+  criomos-lib,
   ...
 }:
 let
-  inherit (builtins) toJSON;
   inherit (user.methods) sizedAtLeast;
+  inherit (criomos-lib) mkJsonMerge;
 
   visualjj = pkgs.vscode-utils.buildVscodeMarketplaceExtension {
     mktplcRef = {
@@ -93,7 +94,7 @@ let
       };
     };
 
-  settingsJson = toJSON {
+  nixSettings = {
     # Theme — stylix generates base16 theme, darkman switches via portal
     "window.autoDetectColorScheme" = true;
     "workbench.preferredDarkColorTheme" = "Default Dark Modern";
@@ -130,6 +131,7 @@ let
     "update.mode" = "none";
 
     # Editor
+    "window.openFilesInNewWindow" = "default";
     "editor.renderWhitespace" = "boundary";
     "editor.minimap.enabled" = false;
     "files.trimTrailingWhitespace" = true;
@@ -187,16 +189,9 @@ lib.mkIf sizedAtLeast.med {
     "application/x-shellscript"
   ]);
 
-  home.activation.seedVscodiumSettings =
-    lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      settings="$HOME/.config/VSCodium/User/settings.json"
-      mkdir -p "$(dirname "$settings")"
-
-      if [ ! -e "$settings" ] || [ -L "$settings" ]; then
-        rm -f "$settings"
-        cat > "$settings" << 'SETTINGS'
-      ${settingsJson}
-      SETTINGS
-      fi
-    '';
+  home.activation.mergeVscodiumSettings = mkJsonMerge {
+    inherit lib pkgs;
+    file = "$HOME/.config/VSCodium/User/settings.json";
+    inherit nixSettings;
+  };
 }
