@@ -154,6 +154,15 @@ lib.mkIf sizedAtLeast.med {
     };
   };
 
+  home.sessionVariables = {
+    EDITOR = lib.mkForce "codium --wait";
+    VISUAL = lib.mkForce "codium --wait";
+  };
+
+  xdg.mimeApps.defaultApplications = {
+    "text/plain" = "codium.desktop";
+  };
+
   home.activation.seedVscodiumSettings =
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       settings="$HOME/.config/VSCodium/User/settings.json"
