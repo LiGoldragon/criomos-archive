@@ -748,7 +748,12 @@ mkIf sizedAtLeast.min {
       };
 
       nightshift-on = {
-        Unit.Description = "Gradual warm color temperature transition";
+        Unit = {
+          Description = "Gradual warm color temperature transition";
+          Requires = [ "wl-gammarelay-rs.service" ];
+          After = [ "wl-gammarelay-rs.service" ];
+          Conflicts = [ "nightshift-off.service" ];
+        };
         Service = {
           Type = "oneshot";
           ExecStart = "${nightshift}/bin/nightshift on";
@@ -757,7 +762,12 @@ mkIf sizedAtLeast.min {
       };
 
       nightshift-off = {
-        Unit.Description = "Gradual neutral color temperature transition";
+        Unit = {
+          Description = "Gradual neutral color temperature transition";
+          Requires = [ "wl-gammarelay-rs.service" ];
+          After = [ "wl-gammarelay-rs.service" ];
+          Conflicts = [ "nightshift-on.service" ];
+        };
         Service = {
           Type = "oneshot";
           ExecStart = "${nightshift}/bin/nightshift off";
