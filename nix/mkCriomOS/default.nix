@@ -55,13 +55,8 @@ let
     programs.claude-desktop.enable = true;
   };
 
-  niriModule = {
-    nixpkgs.overlays = [ inputs.niri-flake.overlays.niri ];
-  };
-
   nixosModules =
     baseModules
-    ++ (optional (behavesAs.edge && !behavesAs.iso) niriModule)
     ++ (optional (behavesAs.edge && !behavesAs.iso) edgeModule)
     ++ (optional (behavesAs.router && !behavesAs.iso) ./router)
     ++ (optional (behavesAs.bareMetal && !behavesAs.iso) metalModule)
