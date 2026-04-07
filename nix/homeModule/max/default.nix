@@ -53,6 +53,7 @@ lib.mkIf sizedAtLeast.max {
       package = pkgs.google-chrome;
       commandLineArgs = [
         "--remote-debugging-port=9222"
+        "--user-data-dir=\${HOME}/.config/google-chrome"
       ];
     };
 
