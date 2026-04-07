@@ -103,7 +103,7 @@ let
   bleedingEdgeGraphicalPackages = [ ];
 
   modernGraphicalPackages = with pkgs; [
-    # C
+    handlr-regex
     mpv
     # ctags
     swaylock
@@ -695,6 +695,14 @@ mkIf sizedAtLeast.min {
 
     file =
       {
+        ".local/bin/xdg-open" = {
+          executable = true;
+          text = ''
+            #!/bin/sh
+            exec ${pkgs.handlr-regex}/bin/handlr open "$@"
+          '';
+        };
+
         ".config/IJHack/QtPass.conf".text = ''
           [General]
           autoclearSeconds=20
@@ -774,6 +782,10 @@ mkIf sizedAtLeast.min {
         export _JAVA_AWT_WM_NONREPARENTING=1
       '';
     };
+
+    configFile."handlr/handlr.toml".text = ''
+      expand_wildcards = true
+    '';
 
     dataFile."mime/packages/aski.xml".text = ''
       <?xml version="1.0" encoding="UTF-8"?>
