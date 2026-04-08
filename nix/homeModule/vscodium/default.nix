@@ -10,6 +10,9 @@ let
   inherit (user.methods) sizedAtLeast;
   inherit (criomos-lib) mkJsonMerge;
 
+  system = pkgs.stdenv.hostPlatform.system;
+  ovsx = inputs.nix-vscode-extensions.extensions.${system}.open-vsx;
+
   visualjj = pkgs.vscode-utils.buildVscodeMarketplaceExtension {
     mktplcRef = {
       name = "visualjj";
@@ -32,57 +35,17 @@ let
     '';
   };
 
-  claude-code = pkgs.vscode-utils.buildVscodeMarketplaceExtension {
-    mktplcRef = {
-      name = "claude-code";
-      publisher = "anthropic";
-      version = "2.1.92";
-    };
-    vsix = pkgs.fetchurl {
-      name = "claude-code-2.1.92-linux-x64.vsix";
-      url = "https://open-vsx.org/api/anthropic/claude-code/linux-x64/2.1.92/file/anthropic.claude-code-2.1.92@linux-x64.vsix";
-      hash = "sha256-dZ9625x6qCWwI2tY/GP3QSNoG/Sxi6nZGHNFnSSIy+Y=";
-    };
-    postInstall = ''
+  claude-code = pkgs.vscode-extensions.anthropic.claude-code.overrideAttrs (old: {
+    postInstall = (old.postInstall or "") + ''
       extDir="$out/share/vscode/extensions/anthropic.claude-code"
-
-      # Replace bundled native binary with Nix-built one (Go binary can't survive patchelf)
-      rm -f "$extDir/resources/native-binary/claude"
-      ln -s ${pkgs.vscode-extensions.anthropic.claude-code}/share/vscode/extensions/anthropic.claude-code/resources/native-binary/claude \
-        "$extDir/resources/native-binary/claude"
-
       # Fix hardcoded dark theme in diff view
-      substituteInPlace "$extDir/webview/index.js" \
-        --replace-fail 'theme:"vs-dark"' \
-        'theme:document.body.classList.contains("vscode-light")?"vs":"vs-dark"'
+      if [ -f "$extDir/webview/index.js" ]; then
+        substituteInPlace "$extDir/webview/index.js" \
+          --replace-fail 'theme:"vs-dark"' \
+          'theme:document.body.classList.contains("vscode-light")?"vs":"vs-dark"' || true
+      fi
     '';
-  };
-
-  gemini = pkgs.vscode-utils.buildVscodeMarketplaceExtension {
-    mktplcRef = {
-      name = "geminicodeassist";
-      publisher = "Google";
-      version = "2.77.1";
-    };
-    vsix = pkgs.fetchurl {
-      name = "geminicodeassist-2.77.1.vsix";
-      url = "https://open-vsx.org/api/Google/geminicodeassist/2.77.1/file/Google.geminicodeassist-2.77.1.vsix";
-      hash = "sha256-oVaeAxOs6HpJXqtgpYmEuo42gKPsxlTXssGmLTffptM=";
-    };
-  };
-
-  codex = pkgs.vscode-utils.buildVscodeMarketplaceExtension {
-    mktplcRef = {
-      name = "chatgpt";
-      publisher = "openai";
-      version = "26.5401.11717";
-    };
-    vsix = pkgs.fetchurl {
-      name = "codex-26.5401.11717-linux-x64.vsix";
-      url = "https://open-vsx.org/api/openai/chatgpt/linux-x64/26.5401.11717/file/openai.chatgpt-26.5401.11717@linux-x64.vsix";
-      hash = "sha256-X7FHk48ARpf4kLQBNzZdYFXqpF2m6PK7vRcH9qcc1xA=";
-    };
-  };
+  });
 
   askiWasm = inputs.aski.packages.${pkgs.system}.tree-sitter-aski-wasm;
 
@@ -175,8 +138,8 @@ lib.mkIf sizedAtLeast.med {
       extensions = [
         visualjj
         claude-code
-        gemini
-        codex
+        ovsx.google.geminicodeassist
+        ovsx.openai.chatgpt
         vscode-aski
         pkgs.vscode-extensions.mkhl.direnv
         pkgs.vscode-extensions.jnoortheen.nix-ide

@@ -52,6 +52,10 @@
       url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nix-vscode-extensions = {
+      url = "github:nix-community/nix-vscode-extensions";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # Desktop agents
     claude-for-linux.url = "github:Criome/claude-for-linux/update-v1.1.7714";
