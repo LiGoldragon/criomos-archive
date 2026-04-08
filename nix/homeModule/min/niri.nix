@@ -1,5 +1,6 @@
 { pkgs, config, user, ... }:
 let
+  constants = import ../../../nix/mkCriomOS/constants.nix;
   terminal = "${pkgs.ghostty}/bin/ghostty";
   inherit (user.methods) useFastRepeat;
 
@@ -174,6 +175,7 @@ in
         };
 
         # Screenshot
+        "Print".action = a.spawn "sh" "-c" ''mkdir -p ~/${constants.fileSystem.screenshots} && grim ~/${constants.fileSystem.screenshots}/$(date +%Y%m%d-%H%M%S).png'';
         "Mod+P".action = a.spawn "sh" "-c" ''grim - | wl-copy'';
         "Mod+Print".action = a.spawn "sh" "-c" ''grim -g "$(slurp)" - | wl-copy'';
 

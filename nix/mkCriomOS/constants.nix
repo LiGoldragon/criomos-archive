@@ -45,6 +45,8 @@ in
       serverCertFile = "/etc/criomOS/wifi-server/server.pem";
       serverKeyFile = "/etc/criomOS/wifi-server/server.key";
     };
+
+    screenshots = "Pictures/Screenshots";
   };
 
   network = {
