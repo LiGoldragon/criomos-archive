@@ -20,18 +20,17 @@ rec {
       nixJson = toJSON nixSettings;
       jq = "${pkgs.jq}/bin/jq";
     in
+    let
+      nixJsonFile = pkgs.writeText "nix-settings.json" nixJson;
+    in
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       target="${file}"
       mkdir -p "$(dirname "$target")"
       if [ -f "$target" ]; then
-        ${jq} -s '.[0] * .[1]' "$target" <<'NIX_SETTINGS' > "$target.tmp"
-      ${nixJson}
-      NIX_SETTINGS
+        ${jq} -s '.[0] * .[1]' "$target" ${nixJsonFile} > "$target.tmp"
         mv "$target.tmp" "$target"
       else
-        cat > "$target" <<'NIX_SETTINGS'
-      ${nixJson}
-      NIX_SETTINGS
+        cp ${nixJsonFile} "$target"
       fi
     '';
 
