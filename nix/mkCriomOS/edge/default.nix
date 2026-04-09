@@ -1,7 +1,6 @@
 {
   lib,
   horizon,
-  inputs,
   pkgs,
   ...
 }:
@@ -9,17 +8,17 @@ let
   inherit (lib) mkIf optionals;
   inherit (horizon.node.methods) sizedAtLeast;
 
-  niri = inputs.niri-flake.packages.${pkgs.stdenv.hostPlatform.system}.niri-stable;
-
   minPackages = optionals sizedAtLeast.min (
-    (with pkgs; [
+    with pkgs;
+    [
       adwaita-icon-theme
       papirus-icon-theme
       nautilus
       libinput
       gnome-control-center
+      niri
       xdg-utils
-    ]) ++ [ niri ]
+    ]
   );
 
   medPackages = with pkgs; [ ];
@@ -90,7 +89,7 @@ in
   hardware.graphics.enable = lib.mkDefault true;
 
   services = {
-    displayManager.sessionPackages = [ niri ];
+    displayManager.sessionPackages = [ pkgs.niri ];
     avahi.enable = sizedAtLeast.min;
 
     blueman.enable = sizedAtLeast.min;
