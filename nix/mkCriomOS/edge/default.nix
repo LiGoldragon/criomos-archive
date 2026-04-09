@@ -86,6 +86,7 @@ in
 
   security.polkit.enable = true;
   security.pam.services.swaylock = { };
+  security.pam.services.noctalia = { };
   hardware.graphics.enable = lib.mkDefault true;
 
   services = {

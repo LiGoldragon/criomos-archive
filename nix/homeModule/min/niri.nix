@@ -9,6 +9,7 @@ in
 {
   programs.niri.settings.environment = {
     "XDG_CURRENT_DESKTOP" = "niri:GNOME";
+    "NOCTALIA_PAM_SERVICE" = "noctalia";
   };
 
   home.packages = with pkgs; [
