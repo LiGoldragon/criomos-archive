@@ -195,6 +195,7 @@ in
     ) + (
       optionalString (model == "ThinkPadT14Gen5Intel") ''
         blacklist i915
+        options xe force_probe=7d45
       ''
     );
 
