@@ -1037,11 +1037,11 @@
         "substack-mcp-src": "substack-mcp-src"
       },
       "locked": {
-        "lastModified": 1775663962,
-        "narHash": "sha256-AkBP07OxPo+StoKr/2ClIANz94zRHBAcD1/q57XeRhg=",
+        "lastModified": 1775765657,
+        "narHash": "sha256-VjiCvaRd2mtMq6dVhQ/Tj7NIhsZ0PvQsOfXU9Er9dc4=",
         "owner": "LiGoldragon",
         "repo": "Mentci",
-        "rev": "8517526e8d949a035014022329f9f624fd46870a",
+        "rev": "6d35c4d77293cdd0305c4f6b35d0a632941349b0",
         "type": "github"
       },
       "original": {
