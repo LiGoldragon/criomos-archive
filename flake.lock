@@ -1034,14 +1034,15 @@
         "samskara-lojix-contract-src": "samskara-lojix-contract-src",
         "samskara-reader-src": "samskara-reader-src",
         "samskara-src": "samskara-src",
+        "sem-src": "sem-src",
         "substack-mcp-src": "substack-mcp-src"
       },
       "locked": {
-        "lastModified": 1775765657,
-        "narHash": "sha256-VjiCvaRd2mtMq6dVhQ/Tj7NIhsZ0PvQsOfXU9Er9dc4=",
+        "lastModified": 1775808813,
+        "narHash": "sha256-EqlijUS7VjLf24ZwgaCQO+Z98KYdxhwRPpmPodEU524=",
         "owner": "LiGoldragon",
         "repo": "Mentci",
-        "rev": "6d35c4d77293cdd0305c4f6b35d0a632941349b0",
+        "rev": "fea677ea7cfe6ceec811367c65616623abea08a6",
         "type": "github"
       },
       "original": {
@@ -1637,6 +1638,22 @@
       "original": {
         "owner": "AnaSeahawk",
         "repo": "website",
+        "type": "github"
+      }
+    },
+    "sem-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1775663355,
+        "narHash": "sha256-U0eDvp1LSatMH59DE1xvEivD/rDHGKlIs3VmK+oKzaA=",
+        "owner": "Ataraxy-Labs",
+        "repo": "sem",
+        "rev": "a6059294f4c141465024a92d947b1b6424db1e21",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Ataraxy-Labs",
+        "repo": "sem",
         "type": "github"
       }
     },
