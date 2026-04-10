@@ -223,11 +223,6 @@ in
           "ttm.page_pool_size=27787264"
           "ttm.pages_limit=27787264"
         ])
-        # Skip display engine init on headless nodes (saves ~1W idle).
-        # Requires remote access (ygg + ssh + nix keys) and not ISO media.
-        (optionals (!hasVideoOutput && !behavesAs.iso && hasYggPrecriad && hasSshPrecriad) [
-          "amdgpu.dc=0"
-        ])
       ];
 
   };
