@@ -208,6 +208,15 @@ in
           "console=tty0"
           "dtparam=audio=on"
         ] else [])
+        # RDNA 3.5 (gfx1150/1151/1152) stability — MES hang + PSR2-SU freeze workarounds.
+        # cwsr_enable=0: prevents MES "failed to respond" hangs during compute.
+        # gpu_recovery=1: auto-recover from GPU hangs instead of hard-lock.
+        # dcdebugmask=0x200: disables PSR2-SU (keeps legacy PSR for battery).
+        (optionals gpuUsesAmdGpu [
+          "amdgpu.cwsr_enable=0"
+          "amdgpu.gpu_recovery=1"
+          "amdgpu.dcdebugmask=0x200"
+        ])
         # largeAI GPU tuning — expose 5/6 of unified RAM to GPU via TTM
         # Without this, Vulkan only sees ~64GB on 128GB Strix Halo.
         (optionals (behavesAs.center) [

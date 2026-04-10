@@ -85,10 +85,13 @@ in
       };
     };
 
+    criomos-deploy = pkgs.callPackage ../criomos-deploy.nix { };
+
     systemPackages = with pkgs; [
       openssh
       ntfs3g
       fuse
+      criomos-deploy
     ]
     ++ (if behavesAs.iso then [
       btrfs-progs
