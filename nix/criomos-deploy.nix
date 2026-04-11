@@ -15,6 +15,7 @@ pkgs.symlinkJoin {
           pkgs.openssh
           pkgs.jujutsu
           pkgs.coreutils
+          pkgs.procps
         ]}
     done
   '';

@@ -16,9 +16,9 @@ an evolved version of NixOS, which is used for the bootstrap version.
   --no-link --print-out-paths --refresh` from the nested repo to reproduce the artifact.
 - Nix usage rule: do not use `<nixpkgs>` / `NIX_PATH` style commands here. Use flake attrs in this repo and registry references such as `nix shell nixpkgs#jq` for ad-hoc environment tools.
 - Temporary deployment transport: test the Prometheus Yggdrasil address first and use it when it responds (`200:ca41:6b12:fba:d7bc:cfc6:4aaa:165f` at the time of writing). Localhost is override-only and must pass a `hostname == nodeName` guard before any activation proceeds.
-- Deployment command: `execute deploy-manifest --manifest $(nix build .#crioZones.maisiliym.prometheus.deployManifest --no-link --print-out-paths --refresh) --node prometheus`.
+- Deployment command: `criomos-deploy maisiliym prometheus` (builds fullOs on target, sets profile, activates). Use `--boot` for kernel changes, `--commit <hash>` for a specific revision.
 - GitHub-only override form when needed: `--override-input maisiliym github:LiGoldragon/maisiliym`.
-- Deployment agent note: prefer the project-local `criomos-deployer` agent for exact-attr build + manifest deploy work so the right build is activated on the right node.
+- Shell reload: `criomos-reload-shell maisiliym prometheus <user>` restarts noctalia-shell in the user's Wayland session.
 - Node/network truth reminder: update `datom.nix` / `NodeProposal.nodes.*` in Maisiliym before touching CriomOS network behavior so the horizon export stays authoritative.
 - Hardware: the GMKtec EVO-X2 is AMD-based, so `nix/mkCriomOS/metal/default.nix`
   deliberately keeps it out of the Intel media-driver set and enables

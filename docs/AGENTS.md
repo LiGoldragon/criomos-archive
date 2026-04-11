@@ -85,7 +85,27 @@ Never use `<nixpkgs>` / `NIX_PATH` in this repo. Use `nix shell nixpkgs#<pkg>` f
 
 ## Deployment
 
-### Standard deployment
+### criomos-deploy (preferred)
+
+The `criomos-deploy` command wraps the full build→profile→switch workflow:
+
+```
+criomos-deploy <cluster> <node>              # build + switch
+criomos-deploy <cluster> <node> --boot       # build + boot entry only (for kernel changes)
+criomos-deploy <cluster> <node> --commit abc123  # deploy a specific commit
+```
+
+It builds `fullOs` on the target node via SSH, sets the system profile, and activates. The commit defaults to whatever `main` points at in jj.
+
+To reload a user's compositor shell after deployment:
+```
+criomos-reload-shell <cluster> <node> <user>   # remote
+criomos-reload-shell <user>                    # local
+```
+
+Both commands are installed system-wide via `nix/criomos-deploy.nix` (in normalize.nix systemPackages).
+
+### Manual deployment (when criomos-deploy is unavailable)
 
 1. **Push and build** (on the target node or locally):
    ```
@@ -189,6 +209,10 @@ When a node is unresponsive, boot the asklepios USB, then:
 ### Hot-reloading a user's compositor session
 
 After `switch-to-configuration switch` with updated home-manager configs:
+
+Preferred: `criomos-reload-shell <cluster> <node> <user>`
+
+Manual equivalent:
 
 1. **Reload niri config** (does NOT kill the session):
    ```

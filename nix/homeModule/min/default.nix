@@ -387,7 +387,14 @@ let
 
     case "''${1:-sync}" in
       sync)
-        mode=$(${pkgs.darkman}/bin/darkman get 2>/dev/null || echo "light")
+        mode=$(${pkgs.darkman}/bin/darkman get 2>/dev/null) || {
+          hour=$(date +%H)
+          if [ "$hour" -ge 20 ] || [ "$hour" -lt 7 ]; then
+            mode="dark"
+          else
+            mode="light"
+          fi
+        }
         if [ "$mode" = "dark" ]; then
           apply $NIGHT
         else
@@ -779,7 +786,7 @@ mkIf sizedAtLeast.min {
         Unit = {
           Description = "Sync color temperature to current dark/light mode";
           Requires = [ "wl-gammarelay-rs.service" ];
-          After = [ "wl-gammarelay-rs.service" ];
+          After = [ "wl-gammarelay-rs.service" "darkman.service" ];
         };
         Service = {
           Type = "simple";

@@ -241,7 +241,7 @@ directly instead of hardcoding the behavior inside a module.
 
 ## Operator Node/Network Truth Authority
 
-**MUST UPDATE WHEN EDITING REPO:** When node or network behavior is touched, operators update the Maisiliym source (`datom.nix` / `NodeProposal.nodes.*`) first, then reread this guidance and the mirror in `Components/CriomOS/docs/AGENTS.md` before touching CriomOS artifacts. For deployment/build consumption, prefer the GitHub flake source `github:LiGoldragon/maisiliym`; do not rely on ad-hoc local checkout overrides in this lane.
+**MUST UPDATE WHEN EDITING REPO:** When node or network behavior is touched, operators update the Maisiliym source (`datom.nix` / `NodeProposal.nodes.*`) first, then reread this guidance and `docs/AGENTS.md` before touching CriomOS artifacts. For deployment/build consumption, prefer the GitHub flake source `github:LiGoldragon/maisiliym`; do not rely on ad-hoc local checkout overrides in this lane.
 
 ### Edit authority
 - Maisiliym owns node/network truth inside `datom.nix` via `NodeProposal.nodes.*`. Any node name, role, connectivity, or identity change begins by editing the corresponding `NodeProposal` entry so horizon data exports the new truth before any CriomOS consumer is built or deployed.
@@ -249,7 +249,7 @@ directly instead of hardcoding the behavior inside a module.
 - For deployment/build consumption, operators and deploy agents should treat `github:LiGoldragon/maisiliym` as the canonical flake source. Local path overrides such as `/home/li/git/maisiliym` are historical/operator scratch only and are not the preferred deploy lane anymore.
 
 ### Build/deploy authority
-- CriomOS consumes that Maisiliym truth through horizon exports (see `Components/CriomOS/nix/mkCrioZones/mkHorizonModule.nix` for the export wiring) and the network modules (`Components/CriomOS/nix/mkCriomOS/network/default.nix`, `Components/CriomOS/nix/mkCriomOS/network/unbound.nix`). Builders read `node.name`, `node.yggAddress`, and `exNodes` from horizon data rather than adding new literals.
+- CriomOS consumes that Maisiliym truth through horizon exports (see `nix/mkCrioZones/mkHorizonModule.nix` for the export wiring) and the network modules (`nix/mkCriomOS/network/default.nix`, `nix/mkCriomOS/network/unbound.nix`). Builders read `node.name`, `node.yggAddress`, and `exNodes` from horizon data rather than adding new literals.
 - Update horizon exports before adjusting CriomOS DNS, host tables, or kube provisioning. After the Maisiliym change lands, rerun the exact CriomOS attr build and deployment flow so unbound, DHCP, and activation regenerate from the fresh node truth.
 - Use flake-native commands only. Do not use `<nixpkgs>` / `NIX_PATH` style invocations in this repo; when you need environment packages, use flake registry references such as `nix shell nixpkgs#jq`.
 - Exact build commands:
@@ -258,13 +258,9 @@ directly instead of hardcoding the behavior inside a module.
   - `nix build .#crioZones.maisiliym.ouranos.deployManifest --no-link --print-out-paths --refresh`
   - `nix build .#crioZones.maisiliym.prometheus.deployManifest --no-link --print-out-paths --refresh`
   - If an override is required for the Maisiliym source, use only `--override-input maisiliym github:LiGoldragon/maisiliym`.
-- Exact deployment flow (canonical local execute form):
-  - Run the exact execute command from the Components/CriomOS directory. The example below is the tested local form that successfully deploys a generated manifest to a node named `prometheus` (here `prometheus` is the node hostname/crio zone name, not a service identity):
-
-    cd Components/CriomOS && cargo run --quiet --manifest-path ../mentci-execute/Cargo.toml --bin execute -- deploy-manifest --manifest $(nix build .#crioZones.maisiliym.<node>.deployManifest --no-link --print-out-paths --refresh) --node <node>
-
-  - Replace `<node>` with the Maisiliym node name (for Prometheus lane builds use `prometheus` as the node/hostname value). The command must be invoked from Components/CriomOS for relative manifest paths to resolve correctly.
-  - The generated manifest prefers Yggdrasil transport first. Current Ygg transport target remains `200:ca41:6b12:fba:d7bc:cfc6:4aaa:165f` while the Maisiliym node truth stays unchanged.
-  - `ouranos`: use `--allow-localhost` only when remote transport fails. Localhost activation is guarded by a mandatory `hostname` check and must abort when `hostname != nodeName`.
-  - Temporary fallback: use the current LAN IP for `prometheus` only when the generated manifest is extended with that transport or when the operator performs a separate explicitly documented override.
-  - Prefer the project-local `criomos-deployer` agent when exact attr build + manifest deploy + cross-node verification must happen in one bounded lane.
+- Exact deployment flow:
+  - Use `criomos-deploy <cluster> <node>` to build fullOs on the target, set the system profile, and activate. Use `--boot` for kernel changes, `--commit <hash>` for a specific revision.
+  - Replace `<cluster>` and `<node>` with the Maisiliym cluster and node names (e.g. `criomos-deploy maisiliym prometheus`).
+  - To reload a user's compositor shell after deployment: `criomos-reload-shell <cluster> <node> <user>`.
+  - The deploy script builds via `github:criome/CriomOS/<commit>#crioZones.<cluster>.<node>.fullOs` on the target node over SSH, using the current main commit by default.
+  - `ouranos`: can also deploy locally since criomos-deploy is in systemPackages.
