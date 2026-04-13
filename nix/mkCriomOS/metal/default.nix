@@ -35,11 +35,11 @@ let
   # TODO
   hasTouchpad = true;
 
-  needsIntelThrottlingFix = model == "ThinkPadT14Intel";
+  needsIntelThrottlingFix = model == "ThinkPadT14Gen2Intel";
 
   modelFirmwareIndex = with pkgs; {
     ThinkPadE15Gen2Intel = [ sof-firmware ];
-    ThinkPadT14Intel = [ sof-firmware ];
+    ThinkPadT14Gen2Intel = [ sof-firmware ];
     rpi3B = [ raspberrypiWirelessFirmware ];
   };
 
@@ -65,7 +65,7 @@ let
       "nvme"
       "thunderbolt"
     ];
-    ThinkPadT14Intel = [
+    ThinkPadT14Gen2Intel = [
       "nvme"
       "thunderbolt"
       "sd_mod"
@@ -120,7 +120,7 @@ let
 
   intelMediaDriverModels = [
     "ThinkPadT14Gen5Intel"
-    "ThinkPadT14Intel"
+    "ThinkPadT14Gen2Intel"
   ];
 
   gpuUsesMediaDriver = isGenericModel || builtins.elem model intelMediaDriverModels;
@@ -201,7 +201,7 @@ in
       # T14 Gen2 Intel (Tiger Lake) suspend fixes:
       # MHI (Quectel WWAN modem) returns -EBUSY on suspend, aborting sleep.
       # IPU6 camera driver breaks s2idle on kernel 6.16+.
-      optionalString (model == "ThinkPadT14Intel") ''
+      optionalString (model == "ThinkPadT14Gen2Intel") ''
         blacklist mhi
         blacklist mhi_ep
         blacklist mhi_net
@@ -240,7 +240,7 @@ in
         # T14 Gen2 Intel (Tiger Lake) — touchpad and suspend fixes.
         # i8042.nomux: fixes erratic cursor / ghost touches from AUX mux conflict.
         # acpi.ec_no_wakeup: prevents spurious EC wakeups on ThinkPads.
-        (optionals (model == "ThinkPadT14Intel") [
+        (optionals (model == "ThinkPadT14Gen2Intel") [
           "i8042.nomux=1"
           "acpi.ec_no_wakeup=1"
         ])
@@ -264,7 +264,7 @@ in
   # T14 Gen2 Intel (Tiger Lake) — disable ACPI wakeup sources that cause
   # spurious resume from s2idle. GLAN (e1000e with no cable), XHCI, and
   # Thunderbolt controllers (TXHC/TDM/TRP) all trigger immediate wake.
-  systemd.services.disable-spurious-wakeups = mkIf (model == "ThinkPadT14Intel") {
+  systemd.services.disable-spurious-wakeups = mkIf (model == "ThinkPadT14Gen2Intel") {
     description = "Disable ACPI wakeup sources that cause spurious resume";
     after = [ "multi-user.target" ];
     wantedBy = [ "multi-user.target" ];
@@ -286,7 +286,7 @@ in
       "w /sys/devices/system/cpu/cpu*/cpufreq/energy_performance_preference - - - - power"
     ]
     # Disable XHCI wakeup at PCI level — belt-and-suspenders with the ACPI toggle.
-    ++ optionals (model == "ThinkPadT14Intel") [
+    ++ optionals (model == "ThinkPadT14Gen2Intel") [
       "w /sys/devices/pci0000:00/0000:00:14.0/power/wakeup - - - - disabled"
     ];
 

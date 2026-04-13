@@ -266,6 +266,8 @@ let
       thinkpadModels = [
         "ThinkPadX240"
         "ThinkPadX230"
+        "ThinkPadT14Gen2Intel"
+        "ThinkPadT14Gen5Intel"
       ];
       computerModels = thinkpadModels ++ [ "rpi3B" ];
 
