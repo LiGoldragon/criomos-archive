@@ -36,15 +36,27 @@ let
     usage() { echo "usage: battery-ctl care | full | status"; exit 1; }
     bat=/sys/class/power_supply/BAT0
     [ -d "$bat" ] || { echo "no battery found"; exit 1; }
+    set_thresholds() {
+      # thinkpad_acpi requires start < end at all times.
+      # Write whichever direction widens the window first.
+      local cur_start cur_end
+      cur_start=$(cat "$bat/charge_control_start_threshold")
+      cur_end=$(cat "$bat/charge_control_end_threshold")
+      if [ "$1" -ge "$cur_start" ]; then
+        echo "$2" > "$bat/charge_control_end_threshold"
+        echo "$1" > "$bat/charge_control_start_threshold"
+      else
+        echo "$1" > "$bat/charge_control_start_threshold"
+        echo "$2" > "$bat/charge_control_end_threshold"
+      fi
+    }
     case "''${1:-status}" in
       care)
-        echo 80 > "$bat/charge_control_end_threshold"
-        echo 75 > "$bat/charge_control_start_threshold"
+        set_thresholds 75 80
         echo "battery care: 75–80%"
         ;;
       full)
-        echo 95 > "$bat/charge_control_end_threshold"
-        echo 90 > "$bat/charge_control_start_threshold"
+        set_thresholds 90 95
         echo "full charge: 90–95%"
         ;;
       status)
