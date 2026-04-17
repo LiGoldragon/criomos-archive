@@ -127,8 +127,7 @@ let
     qgnomeplatform
     waylandQtpass
     waylandPass
-    # helvum # Broken? Pipewire nodes UI
-    coppwr # Pipewire Nodes UI
+    crosspipe # Pipewire graph UI
 
     # TODO('horizon language')
     (pkgs.hunspell.withDicts (dicts: [
