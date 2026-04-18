@@ -45,7 +45,7 @@ let
     vsix = pkgs.fetchurl {
       name = "claude-code-${claudeCli.version}-linux-x64.vsix";
       url = "https://open-vsx.org/api/anthropic/claude-code/linux-x64/${claudeCli.version}/file/anthropic.claude-code-${claudeCli.version}@linux-x64.vsix";
-      hash = "sha256-VMzNZylGwMoyFQKHFFI9hZ2CJ2AcH2CYAOsLa2WmMI0=";
+      hash = "sha256-rcEbeYsyhbhh5wj6Mo3kz2+K3uZe5XMBKpwmSaB9Pgc=";
     };
     postInstall = ''
       extDir="$out/share/vscode/extensions/anthropic.claude-code"
