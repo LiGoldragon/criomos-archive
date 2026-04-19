@@ -106,6 +106,10 @@ let
     "git.autoRepositoryDetection" = false;
     "visualjj.showSourceControlColocated" = true;
 
+    # Pi can't call vscode.git API when git.enabled is false — "Git model not found" error.
+    # Pi still has full file/tool access; skipping git status in prompt context matches the jj workflow.
+    "pi.context.includeGit" = false;
+
     # direnv — auto-reload on .envrc change
     "direnv.restart.automatic" = true;
 
