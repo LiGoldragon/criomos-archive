@@ -101,14 +101,12 @@ let
     "workbench.preferredDarkColorTheme" = "Default Dark Modern";
     "workbench.preferredLightColorTheme" = "Default Light Modern";
 
-    # jj as primary SCM — hide git, show VisualJJ in Source Control panel
-    "git.enabled" = false;
-    "git.autoRepositoryDetection" = false;
+    # jj uses git as backend — VSCode's SCM API surface assumes vscode.git is available,
+    # so we keep it enabled for extensions that read VCS state (vscode-pi, etc).
+    # VisualJJ colocates in the same SCM panel for the actual jj workflow.
+    "git.enabled" = true;
+    "git.autoRepositoryDetection" = true;
     "visualjj.showSourceControlColocated" = true;
-
-    # Pi can't call vscode.git API when git.enabled is false — "Git model not found" error.
-    # Pi still has full file/tool access; skipping git status in prompt context matches the jj workflow.
-    "pi.context.includeGit" = false;
 
     # direnv — auto-reload on .envrc change
     "direnv.restart.automatic" = true;
