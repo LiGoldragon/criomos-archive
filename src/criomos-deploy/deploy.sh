@@ -2,17 +2,22 @@
 set -euo pipefail
 
 usage() {
-  echo "Usage: criomos-deploy <cluster> <node> [--boot] [--commit <hash>]"
+  echo "Usage: criomos-deploy <cluster> <node> [--boot] [--commit <hash>] [--via <builder>]"
   echo ""
-  echo "Build fullOs on <node>, set system profile, and activate."
+  echo "Build fullOs, set system profile, and activate on <node>."
   echo ""
-  echo "  --boot     Set boot entry only, don't activate (for kernel changes)"
-  echo "  --commit   Build specific commit (default: current main)"
+  echo "  --boot          Set boot entry only, don't activate (for kernel changes)"
+  echo "  --commit        Build specific commit (default: current main)"
+  echo "  --via <builder> Build on <builder> and copy closure to <node>."
+  echo "                  <builder> can be 'local' (this machine) or an SSH host."
+  echo "                  Useful when <node> has a slow connection or weak CPU."
   echo ""
   echo "Examples:"
   echo "  criomos-deploy maisiliym zeus"
   echo "  criomos-deploy maisiliym zeus --boot"
   echo "  criomos-deploy maisiliym prometheus --commit abc123"
+  echo "  criomos-deploy maisiliym zeus --via local"
+  echo "  criomos-deploy maisiliym zeus --via ouranos.maisiliym.criome"
   exit 1
 }
 
@@ -26,6 +31,7 @@ NODE="$1"; shift
 
 MODE="switch"
 COMMIT=""
+VIA=""
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -33,6 +39,10 @@ while [ $# -gt 0 ]; do
     --commit)
       [ $# -lt 2 ] && { echo "Error: --commit requires an argument"; exit 1; }
       COMMIT="$2"; shift 2
+      ;;
+    --via)
+      [ $# -lt 2 ] && { echo "Error: --via requires an argument"; exit 1; }
+      VIA="$2"; shift 2
       ;;
     *)        usage ;;
   esac
@@ -49,13 +59,31 @@ REF="${REPO}/${COMMIT}"
 ATTR="${REF}#crioZones.${CLUSTER}.${NODE}.fullOs"
 HOST="${NODE}.${CLUSTER}.criome"
 
-echo "Deploying ${CLUSTER}/${NODE} from ${COMMIT:0:12} (${MODE})..."
-ssh root@"${HOST}" \
-  "rm -f /tmp/criomos-deploy \
-   && nix build '${ATTR}' --no-write-lock-file -o /tmp/criomos-deploy \
-   && RESULT=\$(readlink /tmp/criomos-deploy) \
-   && [ -n \"\$RESULT\" ] \
-   && nix-env -p /nix/var/nix/profiles/system --set \"\$RESULT\" \
-   && \"\$RESULT\"/bin/switch-to-configuration ${MODE}"
+if [ -z "$VIA" ]; then
+  echo "Deploying ${CLUSTER}/${NODE} from ${COMMIT:0:12} (${MODE}) — build on target..."
+  ssh root@"${HOST}" \
+    "rm -f /tmp/criomos-deploy \
+     && nix build '${ATTR}' --no-write-lock-file -o /tmp/criomos-deploy \
+     && RESULT=\$(readlink /tmp/criomos-deploy) \
+     && [ -n \"\$RESULT\" ] \
+     && nix-env -p /nix/var/nix/profiles/system --set \"\$RESULT\" \
+     && \"\$RESULT\"/bin/switch-to-configuration ${MODE}"
+else
+  echo "Deploying ${CLUSTER}/${NODE} from ${COMMIT:0:12} (${MODE}) — build on ${VIA}, copy to target..."
+  if [ "$VIA" = "local" ]; then
+    RESULT=$(nix build "${ATTR}" --no-write-lock-file --no-link --print-out-paths)
+  else
+    RESULT=$(ssh root@"${VIA}" "nix build '${ATTR}' --no-write-lock-file --no-link --print-out-paths")
+  fi
+  [ -n "$RESULT" ] || { echo "Error: build produced no output path"; exit 1; }
+  if [ "$VIA" = "local" ]; then
+    nix copy --to "ssh://root@${HOST}" "$RESULT"
+  else
+    ssh root@"${VIA}" "nix copy --to 'ssh://root@${HOST}' '${RESULT}'"
+  fi
+  ssh root@"${HOST}" \
+    "nix-env -p /nix/var/nix/profiles/system --set '${RESULT}' \
+     && '${RESULT}/bin/switch-to-configuration' ${MODE}"
+fi
 
 echo "Done: ${CLUSTER}/${NODE} ${MODE}"
