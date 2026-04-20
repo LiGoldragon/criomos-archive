@@ -52,6 +52,10 @@
       url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    pi-mentci = {
+      url = "github:LiGoldragon/pi-mentci";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     nix-vscode-extensions = {
       url = "github:nix-community/nix-vscode-extensions";

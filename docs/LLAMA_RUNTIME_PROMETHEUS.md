@@ -20,7 +20,7 @@ llama.cpp architecture.
 ## Architecture
 - **Config**: `data/config/largeAI/llm.json` — single source of truth for models, presets, pi agent settings.
 - **LLM module**: `nix/mkCriomOS/llm.nix` — generates one systemd router service + models-dir + presets.ini.
-- **Home module**: `nix/homeModule/min/default.nix` — generates pi agent config from the same JSON.
+- **Home module**: `nix/homeModule/min/default.nix` — derives Pi agent config from the same JSON and delegates state generation to `pi-mentci`.
 - **Gate**: `(typeIs.largeAI or false) || (typeIs."largeAI-router" or false)` in `default.nix`.
 - **Package**: `nix/llama-cpp-prometheus.nix` — Vulkan-enabled llama.cpp override (b8470+).
 

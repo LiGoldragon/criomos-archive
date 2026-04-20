@@ -203,44 +203,16 @@ let
 
   unixDeveloperPackages = unixUtilities ++ programmingTools;
 
-  # Pi agent config — derived entirely from largeAI/llm.json + horizon
-  piAgentGatewayProvider = if largeAINodeName != null then largeAINodeName else "local";
-  piAgentGatewayBaseUrl =
-    if hasLargeAI
-    then "http://${largeAIHost}:${toString largeAIConfig.serverPort}/v1"
-    else null;
-
-  piAgentModels = {
-    providers.${piAgentGatewayProvider} = {
-      baseUrl = piAgentGatewayBaseUrl;
-      api = "openai-completions";
-      authRequired = false;
-      apiKey = largeAIConfig.apiKey;
-      models = builtins.map (model: {
-        id = model.modelId;
-        name = "${piAgentGatewayProvider}/${model.modelId} (${model.descriptor})";
-        reasoning = model.reasoning;
-        input = [ "text" ];
-        contextWindow = model.contextWindow;
-        maxTokens = model.maxTokens;
-        cost = { input = 0; output = 0; cacheRead = 0; cacheWrite = 0; };
-      }) largeAIModels;
+  piMentci = inputs.pi-mentci.packages.${pkgs.stdenv.hostPlatform.system}.default or null;
+  piAgent =
+    inputs.pi-mentci.lib.agent.fromLargeAI {
+      inherit largeAIConfig;
+      gatewayProvider = if largeAINodeName != null then largeAINodeName else "local";
+      gatewayBaseUrl =
+        if hasLargeAI
+        then "http://${largeAIHost}:${toString largeAIConfig.serverPort}/v1"
+        else null;
     };
-  };
-
-  piAgentSettings = {
-    defaultProvider = piAgentGatewayProvider;
-    defaultModel = largeAIConfig.piAgent.defaultModel;
-    enabledModels = builtins.map (m: "${piAgentGatewayProvider}/${m.modelId}") largeAIModels;
-    hideThinkingBlock = largeAIConfig.piAgent.hideThinkingBlock;
-    defaultThinkingLevel = largeAIConfig.piAgent.defaultThinkingLevel;
-    compaction = largeAIConfig.piAgent.compaction;
-  };
-
-  piAgentModelsJson = toJSON piAgentModels;
-  piAgentSettingsJson = toJSON piAgentSettings;
-
-  piAgent = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.pi or null;
 
   codex = inputs.codex-cli.packages.${pkgs.stdenv.hostPlatform.system}.default;
 
@@ -250,7 +222,7 @@ let
     codex
     pkgs.opencode
     pkgs.llama-cpp
-  ] ++ optional (piAgent != null) piAgent;
+  ];
 
   nixpkgsPackages =
     with pkgs;
@@ -695,28 +667,6 @@ mkIf sizedAtLeast.min {
       brightness
     ];
 
-    activation = { }
-      // (optionalAttrs hasLargeAI {
-        seedPiAgentConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-          pi_agent_dir="$HOME/.pi/agent"
-          mkdir -p "$pi_agent_dir"
-
-          if [ ! -e "$pi_agent_dir/settings.json" ] || [ -L "$pi_agent_dir/settings.json" ]; then
-            rm -f "$pi_agent_dir/settings.json"
-            cat > "$pi_agent_dir/settings.json" << 'SETTINGS'
-          ${piAgentSettingsJson}
-          SETTINGS
-          fi
-
-          if [ ! -e "$pi_agent_dir/models.json" ] || [ -L "$pi_agent_dir/models.json" ]; then
-            rm -f "$pi_agent_dir/models.json"
-            cat > "$pi_agent_dir/models.json" << 'MODELS'
-          ${piAgentModelsJson}
-          MODELS
-          fi
-        '';
-      });
-
     file =
       {
         ".local/bin/xdg-open" = {
@@ -747,13 +697,18 @@ mkIf sizedAtLeast.min {
         '';
 
         ".config/broot/conf.toml".text = brootConfig;
-      }
-      // (optionalAttrs hasLargeAI {
-        ".pi/settings.json" = {
-          text = piAgentSettingsJson;
-          force = true;
-        };
-      });
+      };
+  };
+
+  programs.pi-mentci = {
+    enable = piMentci != null;
+    package = piMentci;
+
+    agent = {
+      enable = hasLargeAI;
+      settings = piAgent.settings;
+      models = piAgent.models;
+    };
   };
 
   systemd = {

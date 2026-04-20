@@ -1,5 +1,10 @@
 {
+  inputs,
+  ...
+}:
+{
   imports = [
+    inputs.pi-mentci.homeModules.default
     ./baseModule.nix
     ./emacs
     ./vscodium

@@ -364,7 +364,7 @@ Split tunnel: IPv4 user traffic goes through the VPN. Yggdrasil (IPv6) and Tails
 ### Architecture
 - Single config file: `data/config/largeAI/llm.json` — defines models, presets, pi agent settings.
 - `nix/mkCriomOS/llm.nix` reads the config and generates one router service + `models-dir` + `presets.ini`.
-- `nix/homeModule/min/default.nix` reads the same config and generates `.pi/agent/models.json` + settings for the pi coding agent.
+- `nix/homeModule/min/default.nix` reads the same config and passes the derived Pi agent state to `pi-mentci.homeModules.default`.
 - The LLM module loads on any node with `typeIs.largeAI` or `typeIs."largeAI-router"`.
 - Client nodes discover the largeAI node via `horizon.exNodes` — no hardcoded addresses.
 - Provider name, gateway URL, and enabled models are all derived at eval time from the config + horizon topology.
