@@ -77,6 +77,10 @@
       url = "github:LiGoldragon/Mentci";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    mentci-tools = {
+      url = "github:LiGoldragon/mentci-tools";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # Websites - TODO: bad design
     mkZolaWebsite.url = "github:criome/mkZolaWebsite";
