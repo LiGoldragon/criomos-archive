@@ -13,7 +13,7 @@
     ./min/sfwbar.nix
     ./med
     ./med/qutebrowser.nix
-    ./med/beads-global.nix
+    ./med/beads.nix
     ./max
   ];
 }
