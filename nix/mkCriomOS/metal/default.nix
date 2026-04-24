@@ -459,11 +459,10 @@ in
 
     thinkfan = mkIf modelIsThinkpad {
       enable = true;
-      # TODO
       sensors = [
         {
-          type = "hwmon";
-          query = "/sys/devices/virtual/thermal/thermal_zone0/temp";
+          type = "tpacpi";
+          query = "/proc/acpi/ibm/thermal";
         }
       ];
     };
