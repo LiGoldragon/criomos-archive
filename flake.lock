@@ -1237,11 +1237,11 @@
         "substack-cli": "substack-cli"
       },
       "locked": {
-        "lastModified": 1776975324,
-        "narHash": "sha256-ISMHzmw1fSjOQSU7zcrTPgMyoNe8vurE0gRLzr8n4X0=",
+        "lastModified": 1777018934,
+        "narHash": "sha256-g+XzU4PUCNwx1N4AQ9dLCjKezat0KWvxiaRB4kV7qls=",
         "owner": "LiGoldragon",
         "repo": "mentci-tools",
-        "rev": "ef65695f4a7f733fcd12a96d0f123c22a6abd2ac",
+        "rev": "986cb2f76e7861d824691a59313b4ad258f6614a",
         "type": "github"
       },
       "original": {
