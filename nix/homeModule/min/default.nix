@@ -717,7 +717,7 @@ mkIf sizedAtLeast.min {
         Unit = {
           Description = "DBus interface for display temperature, brightness and gamma control";
           PartOf = [ "graphical-session.target" ];
-          After = [ "graphical-session.target" ];
+          After = [ "graphical-session-pre.target" ];
         };
         Service = {
           ExecStart = "${pkgs.wl-gammarelay-rs}/bin/wl-gammarelay-rs";
