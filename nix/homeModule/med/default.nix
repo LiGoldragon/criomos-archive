@@ -182,12 +182,7 @@ lib.mkIf sizedAtLeast.med {
     };
   };
 
-  # mentci-codium .desktop entry dropped 2026-04-27 alongside the
-  # package itself (gone from the post-rewrite mentci flake).
-
-  home.activation.mergeMentciMcp = mkJsonMerge {
-    inherit lib pkgs;
-    file = "$HOME/.claude.json";
-    nixSettings = { mcpServers = inputs.mentci.mcpSettings.${system}.default; };
-  };
+  # mentci-codium .desktop entry + .claude.json mcpSettings merge both
+  # dropped 2026-04-27 — gone from the post-rewrite mentci flake (only
+  # nixfmt-tree-2.4.1 remains exposed).
 }
