@@ -182,7 +182,8 @@ let
           isFullyTrusted = trust == 3;
           sizedAtLeast = mkSizeAtLeast size;
           isBuilder =
-            !typeIs.edge && isFullyTrusted && (sizedAtLeast.med || behavesAs.center) && hasBasePrecriads;
+            (inputNode.online or true)
+            && !typeIs.edge && isFullyTrusted && (sizedAtLeast.med || behavesAs.center) && hasBasePrecriads;
           isDispatcher = !behavesAs.center && isFullyTrusted && sizedAtLeast.min;
           isNixCache = behavesAs.center && sizedAtLeast.min && hasBasePrecriads;
           hasNixPreCriad = node.nixPreCriome != null && node.nixPreCriome != "";

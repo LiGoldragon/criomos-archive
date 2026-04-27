@@ -88,6 +88,11 @@ let
         default = 1;
       };
 
+      online = mkOption {
+        type = lib.types.bool;
+        default = true;
+      };
+
       io = mkOption {
         type = submodule { options = IoOptions; };
         default = { };
